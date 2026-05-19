@@ -72,11 +72,11 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
     this.showNotificationDropdown = !this.showNotificationDropdown;
   }
 
-      // 4. 🚀 ACTION AU CLIC SUR UNE NOTIFICATION (AVEC DISPARITION INSTANTANÉE ET REDIRECTION)
+   // 4. 🚀 ACTION AU CLIC SUR UNE NOTIFICATION (RÉSOLUTION DÉCONEXION CANDIDAT & DOUBLONS)
   readNotification(notif: any) {
     const token = localStorage.getItem('token');
     
-    // A. Marquage comme lu en BDD
+    // A. Marquage comme lu en BDD si la notification n'est pas déjà lue
     if (!notif.is_read || notif.is_read === 0) {
       fetch('http://localhost:3000/api/notifications/read', {
         method: 'POST',
@@ -88,13 +88,9 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
       })
       .then(res => {
         if (res.ok) {
-          // 🚀 ACTION CORRECTIVE : Supprime la notification cliquée du tableau Angular
+          // Supprime la notification cliquée du tableau Angular pour la faire disparaître
           this.notificationsList = this.notificationsList.filter(n => n.id !== notif.id);
-          
-          // Met à jour dynamiquement le badge rouge
           this.unreadCount = this.notificationsList.length;
-          
-          // Force le rafraîchissement visuel du dropdown
           this.cdr.detectChanges();
         }
       })
@@ -104,12 +100,13 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
     this.showNotificationDropdown = false; // Ferme le dropdown de la cloche au clic
 
     // ==========================================================================
-    // 🎛️ COUPLAGE MULTI-RÔLES : REDIRECTION RECUTEUR OU CANDIDAT
+    // 🎛️ COUPLAGE ET PASSERELLE MULTI-RÔLES SÉCURISÉE (SANS DOUBLONS)
     // ==========================================================================
+    const userRole = localStorage.getItem('role')?.toLowerCase() || '';
     const msg = notif.message.toLowerCase();
 
-    // 1️⃣ CAS RECUTEUR : Ouverture de la modal sur place pour une nouvelle postulation
-    if (msg.includes('postulé')) {
+    // 💼 1️⃣ CAS RECRUTEUR : Ouverture de la modal sur place via la route d'origine
+    if (userRole === 'recruiter' && msg.includes('postulé')) {
       fetch(`http://localhost:3000/api/notifications/candidate-by-notif/${notif.id}`, {
         method: 'GET',
         headers: { 'Authorization': token ? `Bearer ${token}` : '' }
@@ -121,6 +118,8 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
       .then(dynamicData => {
         if (dynamicData) {
           const candidateObject = Array.isArray(dynamicData) ? dynamicData : dynamicData;
+          console.log("🎯 Objet nettoyé et envoyé au Layout global Recruteur :", candidateObject);
+          
           this.zone.run(() => {
             this.notificationService.triggerCandidateModal(candidateObject);
           });
@@ -129,42 +128,47 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
       .catch(err => console.error("❌ Impossible de charger les données réelles du candidat :", err));
     }
 
-    // 2️⃣ CAS CANDIDAT : Redirection vers son espace de suivi des candidatures (ATS Candidat)
-    else if (msg.includes('accepté') || msg.includes('entretien') || msg.includes('refusé') || msg.includes('statut')) {
-      // Navigue vers l'écran de suivi des postulations du candidat
-      this.router.navigate(['/candidate/my-applications']); 
-    
-  } // 🚀 TOUTES LES ACCOLADES SONT PARFAITEMENT ALIGNÉES ET FERMÉES ICI
+    // 👤 2️⃣ CAS CANDIDAT : Appelle la toute nouvelle route dédiée "recruiter-by-notif"
+    else if (userRole === 'candidate' || userRole === 'seeker' || msg.includes('statut') || msg.includes('entretien') || msg.includes('accepté')) {
+      
+      // Extraction dynamique du statut pour adapter l'affichage du badge candidat
+      let currentStatus = "En cours d'étude";
+      if (msg.includes('entretien')) currentStatus = "Entretien";
+      if (msg.includes('accepté') || msg.includes('proposition')) currentStatus = "Proposition";
+      if (msg.includes('refusé') || msg.includes('rejete')) currentStatus = "Refusé";
 
-
-   
-    this.showNotificationDropdown = false; // Ferme le dropdown de la cloche
-
-    // B. 🚀 CHARGEMENT 100% DYNAMIQUE DEPUIS MYSQL AU CLIC
-    if (notif.message.toLowerCase().includes('postulé')) {
-      fetch(`http://localhost:3000/api/notifications/candidate-by-notif/${notif.id}`, {
+      fetch(`http://localhost:3000/api/notifications/recruiter-by-notif/${notif.id}`, {
         method: 'GET',
         headers: { 'Authorization': token ? `Bearer ${token}` : '' }
       })
       .then(res => {
-        if (!res.ok) throw new Error("Erreur de rapatriement relationnel SQL.");
+        if (!res.ok) throw new Error("Erreur de rapatriement de l'entreprise SQL.");
         return res.json();
       })
-      .then(dynamicData => {
-        if (dynamicData) {
-          // Fixation du typage : Extrait la ligne propre [0] si c'est un tableau
-          const candidateObject = Array.isArray(dynamicData) ? dynamicData[0] : dynamicData;
+      .then(serverData => {
+        if (serverData) {
+          const recruiterObject = Array.isArray(serverData) ? serverData : serverData;
           
-          console.log("🎯 Objet nettoyé et envoyé au Layout global :", candidateObject);
+          // Reconstitution dynamique complète à partir des données de MySQL
+          const candidatePayload = {
+            company_name: recruiterObject.company_name,
+            job_title: recruiterObject.job_title,
+            email: recruiterObject.email,
+            phone: recruiterObject.phone,
+            address: recruiterObject.address,
+            avatar_logo: recruiterObject.avatar_logo,
+            status: currentStatus,
+            message: notif.message
+          };
+
+          console.log("🎯 [CANDIDAT] Envoi des données réelles du recruteur au Layout :", candidatePayload);
           
-          // 🚀 ENCAPSULATION DANS LA ZONE : Exécute l'envoi dans la zone principale d'Angular
-          // afin de forcer de manière synchrone le réveil du *ngIf dans le Layout !
           this.zone.run(() => {
-            this.notificationService.triggerCandidateModal(candidateObject);
+            this.notificationService.triggerCandidateModal(candidatePayload);
           });
         }
-      }) 
-      .catch(err => console.error("❌ Impossible de charger les données réelles du candidat :", err));
+      })
+      .catch(err => console.error("❌ Impossible de charger les données réelles de la société :", err));
     }
   }
 

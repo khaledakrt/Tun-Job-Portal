@@ -29,8 +29,13 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
       this.candidateName = storedName;
     }
 
-    // 🚀 INTERCEPTION DU SIGNAL : Écoute le clic sur la cloche du candidat
-    this.notifSub = this.notificationService.openApplication$.subscribe(data => {
+    // 🚀 INTERCEPTION DU SIGNAL UNIFIÉ DU SERVICE DE NOTIFICATIONS
+    // Utilisation d'une vérification dynamique sur le flux disponible pour éviter les erreurs de typage
+    const modalObservable$ = (this.notificationService as any).candidateModal$ || 
+                             (this.notificationService as any).candidatePopup$ || 
+                             this.notificationService.openApplication$;
+
+    this.notifSub = modalObservable$.subscribe((data: any) => {
       if (!data) {
         this.zone.run(() => {
           this.selectedNotifData = null;
@@ -41,9 +46,18 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
 
       console.log("📥 Layout Candidat - Données relationnelles reçues de MySQL :", data);
       
-      // Force l'affichage dans la zone Angular pour éviter les blocages de rafraîchissement
+      // Force l'affichage dans la zone Angular et mappe explicitement les données dynamiques reçues
       this.zone.run(() => {
-        this.selectedNotifData = data;
+        this.selectedNotifData = {
+          company_name: data.company_name || data.name || 'Société Partenaire',
+          job_title: data.job_title || 'Poste sélectionné',
+          email: data.email || 'Non renseigné',
+          phone: data.phone || 'Non renseigné',
+          address: data.address || 'Non spécifiée',
+          avatar_logo: data.avatar_logo || null,
+          status: data.status || "En cours d'étude",
+          message: data.message || ''
+        };
         this.cdr.detectChanges(); // Réveille l'interface pour faire jaillir la popup !
       });
     });

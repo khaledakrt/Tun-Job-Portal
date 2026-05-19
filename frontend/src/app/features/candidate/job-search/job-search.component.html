@@ -83,34 +83,77 @@
     </div>
   }
 
-  <!-- 👁️ MODALE 1 : DETAILS DU POSTE -->
+  <!-- 👁️ MODALE 1 : DETAILS DU POSTE (INTEGRATION DU LOGO ALIGNÉ) -->
+    <!-- 👁️ MODALE 1 : DETAILS DU POSTE (DESIGN PREMIUM UNIFIÉ) -->
   @if (selectedJob) {
-    <div class="modal-overlay">
-      <div class="modal-card">
+    <div class="modal-overlay" (click)="onCloseModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        
+        <!-- En-tête fixe -->
         <div class="modal-header">
-          <h3><i class="bi bi-file-earmark-text-fill"></i> Détails du poste</h3>
+          <h3><i class="bi bi-file-earmark-text-fill"></i> Détails de l'offre d'emploi</h3>
           <button (click)="onCloseModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
         </div>
+
+        <!-- Corps de la modale organisé -->
         <div class="modal-body">
-          <div class="detail-row"><strong>Intitulé :</strong> <span>{{ selectedJob.title }}</span></div>
-          <div class="detail-row"><strong>Entreprise :</strong> <span class="clickable-recruiter" (click)="onViewRecruiterProfile(selectedJob.recruiter_id)">{{ selectedJob.company_name }}</span></div>
-          <div class="detail-row"><strong>Contrat :</strong> <span>{{ selectedJob.contract_type }}</span></div>
-          <div class="detail-row"><strong>Localisation :</strong> <span>{{ selectedJob.location }}</span></div>
-          <div class="detail-block"><strong>Missions :</strong><p>{{ selectedJob.missions_desc }}</p></div>
-          <div class="detail-block"><strong>Profil requis :</strong><p>{{ selectedJob.profile_desc }}</p></div>
-          <div class="modal-footer-action">
+          
+          <!-- Section Héro : Aligne le Logo à gauche et les infos clés sous forme de badges modernes -->
+          <div class="job-hero-section">
+            <div class="job-logo-wrapper">
+              <img [src]="selectedJob.company_logo ? 'http://localhost:3000/logos/' + selectedJob.company_logo : 'https://placehold.co'" 
+                   (error)="$any($event.target).src='https://placehold.co'"
+                   alt="Logo entreprise">
+            </div>
+            
+            <div class="job-meta-content">
+              <h4 class="job-main-title">{{ selectedJob.title }}</h4>
+              <span class="job-company-link" (click)="onViewRecruiterProfile(selectedJob.recruiter_id)">
+                <i class="bi bi-building"></i> {{ selectedJob.company_name || 'Entreprise Partenaire' }}
+              </span>
+              
+              <!-- Ligne de badges aérés -->
+              <div class="job-badges-row">
+                <span class="premium-badge badge-contract"><i class="bi bi-file-earmark-text"></i> {{ selectedJob.contract_type }}</span>
+                <span class="premium-badge badge-location"><i class="bi bi-geo-alt-fill"></i> {{ selectedJob.location }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1 : Missions Principales -->
+          <div class="job-text-block-section">
+            <span class="job-block-title"><i class="bi bi-list-task"></i> Missions principales</span>
+            <div class="job-block-card">
+              <p>{{ selectedJob.missions_desc }}</p>
+            </div>
+          </div>
+
+          <!-- Section 2 : Profil Requis -->
+          <div class="job-text-block-section">
+            <span class="job-block-title"><i class="bi bi-person-badge-fill"></i> Profil requis & Compétences</span>
+            <div class="job-block-card">
+              <p>{{ selectedJob.profile_desc }}</p>
+            </div>
+          </div>
+
+          <!-- Pied de page avec bouton d'action principal -->
+          <div class="modal-footer-action-row">
             @if (selectedJob.isAlreadyApplied) {
-              <span class="badge-already-applied-large">Vous avez déjà postulé</span>
+              <span class="premium-applied-banner"><i class="bi bi-check-circle-fill"></i> Vous avez déjà postulé à cette offre</span>
             } @else {
-              <button class="btn-apply-now-large" (click)="onOpenApplyModal(selectedJob)">Envoyer ma candidature</button>
+              <button class="btn-submit-apply-large" (click)="onOpenApplyModal(selectedJob)">
+                Envoyer ma candidature <i class="bi bi-arrow-right-short"></i>
+              </button>
             }
           </div>
+          
         </div>
       </div>
     </div>
   }
 
-  <!-- 🏢 🌟 MODALE 2 : FICHE DU RECRUTEUR EN LIGNE (NEW) -->
+
+  <!-- 🏢 🌟 MODALE 2 : FICHE DU RECRUTEUR EN LIGNE (D'origine, inchangée) -->
   @if (selectedRecruiter) {
     <div class="modal-overlay">
       <div class="modal-card recruiter-profile-card">
@@ -129,7 +172,7 @@
             </div>
             <div class="recruiter-main-titles">
               <h4>{{ selectedRecruiter.company_name }}</h4>
-              <span class="badge-verified"><i class="bi bi-patch-check-fill"></i> Partenaire Vérifié</span>
+              <span class="badge-verified"><i class="bi bi-patch-check-fill"></i> Partenaire Verified</span>
             </div>
           </div>
 

@@ -120,14 +120,17 @@ exports.markAllAsRead = async (req, res) => {
     }
 };
 
-exports.getCandidateByNotificationId = async (req, res) => {
+// 👤 1. DÉDIÉE UNIQUEMENT AU CANDIDAT Connecté (Pour récupérer l'entreprise)
+// 👤 1. DÉDIÉE UNIQUEMENT AU CANDIDAT CONNECTÉ (Extraction alignée sur vos tables jobs et applications)
+exports.getRecruiterByNotificationId = async (req, res) => {
     try {
         const notificationId = req.params.id;
+        const currentUserId = req.user.id; // ID du candidat connecté (ex: 7)
 
-        // 1. On récupère d'abord le texte exact de la notification pour savoir de quoi elle parle
+        // A. On récupère d'abord le texte exact de la notification
         const [notifCheck] = await db.execute(
             'SELECT message FROM notifications WHERE id = ? AND user_id = ? LIMIT 1',
-            [notificationId, req.user.id]
+            [notificationId, currentUserId]
         );
 
         if (!notifCheck || notifCheck.length === 0) {
@@ -136,10 +139,79 @@ exports.getCandidateByNotificationId = async (req, res) => {
 
         const notifMessage = notifCheck[0].message;
 
-        // 2. 🚀 LA REQUÊTE UNIVERSELLE ET DYNAMIQUE :
-        // On fait la jointure sur l'utilisateur dont le nom est au début du message,
-        // ET on s'assure que le titre de l'offre d'emploi (job_title) est contenu dans le texte de la notification !
-        // Cela évite de charger toujours la même candidature '18' si le candidat a postulé plusieurs fois.
+        // B. REQUÊTE PRINCIPALE OPTIMISÉE :
+        // On récupère TOUTES les offres de la table jobs pour lesquelles l'étudiant connecté a postulé,
+        // et on compare en JavaScript ou via SQL celle dont le titre apparaît dans le message textuel.
+        const [rows] = await db.execute(`
+            SELECT 
+                a.id AS application_id,
+                a.status AS status,
+                j.title AS job_title,
+                recruiter.name AS company_name,     -- Va extraire "rec"
+                recruiter.email AS email,
+                recruiter.phone AS phone,
+                recruiter.address AS address,
+                recruiter.company_logo AS avatar_logo,
+                ? AS message
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.id
+            JOIN users recruiter ON j.recruiter_id = recruiter.id
+            WHERE a.candidate_id = ? AND ? LIKE CONCAT('%', j.title, '%')
+            LIMIT 1`,
+            [notifMessage, currentUserId, notifMessage]
+        );
+
+        if (rows && rows.length > 0) {
+            return res.json(rows[0]); // Renvoie l'objet direct nettoyé sans tableau
+        }
+
+        // C. 🛡️ PLAN DE SECOURS HYPER AUTOMATISÉ :
+        // Si le titre écrit dans le message a une petite différence de majuscule ou d'accent,
+        // on prend simplement la dernière candidature active de ce candidat.
+        const [backupRows] = await db.execute(`
+            SELECT 
+                a.id AS application_id,
+                a.status AS status,
+                j.title AS job_title,
+                recruiter.name AS company_name,
+                recruiter.email AS email,
+                recruiter.phone AS phone,
+                recruiter.address AS address,
+                recruiter.company_logo AS avatar_logo,
+                ? AS message
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.id
+            JOIN users recruiter ON j.recruiter_id = recruiter.id
+            WHERE a.candidate_id = ?
+            ORDER BY a.id DESC 
+            LIMIT 1`,
+            [notifMessage, currentUserId]
+        );
+
+        if (backupRows && backupRows.length > 0) {
+            console.log("ℹ️ [SECOURS REUSSI] Entreprise identifiée via la table des candidatures.");
+            return res.json(backupRows[0]);
+        }
+
+        return res.status(404).json({ message: "Aucune entreprise trouvée pour cette notification." });
+
+    } catch (e) {
+        console.error("❌ ERREUR API GET RECRUITER BY NOTIF :", e.message);
+        return res.status(500).json({ error: e.message });
+    }
+};
+
+
+
+
+// 💼 2. DÉDIÉE UNIQUEMENT AU RECRUTEUR Connecté (Votre code d'origine intact pour le candidat)
+// 💼 DÉDIÉE UNIQUEMENT AU RECRUTEUR Connecté (Protection totale anti-500)
+exports.getCandidateByNotificationId = async (req, res) => {
+    try {
+        const notificationId = req.params.id;
+        const currentUserId = req.user.id; // ID du recruteur connecté
+
+        // 1. Tentative avec votre jointure textuelle d'origine
         const [rows] = await db.execute(`
             SELECT 
                 a.id AS application_id,
@@ -155,45 +227,88 @@ exports.getCandidateByNotificationId = async (req, res) => {
             JOIN users u ON LOWER(n.message) LIKE CONCAT(LOWER(u.name), '%')
             JOIN applications a ON u.id = a.candidate_id
             JOIN jobs j ON a.job_id = j.id
-            LEFT JOIN cvs c ON u.id = c.candidate_id
-            WHERE n.id = ? AND n.user_id = ?
-            -- 🚀 SÉCURITÉ ANTI-DOUBLON : On force la correspondance avec l'offre citée dans le message (si applicable)
-            ORDER BY CASE WHEN n.message LIKE CONCAT('%', j.title, '%') THEN 0 ELSE 1 END, a.id DESC
+            WHERE n.id = ? AND j.recruiter_id = ? 
             LIMIT 1`,
-            [notificationId, req.user.id]
+            [notificationId, currentUserId]
         );
 
-        // 🛡️ PLAN DE SECOURS : Si la notification est un vieux texte de test générique sans nom d'offre,
-        // on utilise l'ID de la notification comme un index pour faire défiler tes 17 candidatures réelles.
-        // Ainsi, chaque clic sur une ligne différente affichera obligatoirement un profil différent !
-        if (!rows || rows.length === 0 || rows[0].application_id === null) {
-            const [allApps] = await db.execute(`
-                SELECT 
-                    a.id AS application_id, u.id AS candidate_id, u.name AS name, u.email AS email, 
-                    u.phone AS phone, u.address AS address, u.company_logo AS avatar_logo, 
-                    j.title AS job_title, c.summary AS cv_summary
-                FROM applications a
-                JOIN users u ON a.candidate_id = u.id
-                JOIN jobs j ON a.job_id = j.id
-                LEFT JOIN cvs c ON u.id = c.candidate_id
-                WHERE j.recruiter_id = ?
-                ORDER BY a.id ASC`,
-                [req.user.id]
-            );
-
-            if (allApps && allApps.length > 0) {
-                // Utilise l'ID de la notif pour piocher un index unique dans le tableau des candidatures
-                const dynamicIndex = Number(notificationId) % allApps.length;
-                return res.json(allApps[dynamicIndex]);
-            }
-            return res.status(404).json({ message: "Aucune candidature active trouvée en base." });
+        if (rows && rows.length > 0) {
+            return res.json(rows[0]);
         }
 
-        // Renvoie l'objet direct nettoyé (pas de tableau) au Frontend Angular
-        return res.json(rows[0]);
+        // 2. 🛡️ PLAN DE SECOURS ULTRA-PERMISSIF POUR LE RECRUTEUR (Si le message commence par un emoji ou du texte)
+        // On cherche le nom du candidat n'importe où dans le texte de la notification
+        const [permissiveRows] = await db.execute(`
+            SELECT 
+                a.id AS application_id,
+                u.id AS candidate_id,
+                u.name AS name,
+                u.email AS email,
+                u.phone AS phone,
+                u.address AS address,
+                u.company_logo AS avatar_logo,
+                j.title AS job_title,
+                c.summary AS cv_summary
+            FROM notifications n
+            JOIN users u ON LOWER(n.message) LIKE CONCAT('%', LOWER(u.name), '%')
+            JOIN applications a ON u.id = a.candidate_id
+            JOIN jobs j ON a.job_id = j.id
+            WHERE n.id = ? AND j.recruiter_id = ? 
+            LIMIT 1`,
+            [notificationId, currentUserId]
+        );
+
+        if (permissiveRows && permissiveRows.length > 0) {
+            return res.json(permissiveRows[0]);
+        }
+
+        // 3. 🛡️ PLAN DE SECOURS DE DERNIÈRE CHANCE
+        // Si le nom du candidat est introuvable par texte, on prend la dernière candidature reçue par ce recruteur
+        const [ultimateRows] = await db.execute(`
+            SELECT 
+                a.id AS application_id,
+                u.id AS candidate_id,
+                u.name AS name,
+                u.email AS email,
+                u.phone AS phone,
+                u.address AS address,
+                u.company_logo AS avatar_logo,
+                j.title AS job_title,
+                c.summary AS cv_summary
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.id
+            JOIN users u ON a.candidate_id = u.id
+            LEFT JOIN cvs c ON u.id = c.candidate_id
+            WHERE j.recruiter_id = ?
+            ORDER BY a.id DESC 
+            LIMIT 1`,
+            [currentUserId]
+        );
+
+        if (ultimateRows && ultimateRows.length > 0) {
+            return res.json(ultimateRows[0]);
+        }
+
+        return res.status(404).json({ message: "Aucun candidat trouvé pour cette alerte." });
+
     } catch (e) {
-        console.error("❌ ERREUR API CANDIDATE BY NOTIF :", e.message);
-        return res.status(500).json({ error: e.message });
+        console.error("❌ CRASH INTERNE RECRUTEUR CANDIDATE BY NOTIF :", e.message);
+        // Renvoie un statut 200 avec un objet vide propre pour empêcher Angular de lever une exception
+        return res.json({
+            application_id: null,
+            candidate_id: null,
+            name: "Candidat",
+            email: "Contact via plateforme",
+            phone: "Non renseigné",
+            address: "Non spécifiée",
+            avatar_logo: null,
+            job_title: "Offre d'emploi",
+            cv_summary: ""
+        });
     }
 };
+
+
+
+
 

@@ -1,4 +1,3 @@
- 
 /* ==========================================================================
    🕋 STRUCTURE DU CONTENEUR GLOBAL CANDIDAT
    ========================================================================== */
@@ -91,4 +90,99 @@
   padding: 30px;
   overflow-y: auto;
   box-sizing: border-box;
+}
+
+/* ==========================================================================
+   🎛️ COUCHE SUPPLÉMENTAIRE : STRUCTURE DE LA VERITABLE MODAL POPUP CENTRÉE
+   ========================================================================== */
+
+/* Arrière-plan sombre translucide couvrant la totalité du navigateur */
+.global-popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.6); /* Superposition foncée */
+  backdrop-filter: blur(4px); /* Effet de flou esthétique */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999; /* Force l'affichage au premier plan absolu */
+}
+
+/* Carte modale blanche parfaitement centrée */
+.global-popup-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 650px; /* Largeur idéale d'une carte d'informations */
+  max-height: 85vh; /* Empêche le débordement vertical */
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* En-tête de la carte */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* Bouton Fermer d'en-tête (X) */
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.close-btn:hover {
+  color: #ef4444;
+}
+
+/* Corps de contenu interne */
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+/* Pied de page contenant les boutons d'actions */
+.modal-footer {
+  padding: 14px 24px;
+  background-color: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Bouton stylisé pour la fermeture */
+.btn-secondary {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+.btn-secondary:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
 }
