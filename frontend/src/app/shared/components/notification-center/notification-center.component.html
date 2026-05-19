@@ -1,0 +1,34 @@
+ 
+<div class="notification-container" style="position: relative;">
+  <!-- Clic sur la cloche pour ouvrir/fermer -->
+  <div class="notification-bell" (click)="toggleNotifications()">
+    <i class="bi bi-bell-fill"></i>
+    <span *ngIf="unreadCount > 0" class="bell-dot">
+      {{ unreadCount }}
+    </span>
+  </div>
+
+  <!-- 📥 LE DROPDOWN DES NOTIFICATIONS (S'affiche au clic) -->
+  <div *ngIf="showNotificationDropdown" class="notif-dropdown">
+    <div class="notif-header">
+      <span>Notifications</span>
+      <span class="mark-read">Récentes</span>
+    </div>
+    
+    <div class="notif-list">
+      <!-- S'il n'y a aucune notification -->
+      <div *ngIf="notificationsList.length === 0" class="notif-empty">
+        Aucune notification pour le moment.
+      </div>
+
+      <!-- Boucle pour afficher chaque notification -->
+      <div *ngFor="let notif of notificationsList" class="notif-item" [class.unread]="!notif.is_read || notif.is_read === 0" (click)="readNotification(notif)">
+        <div class="notif-icon">🔔</div>
+        <div class="notif-content">
+          <p class="notif-message">{{ notif.message }}</p>
+          <span class="notif-time">{{ notif.created_at | date:'shortTime' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<div class="candidate-app-container">
+  
+  <!-- 🧭 SIDEBAR COMPLÈTE & PROFESSIONNELLE DU CANDIDAT (D'origine, inchangée) -->
+  <aside class="candidate-sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
+      <div class="logo-text">Tun<span>Job</span> Candidate</div>
+    </div>
+
+    <!-- Menu de navigation -->
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Recherche & Suivi</div>
+      
+      <!-- Lien 1 : Recherche d'emploi -->
+      <a routerLink="/candidate/job-search" routerLinkActive="active" class="nav-link-item">
+        <i class="bi bi-search"></i> Trouver un emploi
+      </a>
+      
+      <!-- Lien 2 : Historique des candidatures -->
+      <a routerLink="/candidate/applications-list" routerLinkActive="active" class="nav-link-item">
+        <i class="bi bi-file-earmark-check-fill"></i> Mes candidatures
+      </a>
+
+      <div class="nav-section-title">Mon Profil & CV</div>
+      
+      <!-- Lien 3 : Générateur de CV -->
+      <a routerLink="/candidate/cv-builder" routerLinkActive="active" class="nav-link-item">
+        <i class="bi bi-file-earmark-person-fill"></i> Construire mon CV
+      </a>
+      
+      <!-- Lien 4 : Visualiser le CV public -->
+      <a routerLink="/candidate/cv-view" routerLinkActive="active" class="nav-link-item">
+        <i class="bi bi-eye-fill"></i> Voir mon CV public
+      </a>
+
+      <!-- Lien 5 : Configuration du Profil Personnel -->
+      <a routerLink="/candidate/profile-settings" routerLinkActive="active" class="nav-link-item">
+        <i class="bi bi-sliders"></i> Configuration Profil
+      </a>
+
+      <!-- Bouton Déconnexion sécurisé en bas de la Sidebar -->
+      <a (click)="onLogout()" class="nav-link-item logout-item" style="margin-top: auto; color: #ef4444; cursor: pointer;">
+        <i class="bi bi-box-arrow-left" style="color: #ef4444;"></i> Quitter la session
+      </a>
+    </nav>
+  </aside>
+
+  <!-- 💻 ZONE DE CONTENU PRINCIPALE (DROITE) (D'origine, inchangée) -->
+  <main class="candidate-main">
+    <header class="candidate-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; padding: 24px 40px; border-bottom: 1px solid #e2e8f0;">
+      <div class="header-welcome">
+        <h2>Bienvenue, <span style="color: #0ea5e9;">{{ candidateName }}</span> 👋</h2>
+        <p>Propulsez votre carrière et trouvez les meilleures opportunités en Tunisie.</p>
+      </div>
+
+      <!-- INJECTION UNIQUE DU CENTRE DE NOTIFICATIONS SANS INTERFÉRER SUR LES AUTRES MODALS -->
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <app-notification-center></app-notification-center>
+      </div>
+    </header>
+
+    <!-- ZONE D'INJECTION DYNAMIQUE POUR LES SOUS-PAGES CANDIDAT (D'origine, inchangée) -->
+    <div class="candidate-content-body" style="padding: 30px 40px;">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <!-- 🎛️ UNIQUE AJOUT : MODAL DU SUIVI DE STATUT (S'affiche uniquement au clic sur une notif) -->
+  <div *ngIf="selectedNotifData" 
+       (click)="closeModal()" 
+       style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(15, 23, 42, 0.6) !important; z-index: 999999 !important; display: flex !important; justify-content: center !important; align-items: center !important;">
+    
+    <div (click)="$event.stopPropagation()" 
+         style="background: #ffffff !important; width: 550px !important; padding: 30px !important; border-radius: 12px !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; display: flex !important; flex-direction: column !important; border: 1px solid #e2e8f0 !important; font-family: sans-serif !important;">
+        
+        <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 20px !important; border-bottom: 1px solid #f1f5f9 !important; padding-bottom: 12px !important;">
+          <h3 style="margin: 0 !important; font-size: 17px !important; font-weight: 700 !important; color: #0f172a !important;">Suivi de votre candidature</h3>
+          <button (click)="closeModal()" style="background: none !important; border: none !important; font-size: 24px !important; cursor: pointer !important; color: #94a3b8 !important; line-height: 1 !important;">&times;</button>
+        </div>
+
+        <div style="display: flex !important; flex-direction: column !important; gap: 14px !important; margin-bottom: 20px !important; font-size: 13.5px !important; color: #334155 !important;">
+          <div style="display: grid !important; grid-template-columns: 140px 1fr !important;">
+            <span style="color: #64748b !important; font-weight: 500 !important;">État du dossier :</span>
+            <span style="display: inline-block !important; padding: 4px 12px !important; border-radius: 20px !important; font-size: 11.5px !important; font-weight: 700 !important; width: max-content !important; background: #e0f2fe !important; color: #0369a1 !important;">
+              {{ selectedNotifData.status || "En cours d'étude" }}
+            </span>
+          </div>
+          <div style="background: #f8fafc !important; border-left: 4px solid #0ea5e9 !important; padding: 14px !important; border-radius: 4px !important; font-size: 13px !important; color: #475569 !important; line-height: 1.5 !important;">
+            {{ selectedNotifData.message }}
+          </div>
+        </div>
+
+        <button (click)="closeModal()" style="background: #ffffff !important; border: 1px solid #cbd5e1 !important; color: #334155 !important; padding: 8px 18px !important; border-radius: 6px !important; font-size: 12px !important; font-weight: 600 !important; cursor: pointer !important; margin-left: auto !important; width: max-content !important;">
+          Fermer
+        </button>
+    </div>
+  </div>
+
+</div>

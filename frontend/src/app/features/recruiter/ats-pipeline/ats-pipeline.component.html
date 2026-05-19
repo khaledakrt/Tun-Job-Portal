@@ -1,0 +1,231 @@
+<div class="ats-container">
+  <div class="ats-card">
+    <div class="card-header">
+      <h3><i class="bi bi-people-fill"></i> Suivi des Candidats (Pipeline ATS)</h3>
+      <p>Suivez pas à pas la progression de vos candidats dans le tunnel de recrutement.</p>
+    </div>
+<!-- 🔍 FILTRE PAR OFFRE D'EMPLOI -->
+<div class="job-filter-container" style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+  <label style="font-size: 13px; font-weight: 700; color: #475569; text-transform: uppercase;">Filtrer par offre :</label>
+  
+  
+  <select (change)="onJobFilterChange($event)" style="padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #1e293b; background: #fff; width: 300px;">
+  
+  <!-- 🟢 Compteur global parfaitement synchronisé (Affiche 14) -->
+  <option value="all">Tous les candidats ({{ getFilteredCandidatesCount('all') }})</option>
+  
+  <!-- 🟢 Compteurs par offre mis à jour en temps réel -->
+  <option *ngFor="let title of getUniqueJobTitles()" [value]="title">
+    {{ title }} ({{ getFilteredCandidatesCount(title) }})
+  </option>
+
+</select>
+
+</div>
+
+    <!-- Les colonnes Kanban du logiciel de recrutement -->
+    <div class="pipeline-grid">
+      
+      <!-- 1. Colonne : Nouveaux CV -->
+      <div class="pipeline-column">
+        <div class="column-header">
+          Nouveaux CV 
+          <span class="count">{{ getCandidatesByStatus('Nouveau').length }}</span>
+        </div>
+        
+        <div *ngFor="let app of getCandidatesByStatus('Nouveau')" 
+             (click)="onSelectApplication(app)"
+             class="candidate-item">
+          <h5>{{ app.name }}</h5>
+          <p>{{ app.job_title }}</p>
+          <span class="location"><i class="bi bi-geo-alt"></i> {{ app.address || 'Tunis' }}</span>
+        </div>
+
+        <!-- Espace visuel si la colonne est vide -->
+        <div *ngIf="getCandidatesByStatus('Nouveau').length === 0" class="empty-placeholder">
+          <svg xmlns="http://w3.org" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M4.5 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM3 2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H8a.5.5 0 0 1-.5-.5M8 9a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H8A.5.5 0 0 1 8 9m.5 2.5a.5.5 0 0 1 0-1h2a.5.5 0 0 1 0 1z"/></svg>
+          <p>Aucun nouveau CV</p>
+        </div>
+      </div>
+
+      <!-- 2. Colonne : Entretien Tech -->
+      <div class="pipeline-column">
+        <div class="column-header">
+          Entretien Tech 
+          <span class="count">{{ getCandidatesByStatus('Entretien').length }}</span>
+        </div>
+        
+        <div *ngFor="let app of getCandidatesByStatus('Entretien')" 
+             (click)="onSelectApplication(app)"
+             class="candidate-item border-orange">
+          <h5>{{ app.name }}</h5>
+          <p>{{ app.job_title }}</p>
+          <span class="location"><i class="bi bi-geo-alt"></i> {{ app.address || 'Tunis' }}</span>
+        </div>
+
+        <!-- Espace visuel si la colonne est vide -->
+        <div *ngIf="getCandidatesByStatus('Entretien').length === 0" class="empty-placeholder">
+          <svg xmlns="http://w3.org" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0"/><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/></svg>
+          <p>Aucun entretien planifié</p>
+        </div>
+      </div>
+
+      <!-- 3. Colonne : Proposition -->
+      <div class="pipeline-column">
+        <div class="column-header">
+          Proposition 
+          <span class="count">{{ getCandidatesByStatus('Proposition').length }}</span>
+        </div>
+        
+        <div *ngFor="let app of getCandidatesByStatus('Proposition')" 
+             (click)="onSelectApplication(app)"
+             class="candidate-item border-green">
+          <h5>{{ app.name }}</h5>
+          <p>{{ app.job_title }}</p>
+          <span class="location"><i class="bi bi-geo-alt"></i> {{ app.address || 'Tunis' }}</span>
+        </div>
+
+        <!-- Espace visuel si la colonne est vide -->
+        <div *ngIf="getCandidatesByStatus('Proposition').length === 0" class="empty-placeholder">
+          <svg xmlns="http://w3.org" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
+          <p>Aucune proposition émise</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================== -->
+<!-- 🚀 FENÊTRE MODALE DE CONSULTATION DE LA CANDIDATURE                        -->
+<!-- ========================================================================== -->
+<div *ngIf="selectedApplication" class="modal-overlay" (click)="onCloseDetails()">
+<div class="modal-content" (click)="$event.stopPropagation()" style="width: 720px; height: 500px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
+    
+    <!-- En-tête -->
+    <div class="modal-header">
+      <h3>Candidature de {{ selectedApplication.name }}</h3>
+      <button class="close-btn" (click)="onCloseDetails()">&times;</button>
+    </div>
+
+        <!-- Corps des détails avec intégration de l'avatar -->
+    <div class="modal-body">
+      
+      <!-- Conteneur Flex pour aligner la photo à gauche et les infos à droite -->
+      <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 20px;">
+        
+        <!-- Bloc Photo de Profil Ronde -->
+                <!-- 📸 Bloc Photo + Bouton Consulter le CV -->
+        <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 110px;">
+          
+          <!-- Photo ronde d'origine -->
+          <div style="width: 85px; height: 85px; border-radius: 50%; border: 1px solid #cbd5e1; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+            <img [src]="selectedApplication.avatar_logo ? 'http://localhost:3000/logos/' + selectedApplication.avatar_logo : 'assets/images/default-avatar.png'" 
+                 (error)="$any($event.target).src='assets/images/default-avatar.png'"
+                 alt="Photo du candidat" 
+                 style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+
+          <!-- 📄 BOUTON INTERACTIF : Ouvrir le document PDF -->
+         <button (click)="openCandidateCV(selectedApplication.candidate_id)" 
+        [disabled]="!selectedApplication.cv_summary || selectedApplication.cv_summary.trim() === ''"
+        [style.opacity]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? '1' : '0.5'"
+        [style.cursor]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'pointer' : 'not-allowed'"
+        [style.pointer-events]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'auto' : 'none'"
+        style="background: #ffffff; border: 1px solid #cbd5e1; color: #0284c7; padding: 6px 4px; border-radius: 4px; font-size: 11px; font-weight: 700; width: 100%; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+  
+  <!-- Icône SVG standardisée -->
+  <svg xmlns="http://w3.org" width="11" height="11" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 1A1.5 1.5 0 0 1 11 2.5V4h3v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+  </svg>
+
+  <!-- Texte Dynamique basé sur la présence du résumé de CV -->
+  {{ selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'Consulter le CV' : 'Aucun CV' }}
+</button>
+
+
+
+        </div>
+
+
+        <!-- Bloc des informations textuelles -->
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
+          <div class="info-row" style="display: flex;">
+            <span class="info-label" style="width: 150px; flex-shrink: 0;">Poste ciblé :</span> 
+            <strong class="info-value text-slate">{{ selectedApplication.job_title }}</strong>
+          </div>
+          <div class="info-row" style="display: flex;">
+            <span class="info-label" style="width: 150px; flex-shrink: 0;">Adresse e-mail :</span> 
+            <span class="info-value">{{ selectedApplication.email }}</span>
+          </div>
+          <div class="info-row" style="display: flex;">
+            <span class="info-label" style="width: 150px; flex-shrink: 0;">Numéro de téléphone :</span> 
+            <span class="info-value">{{ selectedApplication.phone || 'Non renseigné' }}</span>
+          </div>
+          <div class="info-row" style="display: flex;">
+            <span class="info-label" style="width: 150px; flex-shrink: 0;">Ville / Région :</span> 
+            <span class="info-value">{{ selectedApplication.address || 'Non spécifiée' }}</span>
+          </div>
+        </div>
+
+      </div>
+      
+      <!-- Boîte du Résumé (Inchangée et conservée à l'identique) -->
+      <div class="summary-box" style="margin-top: 15px; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+        <span class="summary-title" style="color: #0f172a; font-weight: 700; font-size: 13px; display: block; margin-bottom: 8px;">
+          Résumé du profil & Compétences clés
+        </span>
+        <p class="summary-text" style="margin: 0; color: #475569; font-size: 13px; line-height: 1.6; white-space: pre-line;">
+          {{ selectedApplication.cv_summary || selectedApplication.cv_Summary || selectedApplication.summary || "Le candidat n'a pas encore rédigé de présentation de profil sur son espace TunJob." }}
+        </p>
+      </div>
+    </div>
+
+
+    <!-- Pied de page avec boutons de décision ATS Pro -->
+    <div class="modal-footer" style="display: flex; flex-direction: column; gap: 15px; margin-top: 22px; border-top: 1px solid #f1f5f9; padding-top: 16px; width: 100%;">
+      <div class="action-buttons-group" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
+        
+        <!-- Actions de recrutement à gauche -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          
+          <!-- 1. Bouton Accepter (Vert) -->
+          <button (click)="changeCandidateStatus(selectedApplication.id, 'Proposition')" 
+                  style="background: #10b981; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;">
+            <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
+            Accepter
+          </button>
+
+          <!-- 2. Bouton En attente (Gris Ardoise) -->
+          <button (click)="changeCandidateStatus(selectedApplication.id, 'Nouveau')" 
+                  style="background: #64748b; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;">
+            <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 0 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M5 6.25a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0zm4 0a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0z"/></svg>
+            En attente
+          </button>
+          
+          <!-- 3. Bouton Entretien Technique (Orange) -->
+          <button (click)="changeCandidateStatus(selectedApplication.id, 'Entretien')" 
+                  style="background: #f97316; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;">
+            <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0m-8.5-4.5A.5.5 0 0 1 7 4v3.5h2.5a.5.5 0 0 1 0 1H6.5a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5"/></svg>
+            Entretien Technique
+          </button>
+
+          <!-- 4. Bouton Rejeter (Rouge) -->
+          <button (click)="changeCandidateStatus(selectedApplication.id, 'Rejete')" 
+                  style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;">
+            <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/></svg>
+            Rejeter
+          </button>
+
+        </div>
+
+        <!-- Bouton de fermeture à droite -->
+        <button class="btn-secondary" (click)="onCloseDetails()" style="padding: 8px 14px; font-size: 12px;">
+          Fermer
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+</div>

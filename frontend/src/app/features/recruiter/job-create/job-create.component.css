@@ -1,0 +1,208 @@
+/* ==========================================================================
+   🕋 CONTENEUR PRINCIPAL FLUIDE & SAAS DESIGN
+   ========================================================================== */
+.job-container-compact { 
+  max-width: 100% !important; 
+  margin: 0 auto; 
+  padding: 0 20px !important; 
+  font-family: inherit; 
+  box-sizing: border-box;
+}
+
+.card-header-flex-compact { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 15px; 
+}
+
+.card-header-left h3 { 
+  margin: 0; 
+  color: #0f172a; 
+  font-size: 18px; 
+  font-weight: 700; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+}
+
+/* ==========================================================================
+   💎 DISPOSITION SPLIT : 2 PANNEAUX SANS SCROLL CONTRE LE VIDE
+   ========================================================================== */
+.job-split-layout { 
+  display: grid; 
+  grid-template-columns: 1fr 1.2fr; /* Équilibre parfait pour accueillir les textareas à droite */
+  gap: 24px; 
+  align-items: start; 
+  width: 100%;
+}
+
+.job-panel-card { 
+  background: #ffffff; 
+  border-radius: 12px; 
+  border: 1px solid #e2e8f0; 
+  padding: 26px; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02); 
+  box-sizing: border-box;
+}
+
+.panel-inner-title { 
+  font-size: 14px; 
+  font-weight: 700; 
+  color: #0f172a; 
+  text-align: left; 
+  margin-bottom: 18px; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+}
+.panel-inner-title i { color: #0ea5e9; }
+
+/* Grilles de formulaires condensées */
+.compact-form-grid { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 14px; 
+}
+.compact-form-grid.vertical-stack { 
+  grid-template-columns: 1fr; 
+  gap: 14px; 
+}
+
+.form-group-compact { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 6px; 
+}
+.form-group-compact.span-all { 
+  grid-column: span 2; 
+}
+
+.form-group-compact label { 
+  font-size: 11px; 
+  font-weight: 700; 
+  color: #64748b; 
+  text-align: left; 
+  text-transform: uppercase; 
+  letter-spacing: 0.3px; 
+}
+
+/* Zones d'entrées et sélecteurs unifiés */
+.form-group-compact input, 
+.form-select-compact, 
+.form-group-compact textarea { 
+  width: 100% !important; 
+  padding: 10px 14px !important; 
+  border: 1px solid #cbd5e1 !important; 
+  border-radius: 6px !important; 
+  font-size: 13.5px !important; 
+  box-sizing: border-box !important; 
+  color: #1e293b !important; 
+  background-color: #ffffff !important; 
+  font-family: inherit !important;
+  margin: 0 !important;
+  transition: border-color 0.2s ease;
+}
+
+.form-group-compact input:focus, 
+.form-select-compact:focus, 
+.form-group-compact textarea:focus { 
+  border-color: #0ea5e9 !important; 
+  outline: none !important; 
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12) !important; 
+}
+
+.form-select-compact {
+  cursor: pointer;
+}
+
+/* Ajustement de hauteur pour les deux zones de texte longues */
+.form-group-compact textarea {
+  min-height: 105px;
+  max-height: 105px;
+  resize: none;
+  line-height: 1.5;
+}
+
+/* 🔘 ACTION DE SOUFFLAGE DE L'OFFRE (BOUTON PREMIUM) */
+.form-actions-compact { 
+  display: flex; 
+  justify-content: flex-end; 
+  padding-top: 15px; 
+  border-top: 1px solid #f1f5f9; 
+}
+
+.btn-publish-job-compact { 
+  background-color: #0ea5e9 !important; 
+  color: #ffffff !important; 
+  border: none !important; 
+  border-radius: 6px !important; 
+  padding: 11px 24px !important; 
+  font-size: 13.5px !important; 
+  font-weight: 600 !important; 
+  cursor: pointer !important; 
+  display: inline-flex !important; 
+  align-items: center !important; 
+  gap: 8px !important; 
+  transition: background-color 0.2s ease !important; 
+}
+
+.btn-publish-job-compact:hover { 
+  background-color: #0284c7 !important; 
+}
+
+/* ==========================================================================
+   🚀 TOAST NOTIFICATION FLOATING PRO
+   ========================================================================== */
+.toast-notification {
+  position: fixed !important;
+  top: 25px !important;
+  right: 25px !important;
+  z-index: 12000 !important;
+  min-width: 320px;
+  max-width: 480px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  animation: slideInFromRight 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Thème d'insertion acceptée (Vert) */
+.toast-notification.success {
+  background-color: #ecfdf5 !important;
+  border-left: 5px solid #059669 !important;
+  color: #065f46 !important;
+}
+
+/* Thème d'erreur (Rouge) */
+.toast-notification.error {
+  background-color: #fef2f2 !important;
+  border-left: 5px solid #dc2626 !important;
+  color: #991b1b !important;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.toast-icon {
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+}
+
+.toast-message {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: left;
+}
+
+/* Animation d'apparition dynamique */
+@keyframes slideInFromRight {
+  from { transform: translateX(130%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

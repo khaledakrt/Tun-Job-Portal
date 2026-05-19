@@ -1,0 +1,110 @@
+ 
+/* 🕋 Conteneur principal et animations */
+.manage-container { 
+  padding: 10px 24px 40px 24px; 
+  animation: fadeIn 0.2s ease-out; 
+}
+
+/* 📋 Cadre blanc de la carte principale */
+.manage-card { 
+  background: #ffffff !important; 
+  border-radius: 12px !important; 
+  border: 1px solid #e2e8f0 !important; 
+  padding: 30px !important; 
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+  margin-top: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* En-tête */
+.card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; }
+.card-header-left { text-align: left; }
+.card-header h3 { margin: 0 0 4px 0; color: #0f172a; font-size: 19px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.card-header h3 i { color: #0ea5e9; }
+.card-header p { margin: 0; color: #64748b; font-size: 13.5px; }
+
+/* Structures et alignements de la table */
+.table-wrapper { width: 100%; overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; }
+.jobs-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.jobs-table th { background: #f8fafc; padding: 14px; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+.jobs-table td { padding: 16px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+
+.table-row-hover:hover {
+  background-color: rgba(248, 250, 252, 0.5);
+  transition: background-color 0.2s ease;
+}
+
+/* Textes internes aux cellules */
+.job-main-title { display: block; font-weight: 700; color: #0f172a; font-size: 14.5px; text-align: left; }
+.company-sub-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #10b981; text-transform: uppercase; margin-top: 3px; }
+.date-text-cell { color: #64748b; font-weight: 500; font-size: 13.5px; }
+.date-text-cell i { color: #94a3b8; margin-right: 4px; }
+
+/* 🌟 DESIGN DES BADGES ENTIÈREMENT SÉCURISÉ AVEC UN POINT COLORÉ */
+.status-badge { 
+  padding: 5px 12px; 
+  border-radius: 20px; 
+  font-size: 12px; 
+  font-weight: 600; 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px; 
+}
+.dot-status { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+
+/* En attente / Nouveau */
+.status-badge.bg-amber { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+.status-badge.bg-amber .dot-status { background-color: #f97316; }
+
+/* Entretien */
+.status-badge.bg-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+.status-badge.bg-blue .dot-status { background-color: #3b82f6; }
+
+/* Retenu / Acceptée */
+.status-badge.bg-emerald { background: #ecfdf5; color: #047857; border: 1px solid #d1fae5; }
+.status-badge.bg-emerald .dot-status { background-color: #10b981; }
+
+/* Refusé / Refusée */
+.status-badge.bg-red { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+.status-badge.bg-red .dot-status { background-color: #ef4444; }
+
+/* Animations */
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+/* ... Conservez vos styles existants intacts et ajoutez ces lignes : */
+
+/* Interaction nom d'entreprise */
+.clickable-recruiter {
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
+.clickable-recruiter:hover {
+  color: #0ea5e9 !important;
+  text-decoration: underline !important;
+}
+
+/* Modale de la fiche entreprise */
+.modal-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; background: rgba(15, 23, 42, 0.4) !important; backdrop-filter: blur(4px) !important; z-index: 11000 !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+.modal-card { background: #ffffff !important; width: 100% !important; max-width: 580px !important; border-radius: 12px !important; padding: 25px !important; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1) !important; box-sizing: border-box !important; }
+.modal-header { display: flex !important; justify-content: space-between !important; align-items: center !important; border-bottom: 1px solid #f1f5f9 !important; padding-bottom: 12px !important; margin-bottom: 16px !important; }
+.modal-header h3 { margin: 0 !important; font-size: 18px !important; font-weight: 700 !important; color: #0f172a !important; display: flex !important; gap: 8px !important; align-items: center !important; }
+.btn-close-modal { background: #f1f5f9 !important; border: none !important; font-size: 13px !important; color: #64748b !important; cursor: pointer !important; padding: 5px 10px !important; border-radius: 6px !important; }
+.modal-body { display: flex !important; flex-direction: column !important; gap: 11px !important; text-align: left !important; }
+
+.recruiter-meta-header { display: flex; align-items: center; gap: 16px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 5px; }
+.large-avatar-placeholder { width: 64px; height: 64px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+.large-avatar-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+.recruiter-main-titles { text-align: left; }
+.recruiter-main-titles h4 { margin: 0; font-size: 17px; color: #0f172a; font-weight: 700; }
+.badge-verified { font-size: 11.5px; color: #0ea5e9; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; }
+
+.recruiter-contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 5px; }
+.contact-item { font-size: 13px; background: #fafbfc; border: 1px solid #f1f5f9; padding: 10px; border-radius: 6px; }
+.contact-item.span-two { grid-column: span 2; }
+.contact-item strong { color: #64748b; }
+.contact-item span { color: #1e293b; font-weight: 600; float: right; }
+.contact-item.span-two span { float: none; display: block; margin-top: 4px; }
+
+.detail-block { display: flex; flex-direction: column; gap: 4px; }
+.detail-block p { background: #f8fafc !important; padding: 12px !important; border-radius: 6px !important; color: #334155 !important; font-size: 13px !important; line-height: 1.5 !important; margin: 0 !important; white-space: pre-line !important; border: 1px solid #e2e8f0 !important; }

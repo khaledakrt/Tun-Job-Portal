@@ -1,0 +1,94 @@
+ 
+/* ==========================================================================
+   🕋 STRUCTURE DU CONTENEUR GLOBAL CANDIDAT
+   ========================================================================== */
+.candidate-app-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f8fafc;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   🧭 SIDEBAR PREMIUM (GAUCHE)
+   ========================================================================== */
+.candidate-sidebar {
+  width: 260px;
+  background: #0f172a; /* Bleu nuit pro */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+.logo-icon i { color: #0ea5e9; font-size: 22px; }
+.logo-text { font-size: 18px; font-weight: 700; }
+.logo-text span { color: #0ea5e9; }
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
+
+.nav-section-title { 
+  font-size: 11px; 
+  font-weight: 700; 
+  color: #64748b; 
+  text-transform: uppercase; 
+  letter-spacing: 0.5px; 
+  margin: 20px 0 8px 8px; 
+  text-align: left; 
+}
+
+.nav-link-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+.nav-link-item:hover, .nav-link-item.active {
+  background: #1e293b;
+  color: #ffffff;
+}
+.nav-link-item.active i { color: #0ea5e9; }
+
+/* ==========================================================================
+   💻 CONTENEUR DE CONTENU ET HEADER (DROITE)
+   ========================================================================== */
+.candidate-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.candidate-header {
+  background: #ffffff;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+.header-welcome h2 { margin: 0; color: #0f172a; font-size: 20px; font-weight: 700; }
+.header-welcome p { margin: 4px 0 0 0; color: #64748b; font-size: 13.5px; }
+
+/* Corps d'affichage dynamique */
+.candidate-content-body {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}

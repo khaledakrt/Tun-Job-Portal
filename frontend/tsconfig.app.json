@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": []
+  },
+  "files": ["src/main.ts"],
+  "include": [
+    "src/main.ts",
+    "src/app/app.component.ts",
+    "src/app/app.config.ts",
+    "src/app/app.routes.ts",
+    "src/app/core/services/auth.service.ts",
+    "src/app/core/services/job.service.ts",
+    "src/app/features/auth/**/*.ts",
+    "src/app/features/recruiter/**/*.ts"
+  ]
+}

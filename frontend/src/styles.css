@@ -1,0 +1,9 @@
+/* 🚀 Importation locale et autonome des icônes Bootstrap */
+@import "../node_modules/bootstrap-icons/font/bootstrap-icons.css";
+
+/* Styles globaux */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f8fafc;
+}

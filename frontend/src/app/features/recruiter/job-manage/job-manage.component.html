@@ -1,0 +1,148 @@
+<div class="manage-container">
+
+  <!-- 📊 SECTION COMPTEURS DYNAMIQUE -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-content">
+        <span class="stat-label">OFFRES ACTIVES</span>
+        <span class="stat-number">{{ jobsList.length }}</span>
+        <span class="stat-sub green">+1 cette semaine</span>
+      </div>
+      <div class="stat-icon blue-bg"><i class="bi bi-briefcase"></i></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-content"><span class="stat-label">CANDIDATURES</span><span class="stat-number">14</span><span class="stat-sub green">+8 aujourd'hui</span></div>
+      <div class="stat-icon green-bg"><i class="bi bi-file-earmark-person"></i></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-content"><span class="stat-label">ENTRETIENS</span><span class="stat-number">4</span><span class="stat-sub gray">Planifiés ce mois</span></div>
+      <div class="stat-icon orange-bg"><i class="bi bi-calendar-event"></i></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-content"><span class="stat-label">TAUX DE CONVERSION</span><span class="stat-number">28%</span><span class="stat-sub green">+-2.4% vs mois max</span></div>
+      <div class="stat-icon purple-bg"><i class="bi bi-pie-chart"></i></div>
+    </div>
+  </div>
+
+  <!-- 📋 SECTION TABLEAU DES ANNONCES AVEC RECHERCHE -->
+  <div class="manage-card">
+    <div class="card-header-flex">
+      <!-- 🌟 REGROUPEMENT OBLIGATOIRE DU TITRE ET DE SA DESCRIPTION -->
+      <div class="card-header-left">
+        <h3><i class="bi bi-briefcase-fill"></i> Vos Annonces en Ligne</h3>
+        
+      </div>
+      
+      <!-- 🔍 BARRE DE RECHERCHE COMPACTE ET PARFAITEMENT ALIGNÉE -->
+      <div class="search-box-container">
+        <i class="bi bi-search search-icon"></i>
+        <input 
+          type="text" 
+          [(ngModel)]="searchText" 
+          (ngModelChange)="onSearchChange()"
+          placeholder="Rechercher..." 
+          class="search-input"
+        >
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="jobs-table">
+        <thead>
+          <tr>
+            <th>Intitulé du Poste</th>
+            <th>Type de Contrat</th>
+            <th>Localisation</th>
+            <th>Candidatures Reçues</th>
+            <th>Statut</th>
+            <th style="text-align: center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoading) {
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 25px; color: #64748b; font-weight: 500;">
+                <i class="bi bi-arrow-clockwise" style="display: inline-block; animation: spin 1s linear infinite; margin-right: 8px;"></i>
+                Synchronisation avec la base de données...
+              </td>
+            </tr>
+          }
+
+          @if (!isLoading && filteredJobs.length === 0) {
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 35px; color: #64748b;">
+                <i class="bi bi-folder-x" style="font-size: 26px; display: block; margin-bottom: 6px; color: #cbd5e1;"></i>
+                Aucune annonce ne correspond à votre recherche.
+              </td>
+            </tr>
+          }
+
+          <!-- 🚀 RENDU PAGINÉ : Utilise paginatedJobs au lieu de jobsList -->
+          @for (job of paginatedJobs; track job.id) {
+            <tr>
+              <td class="job-title">{{ job.title }}</td>
+              <td>{{ job.contract_type }}</td>
+              <td>{{ job.location }}</td>
+              <td class="candidate-count">
+  <i class="bi bi-people-fill"></i> 
+  {{ job.application_count || 0 }} {{ (job.application_count || 0) <= 1 ? 'profil' : 'profils' }}
+</td>
+              <td>
+                <span class="status-badge" [ngClass]="job.status === 'disponible' || job.status === 'Actif' ? 'bg-green' : 'bg-gray'">
+                  {{ job.status === 'disponible' || job.status === 'Actif' ? 'Actif' : 'Masqué' }}
+                </span>
+              </td>
+              <td>
+                <div class="actions-cell">
+                  <button (click)="onViewJob(job)" class="btn-action btn-view" title="Consulter"><i class="bi bi-eye-fill"></i></button>
+                  <button (click)="onToggleStatus(job)" class="btn-action btn-toggle" title="Masquer/Afficher"><i class="bi" [ngClass]="job.status === 'disponible' || job.status === 'Actif' ? 'bi-eye-slash-fill' : 'bi-check-circle-fill'"></i></button>
+                  <button (click)="onDeleteJob(job.id)" class="btn-action btn-delete" title="Supprimer"><i class="bi bi-trash3-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 🎚️ 2. NOUVEAU BLOC DE PAGINATION PREMIUM (S'affiche si plus de 1 page disponible) -->
+    @if (totalPages > 1) {
+      <div class="pagination-container">
+        <span class="pagination-info">
+          Page <strong>{{ currentPage }}</strong> sur {{ totalPages }} ({{ filteredJobs.length }} offres au total)
+        </span>
+        <div class="pagination-buttons">
+          <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" class="btn-page-nav">
+            <i class="bi bi-chevron-left"></i> Précédent
+          </button>
+          
+          <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="btn-page-nav">
+            Suivant <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- MODALE DE CONSULTATION EXISTANTE (CONSERVÉE) -->
+  @if (selectedJob) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3><i class="bi bi-file-earmark-text-fill"></i> Détails de l'offre</h3>
+          <button (click)="onCloseModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-row"><strong>Intitulé :</strong> <span>{{ selectedJob.title }}</span></div>
+          <div class="detail-row"><strong>Contrat :</strong> <span>{{ selectedJob.contract_type }}</span></div>
+          <div class="detail-row"><strong>Lieu :</strong> <span>{{ selectedJob.location }} ({{ selectedJob.workplace_type || 'Présentiel' }})</span></div>
+          <div class="detail-row"><strong>Salaire :</strong> <span>{{ selectedJob.salary || 'Non spécifié' }}</span></div>
+          <div class="detail-row"><strong>Expérience :</strong> <span>{{ selectedJob.experience_level }}</span></div>
+          <div class="detail-block"><strong>Missions principales :</strong><p>{{ selectedJob.missions_desc }}</p></div>
+          <div class="detail-block"><strong>Profil recherché :</strong><p>{{ selectedJob.profile_desc }}</p></div>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

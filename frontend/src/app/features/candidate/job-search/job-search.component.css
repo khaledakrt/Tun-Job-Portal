@@ -1,0 +1,198 @@
+.job-search-container {
+  animation: fadeIn 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 🔍 CONTENEUR RECHERCHE AVANCÉE EN GRILLE COMPACTE */
+.search-advanced-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.advanced-search-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) !important; /* Aligne les 4 critères côte à côte */
+  gap: 16px;
+  width: 100%;
+}
+
+.search-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.search-filter-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-with-icon {
+  position: relative;
+  width: 100%;
+}
+
+.input-with-icon i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.input-with-icon input, .select-filter-compact {
+  width: 100% !important;
+  padding: 9px 12px 9px 34px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  color: #1e293b !important;
+  background-color: #f8fafc !important;
+  box-sizing: border-box;
+}
+
+.select-filter-compact {
+  padding: 9px 12px !important; /* Pas d'icône interne nécessaire pour les listes déroulantes */
+  cursor: pointer;
+}
+
+.input-with-icon input:focus, .select-filter-compact:focus {
+  background-color: #ffffff !important;
+  border-color: #0ea5e9 !important;
+  outline: none !important;
+}
+
+/* Bouton réinitialiser */
+.reset-filters-row {
+  display: flex;
+  justify-content: flex-end;
+}
+.btn-reset-filters {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-reset-filters:hover { text-decoration: underline; }
+
+/* 🚀 GRILLE À 3 COLONNES SANS SCROLL */
+.jobs-cards-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 20px;
+  width: 100%;
+}
+
+.job-feed-card {
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; display: flex; flex-direction: column; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.01); box-sizing: border-box;
+}
+
+.card-top-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.company-logo-placeholder { width: 44px; height: 44px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+.company-logo-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+
+.job-title-block { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.feed-job-title { margin: 0; color: #0f172a; font-size: 14.5px; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.feed-company-name { font-size: 12.5px; color: #64748b; margin-top: 1px; }
+.contract-badge-feed { background: #f0f9ff; color: #0ea5e9; font-size: 11px; font-weight: 700; padding: 3px 6px; border-radius: 4px; }
+
+.card-mid-meta { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 12px; }
+.meta-item { font-size: 12px; color: #64748b; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+.salary-tag { color: #10b981; font-weight: 600; }
+
+.job-short-desc { margin: 0 0 14px 0; font-size: 13px; color: #475569; line-height: 1.5; flex: 1; }
+
+.card-bottom-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px; gap: 8px; }
+.btn-consult-job { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+.btn-apply-now { background: #0ea5e9; color: #ffffff; border: none; border-radius: 6px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.badge-already-applied { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; padding: 7px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; }
+
+/* MODALE INTERNE */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 11000; display: flex; align-items: center; justify-content: center; }
+.modal-card { background: #ffffff; width: 100%; max-width: 580px; border-radius: 12px; padding: 25px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); box-sizing: border-box; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
+.modal-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: #0f172a; display: flex; gap: 8px; align-items: center; }
+.btn-close-modal { background: #f1f5f9; border: none; font-size: 13px; color: #64748b; cursor: pointer; padding: 5px 10px; border-radius: 6px; }
+.modal-body { display: flex; flex-direction: column; gap: 11px; text-align: left; }
+.detail-row { display: flex; justify-content: space-between; font-size: 13.5px; padding-bottom: 8px; border-bottom: 1px solid #f8fafc; }
+.detail-row span { color: #0f172a; font-weight: 600; }
+.detail-block { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.detail-block p { background: #f8fafc; padding: 12px; border-radius: 6px; color: #334155; font-size: 13px; line-height: 1.5; margin: 0; white-space: pre-line; border: 1px solid #e2e8f0; }
+.modal-footer-action { margin-top: 15px; display: flex; justify-content: center; }
+.btn-apply-now-large { background: #0ea5e9; color: white; border: none; width: 100%; padding: 11px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.badge-already-applied-large { background: #f8fafc; color: #64748b; width: 100%; padding: 11px; border-radius: 6px; text-align: center; font-weight: 600; border: 1px solid #e2e8f0; font-size: 13.5px; }
+
+.loading-state-box, .empty-state-box { padding: 40px; text-align: center; color: #64748b; }
+.spin-animation { display: inline-block; font-size: 24px; animation: spin 1s linear infinite; margin-bottom: 8px; color: #0ea5e9; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+/* Nom du recruteur cliquable */
+.clickable-recruiter {
+  cursor: pointer !important;
+  transition: color 0.15s ease;
+}
+.clickable-recruiter:hover {
+  color: #0ea5e9 !important;
+  text-decoration: underline !important;
+}
+
+/* Modale de l'entreprise */
+.recruiter-meta-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 16px;
+}
+.large-avatar-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.large-avatar-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+
+.recruiter-main-titles { text-align: left; }
+.recruiter-main-titles h4 { margin: 0; font-size: 18px; color: #0f172a; font-weight: 700; }
+.badge-verified { font-size: 12px; color: #0ea5e9; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; }
+
+.recruiter-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  text-align: left;
+}
+.contact-item { font-size: 13.5px; background: #fafbfc; border: 1px solid #f1f5f9; padding: 10px; border-radius: 6px; }
+.contact-item.span-two { grid-column: span 2; }
+.contact-item strong { color: #64748b; }
+.contact-item span { color: #1e293b; font-weight: 600; float: right; }
+.contact-item.span-two span { float: none; display: block; margin-top: 4px; }
+
+.bio-text-box { max-height: 120px; overflow-y: auto; }

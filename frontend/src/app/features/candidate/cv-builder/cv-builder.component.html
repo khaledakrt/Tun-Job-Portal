@@ -1,0 +1,172 @@
+<div class="cv-container-compact">
+  
+  
+
+  @if (successMessage) {
+    <div class="alert-box-compact alert-success">{{ successMessage }}</div>
+  }
+
+  <!-- 📊 GRILLE DOUBLE PANNEAU ASYMETRIQUE -->
+  <div class="cv-split-layout">
+    
+    <!-- ================= PANNEAU GAUCHE : IDENTITÉ, PHOTO & TOUTES INFOS PERSO ================= -->
+    <div class="cv-panel-card scrollable-form-panel">
+      <form (ngSubmit)="onSaveCV($event)" class="compact-form-grid-vertical">
+        
+        <div class="form-section-title-inline"><i class="bi bi-person-bounding-box"></i> Upload Photo & Identité</div>
+        
+        <!-- Zone Photo de profil -->
+        <div class="form-group-compact" style="flex-direction: row; align-items: center; gap: 16px; margin-bottom: 10px;">
+          <div class="cv-avatar-wrapper-pro" style="margin: 0;">
+            @if (avatarUrl) {
+              <img [src]="avatarUrl" alt="Photo Candidat">
+            } @else {
+              <i class="bi bi-person-fill" style="font-size: 32px; color: #94a3b8;"></i>
+            }
+          </div>
+          <div style="text-align: left;">
+            <label style="margin-bottom: 2px; display: block;">Photo de profil</label>
+            <span style="font-size: 12px; color: #64748b;">Synchronisée avec vos paramètres de compte.</span>
+          </div>
+        </div>
+
+        <div class="form-group-compact">
+          <label>Nom & Prénom *</label>
+          <input type="text" name="candidate_name" [(ngModel)]="candidateName" placeholder="Ex: Mohamed Ali" required>
+        </div>
+
+        <div class="form-group-compact">
+          <label>Titre du poste recherché *</label>
+          <input type="text" name="cv_title" [(ngModel)]="cvData.title" placeholder="Ex: Développeur Fullstack Angular" required>
+        </div>
+
+        <div class="form-group-compact">
+          <label>Résumé / Accroche professionnelle *</label>
+          <textarea name="summary" [(ngModel)]="cvData.summary" rows="3" placeholder="Ex: Développeur motivé spécialisé dans..." required></textarea>
+        </div>
+
+        <div class="form-section-title-inline" style="margin-top: 15px;"><i class="bi bi-geo-alt-fill"></i> Informations Personnelles & Contact</div>
+
+        <div class="form-group-compact">
+          <label>Adresse Email *</label>
+          <input type="email" name="candidate_email" [(ngModel)]="candidateContact.email" placeholder="exemple@mail.com" required>
+        </div>
+
+        <div class="form-group-compact">
+          <label>Numéro de Téléphone *</label>
+          <input type="text" name="candidate_phone" [(ngModel)]="candidateContact.phone" placeholder="+216 -- --- ---" required>
+        </div>
+
+        <div class="form-group-compact">
+          <label>Adresse Géographique *</label>
+          <input type="text" name="candidate_address" [(ngModel)]="candidateContact.address" placeholder="Ex: Tunis, Tunisie" required>
+        </div>
+
+        <!-- Inputs masqués nécessaires pour la liaison NgModel -->
+        <input type="hidden" name="skills" [(ngModel)]="cvData.skills">
+        <input type="hidden" name="interests" [(ngModel)]="cvData.interests">
+
+        <div class="form-actions-compact" style="margin-top: 15px;">
+          <button type="submit" class="btn-save-cv-compact" [disabled]="isSaving">
+            <i class="bi bi-cloud-arrow-up-fill"></i> Enregistrer les Informations
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= PANNEAU DROIT : FORMATIONS, EXPERIENCES, COMPETENCES & INTERETS ================= -->
+    <div class="cv-right-layout-cards scrollable-form-panel">
+      <div class="cv-panel-card-inner-box">
+        
+        <!-- SECTION 1 : EXPÉRIENCES PROFESSIONNELLES -->
+        <div class="preview-section-item">
+          <div class="section-flex-header-pro">
+            <span class="preview-section-label"><i class="bi bi-briefcase-fill"></i> Expériences Professionnelles</span>
+            <button type="button" class="btn-add-dynamic" (click)="addExperience()"><i class="bi bi-plus-circle-fill"></i> Ajouter</button>
+          </div>
+          
+          @if (cvData.experiences.length > 0) {
+            @for (exp of cvData.experiences; track $index) {
+              <div class="dynamic-entry-card-pro">
+                <div class="dynamic-entry-header-pro">
+                  <span>Saisie Expérience #{{ $index + 1 }}</span>
+                  <button type="button" class="btn-remove-dynamic-pro" (click)="removeExperience($index)"><i class="bi bi-trash3-fill"></i> Supprimer</button>
+                </div>
+                <div class="dynamic-fields-grid-pro">
+                  <input type="text" name="exp_title_{{$index}}" [(ngModel)]="exp.job_title" placeholder="Intitulé du poste occupé" required>
+                  <input type="text" name="exp_comp_{{$index}}" [(ngModel)]="exp.company" placeholder="Nom de l'entreprise" required>
+                  <input type="text" name="exp_date_{{$index}}" [(ngModel)]="exp.duration" placeholder="Ex: Janv 2024 - Présent" required>
+                  <textarea name="exp_desc_{{$index}}" [(ngModel)]="exp.description" rows="2" class="span-all-field-pro" placeholder="Description des tâches et missions accomplies..." required></textarea>
+                </div>
+              </div>
+            }
+          } @else {
+            <span class="empty-text-italic">Aucune expérience professionnelle renseignée. Cliquez sur Ajouter.</span>
+          }
+        </div>
+
+        <!-- SECTION 2 : FORMATIONS & ÉTUDES -->
+        <div class="preview-section-item" style="margin-top: 24px;">
+          <div class="section-flex-header-pro">
+            <span class="preview-section-label"><i class="bi bi-mortarboard-fill"></i> Formations & Études</span>
+            <button type="button" class="btn-add-dynamic" (click)="addEducation()"><i class="bi bi-plus-circle-fill"></i> Ajouter</button>
+          </div>
+
+          @if (cvData.educations.length > 0) {
+            @for (edu of cvData.educations; track $index) {
+              <div class="dynamic-entry-card-pro">
+                <div class="dynamic-entry-header-pro">
+                  <span>Saisie Formation #{{ $index + 1 }}</span>
+                  <button type="button" class="btn-remove-dynamic-pro" (click)="removeEducation($index)"><i class="bi bi-trash3-fill"></i> Supprimer</button>
+                </div>
+                <div class="dynamic-fields-grid-pro">
+                  <input type="text" name="edu_deg_{{$index}}" [(ngModel)]="edu.degree" placeholder="Diplôme ou certification" required>
+                  <input type="text" name="edu_sch_{{$index}}" [(ngModel)]="edu.school" placeholder="Université / École" required>
+                  <input type="text" name="edu_year_{{$index}}" [(ngModel)]="edu.year" placeholder="Ex: 2023" required>
+                </div>
+              </div>
+            }
+          } @else {
+            <span class="empty-text-italic">Aucune formation académique enregistrée. Cliquez sur Ajouter.</span>
+          }
+        </div>
+
+        <!-- SECTION 3 : COMPÉTENCES -->
+        <div class="preview-section-item" style="margin-top: 24px;">
+          <span class="preview-section-label"><i class="bi bi-star-fill"></i> Compétences Clés</span>
+          <div style="margin-top: 8px; margin-bottom: 12px;">
+            <input type="text" name="skills_input" [(ngModel)]="cvData.skills" placeholder="Ex: Angular, TypeScript, SQL, Git (Séparez par des virgules)" class="tag-input-field-pro">
+          </div>
+          <div class="cv-tags-container">
+            @if (cvData.skills) {
+              @for (skill of getSkillsArray(); track skill) {
+                <span class="skill-tag-preview-pro">{{ skill.trim() }}</span>
+              }
+            } @else {
+              <span class="empty-text-italic">Les badges de vos compétences s'afficheront ici.</span>
+            }
+          </div>
+        </div>
+
+        <!-- SECTION 4 : CENTRES D'INTÉRÊT -->
+        <div class="preview-section-item" style="margin-top: 24px;">
+          <span class="preview-section-label"><i class="bi bi-heart-fill"></i> Centres d'intérêt</span>
+          <div style="margin-top: 8px; margin-bottom: 12px;">
+            <input type="text" name="interests_input" [(ngModel)]="cvData.interests" placeholder="Ex: Voyages, Football, Lecture (Séparez par des virgules)" class="tag-input-field-pro">
+          </div>
+          <div class="cv-tags-container">
+            @if (cvData.interests) {
+              @for (interest of getInterestsArray(); track interest) {
+                <span class="interest-tag-preview-pro">{{ interest.trim() }}</span>
+              }
+            } @else {
+              <span class="empty-text-italic">Les badges de vos intérêts s'afficheront ici.</span>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

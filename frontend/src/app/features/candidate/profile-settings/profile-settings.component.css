@@ -1,0 +1,137 @@
+ 
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-profile-settings',
+  standalone: true,
+  imports: [FormsModule],
+  templateUrl: './profile-settings.component.html',
+  styles: [`
+    .profile-container { max-width: 800px; margin: 0 auto; padding-top: 10px; }
+    .profile-card { background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 30px; }
+    .card-header { margin-bottom: 25px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+    .card-header h3 { margin: 0 0 6px 0; color: #0f172a; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .card-header p { margin: 0; color: #64748b; font-size: 14px; }
+    .logo-upload-section { display: flex; align-items: center; gap: 24px; background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+    .logo-preview { width: 100px; height: 100px; border-radius: 8px; border: 2px solid #e2e8f0; background: #fff; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+    .logo-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .btn-secondary-upload { background-color: #ffffff; border: 1px solid #cbd5e1; color: #334155; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: #334155; }
+    .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box; font-family: inherit; }
+    .url-group { grid-column: span 2; }
+    .btn-save { background-color: #0ea5e9; color: white; border: none; border-radius: 6px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 25px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .alert-box { padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; text-align: center; font-weight: 600; }
+    .alert-success { background-color: #e6f4ea; color: #137333; border: 1px solid #ceead6; }
+  `]
+})
+export class ProfileSettingsComponent implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+
+  profile = { company_name: '', phone: '', address: '', company_bio: '' };
+  logoPreviewUrl: string | null = null;
+  selectedFile: File | null = null; // 🚀 Permet de stocker le fichier image binaire
+  successMessage = '';
+
+  ngOnInit() {
+    this.loadCurrentProfile();
+  }
+
+  // 📥 1. CHARGEMENT DYNAMIQUE DES DONNÉES DEPUIS VOTRE API RECRUTEUR
+  loadCurrentProfile() {
+    const targetUrl = 'http://localhost:3000/api/recruiter/profile/details'; // Ajustez si la route de lecture porte un autre nom
+    const token = localStorage.getItem('token');
+
+    fetch(targetUrl, {
+      method: 'GET',
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    })
+    .then(async res => {
+      if (res.ok) return res.json();
+      throw new Error();
+    })
+    .then(data => {
+      if (data) {
+        this.profile.company_name = data.company_name || localStorage.getItem('name') || '';
+        this.profile.phone = data.phone || '';
+        this.profile.address = data.address || '';
+        this.profile.company_bio = data.company_bio || '';
+        
+        if (data.company_logo) {
+          this.logoPreviewUrl = `http://localhost:3000/uploads/${data.company_logo}`;
+        }
+        this.cdr.detectChanges();
+      }
+    })
+    .catch(() => {
+      // Fallback par défaut si la table est vierge lors de la première ouverture
+      this.profile.company_name = localStorage.getItem('name') || '';
+      this.cdr.detectChanges();
+    });
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file; // Enregistrement binaire pour le FormData
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.logoPreviewUrl = reader.result as string;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // 📤 2. EXPÉDITION DU FORMDATA ENTIÈREMENT SÉCURISÉ VERS VOTRE ROUTE AVEC LOGO
+  onSaveProfile(event: Event) {
+    event.preventDefault();
+
+    const targetUrl = 'http://localhost:3000/api/recruiter/profile/update';
+    const token = localStorage.getItem('token');
+
+    // 🚀 Création du FormData requis par multer pour le traitement du logo
+    const formData = new FormData();
+    formData.append('company_name', this.profile.company_name);
+    formData.append('phone', this.profile.phone);
+    formData.append('address', this.profile.address);
+    formData.append('company_bio', this.profile.company_bio);
+
+    if (this.selectedFile) {
+      formData.append('logo', this.selectedFile); // 'logo' correspond à upload.single('logo') dans votre routeur
+    }
+
+    fetch(targetUrl, {
+      method: 'POST',
+      headers: { 
+        'Authorization': token ? `Bearer ${token}` : ''
+        // ⚠️ SURTOUT PAS de Content-Type: application/json ici, le navigateur le configure lui-même pour le FormData
+      },
+      body: formData
+    })
+    .then(async res => {
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Impossible de sauvegarder votre profil.");
+      }
+      return res.json();
+    })
+    .then(resData => {
+      // Synchronise le nom de l'entreprise de la barre latérale instantanément
+      localStorage.setItem('name', this.profile.company_name);
+      
+      this.successMessage = resData.message || "Les informations de votre profil et votre logo ont été mis à jour.";
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        this.successMessage = '';
+        this.cdr.detectChanges();
+      }, 3000);
+    })
+    .catch(err => {
+      alert(err.message);
+    });
+  }
+}
