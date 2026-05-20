@@ -51,7 +51,7 @@ exports.apply = async (req, res) => {
 };
 
 // ==========================================================================
-// 📥 2. HISTORIQUE DU PIPELINE DÉDIÉ AU CANDIDAT CONNECTÉ
+// 📥 2. HISTORIQUE DU PIPELINE DE CANDIDATURES (CORRIGÉ & SYNCHRONISÉ)
 // ==========================================================================
 exports.getHistory = async (req, res) => {
     const candidate_id = req.user && req.user.id ? req.user.id : null;
@@ -61,9 +61,23 @@ exports.getHistory = async (req, res) => {
     }
 
     try {
-        // Cette requête SQL extrait l'historique complet pour alimenter votre composant Angular 'applications-list'
+        // 🚀 REQUÊTE PREMIUM : Rapatrie toutes les colonnes descriptives et les badges de l'offre
         const [rows] = await db.execute(`
-            SELECT a.status, a.applied_at, a.job_id, j.title AS job_title, u.company_name
+            SELECT 
+                a.status, 
+                a.applied_at, 
+                a.job_id, 
+                j.title AS job_title, 
+                j.recruiter_id,
+                j.contract_type,
+                j.location,
+                j.missions_desc,
+                j.profile_desc,
+                j.skills_desc,
+                j.languages_desc,
+                j.expires_at,
+                u.company_name,
+                u.company_logo
             FROM applications a
             JOIN jobs j ON a.job_id = j.id
             JOIN users u ON j.recruiter_id = u.id
@@ -74,26 +88,6 @@ exports.getHistory = async (req, res) => {
         return res.json({ history: rows });
     } catch (e) { 
         console.error("❌ Erreur MySQL getHistory :", e.message);
-        return res.status(500).json({ error: e.message }); 
-    }
-};
-
-exports.getHistory = async (req, res) => {
-    const candidate_id = req.user && req.user.id ? req.user.id : null;
-
-    try {
-        // 🚀 AJOUT DE j.recruiter_id DANS LE SELECT POUR ALIMENTER LE CLIC ANGULAR
-        const [rows] = await db.execute(`
-            SELECT a.status, a.applied_at, a.job_id, j.title AS job_title, j.recruiter_id, u.company_name
-            FROM applications a
-            JOIN jobs j ON a.job_id = j.id
-            JOIN users u ON j.recruiter_id = u.id
-            WHERE a.candidate_id = ? 
-            ORDER BY a.applied_at DESC
-        `, [candidate_id]);
-
-        return res.json({ history: rows });
-    } catch (e) { 
         return res.status(500).json({ error: e.message }); 
     }
 };

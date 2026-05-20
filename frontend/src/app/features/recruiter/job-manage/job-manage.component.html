@@ -30,7 +30,6 @@
       <!-- 🌟 REGROUPEMENT OBLIGATOIRE DU TITRE ET DE SA DESCRIPTION -->
       <div class="card-header-left">
         <h3><i class="bi bi-briefcase-fill"></i> Vos Annonces en Ligne</h3>
-        
       </div>
       
       <!-- 🔍 BARRE DE RECHERCHE COMPACTE ET PARFAITEMENT ALIGNÉE -->
@@ -77,16 +76,16 @@
             </tr>
           }
 
-          <!-- 🚀 RENDU PAGINÉ : Utilise paginatedJobs au lieu de jobsList -->
+          <!-- 🚀 RENDU PAGINÉ -->
           @for (job of paginatedJobs; track job.id) {
             <tr>
               <td class="job-title">{{ job.title }}</td>
               <td>{{ job.contract_type }}</td>
               <td>{{ job.location }}</td>
               <td class="candidate-count">
-  <i class="bi bi-people-fill"></i> 
-  {{ job.application_count || 0 }} {{ (job.application_count || 0) <= 1 ? 'profil' : 'profils' }}
-</td>
+                <i class="bi bi-people-fill"></i> 
+                {{ job.application_count || 0 }} {{ (job.application_count || 0) <= 1 ? 'profil' : 'profils' }}
+              </td>
               <td>
                 <span class="status-badge" [ngClass]="job.status === 'disponible' || job.status === 'Actif' ? 'bg-green' : 'bg-gray'">
                   {{ job.status === 'disponible' || job.status === 'Actif' ? 'Actif' : 'Masqué' }}
@@ -105,7 +104,7 @@
       </table>
     </div>
 
-    <!-- 🎚️ 2. NOUVEAU BLOC DE PAGINATION PREMIUM (S'affiche si plus de 1 page disponible) -->
+    <!-- 🎚️ BLOC DE PAGINATION PREMIUM -->
     @if (totalPages > 1) {
       <div class="pagination-container">
         <span class="pagination-info">
@@ -124,23 +123,90 @@
     }
   </div>
 
-  <!-- MODALE DE CONSULTATION EXISTANTE (CONSERVÉE) -->
+  <!-- 🎛️ MODALE DE CONSULTATION AVEC BADGES DYNAMIQUES -->
   @if (selectedJob) {
-    <div class="modal-overlay">
-      <div class="modal-card">
+    <div class="modal-overlay" (click)="onCloseModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        
+        <!-- En-tête -->
         <div class="modal-header">
-          <h3><i class="bi bi-file-earmark-text-fill"></i> Détails de l'offre</h3>
+          <h3><i class="bi bi-file-earmark-text-fill"></i> {{ selectedJob.title }}</h3>
           <button (click)="onCloseModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
         </div>
+
+        <!-- Corps -->
         <div class="modal-body">
-          <div class="detail-row"><strong>Intitulé :</strong> <span>{{ selectedJob.title }}</span></div>
-          <div class="detail-row"><strong>Contrat :</strong> <span>{{ selectedJob.contract_type }}</span></div>
-          <div class="detail-row"><strong>Lieu :</strong> <span>{{ selectedJob.location }} ({{ selectedJob.workplace_type || 'Présentiel' }})</span></div>
-          <div class="detail-row"><strong>Salaire :</strong> <span>{{ selectedJob.salary || 'Non spécifié' }}</span></div>
-          <div class="detail-row"><strong>Expérience :</strong> <span>{{ selectedJob.experience_level }}</span></div>
-          <div class="detail-block"><strong>Missions principales :</strong><p>{{ selectedJob.missions_desc }}</p></div>
-          <div class="detail-block"><strong>Profil recherché :</strong><p>{{ selectedJob.profile_desc }}</p></div>
+          
+          <!-- 📊 Grille Horizontale des Métadonnées -->
+          <div class="job-meta-header-grid">
+            <div class="meta-card-item">
+              <span class="meta-card-label"><i class="bi bi-file-earmark-text"></i> Contrat</span>
+              <strong class="meta-card-value badge-contract-premium">{{ selectedJob.contract_type || 'CDI' }}</strong>
+            </div>
+            <div class="meta-card-item">
+              <span class="meta-card-label"><i class="bi bi-geo-alt"></i> Lieu</span>
+              <strong class="meta-card-value">{{ selectedJob.location }} ({{ selectedJob.workplace_type || 'Présentiel' }})</strong>
+            </div>
+            <div class="meta-card-item">
+              <span class="meta-card-label"><i class="bi bi-cash-stack"></i> Salaire</span>
+              <strong class="meta-card-value value-salary">{{ selectedJob.salary || 'Non spécifié' }}</strong>
+            </div>
+            <div class="meta-card-item">
+              <span class="meta-card-label"><i class="bi bi-mortarboard"></i> Expérience</span>
+              <strong class="meta-card-value">{{ selectedJob.experience_level || 'Tous niveaux' }}</strong>
+            </div>
+          </div>
+
+          <!-- 🎯 Section Missions -->
+          <div class="job-display-section">
+            <h4 class="section-display-title"><i class="bi bi-list-task"></i> Missions principales</h4>
+            <div class="display-text-card">
+              <p class="formatted-pre-line">{{ selectedJob.missions_desc }}</p>
+            </div>
+          </div>
+
+          <!-- 👤 Section Profil recherché -->
+          <div class="job-display-section">
+            <h4 class="section-display-title"><i class="bi bi-person-badge-fill"></i> Profil recherché & Exigences</h4>
+            <div class="display-text-card">
+              <p class="formatted-pre-line">{{ selectedJob.profile_desc }}</p>
+            </div>
+          </div>
+
+          <!-- 🏷️ Section Compétences clés -->
+          @if (selectedJob.skills_desc) {
+            <div class="job-display-section">
+              <h4 class="section-display-title"><i class="bi bi-tags-fill"></i> Compétences clés & Technologies</h4>
+              <div class="display-text-card">
+                <div class="skills-badge-display-grid">
+                  @for (skill of getJobSkillsArray(selectedJob.skills_desc); track $index) {
+                    <span class="premium-skill-tag">
+                      <i class="bi bi-check2"></i> {{ skill }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- 🌐 Section Langues exigées -->
+          @if (selectedJob.languages_desc) {
+            <div class="job-display-section">
+              <h4 class="section-display-title"><i class="bi bi-translate"></i> Langues exigées</h4>
+              <div class="display-text-card">
+                <div class="skills-badge-display-grid">
+                  @for (lang of getJobLanguagesArray(selectedJob.languages_desc); track $index) {
+                    <span class="premium-lang-tag">
+                      <i class="bi bi-globe"></i> {{ lang }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
         </div>
+
       </div>
     </div>
   }

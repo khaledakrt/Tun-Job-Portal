@@ -23,7 +23,7 @@ export class JobCreateComponent {
     type: 'success' as 'success' | 'error'
   };
 
-  // Données de l'offre tunisienne synchronisées avec le HTML
+  // Données de l'offre tunisienne synchronisées avec le HTML (Mises à jour avec les nouveaux champs)
   job = { 
     title: '', 
     contract_type: 'CDI', 
@@ -33,6 +33,8 @@ export class JobCreateComponent {
     experience_level: 'Junior (0-2 ans)', 
     missions_desc: '', 
     profile_desc: '', 
+    skills_desc: '',     // 🚀 Nouvelle propriété pour les compétences
+    languages_desc: '',  // 🚀 Nouvelle propriété pour les langues
     expires_at: '' 
   };
 
@@ -49,11 +51,29 @@ export class JobCreateComponent {
     }, 3000);
   }
 
+  // 🌟 EXTRACTION EN TEMPS RÉEL DES COMPÉTENCES (Séparées par des virgules)
+  getSkillsArray(): string[] {
+    if (!this.job.skills_desc) return [];
+    return this.job.skills_desc
+      .split(',')
+      .map(skill => skill.trim())
+      .filter(skill => skill !== '');
+  }
+
+  // 🌟 EXTRACTION EN TEMPS RÉEL DES LANGUES (Séparées par des virgules)
+  getLanguagesArray(): string[] {
+    if (!this.job.languages_desc) return [];
+    return this.job.languages_desc
+      .split(',')
+      .map(lang => lang.trim())
+      .filter(lang => lang !== '');
+  }
+
   onPublish(event: Event) {
     event.preventDefault(); // Bloque le rechargement de page indésirable
 
-    // Validation locale obligatoire
-    if (!this.job.title || !this.job.location || !this.job.missions_desc || !this.job.profile_desc) {
+    // Validation locale obligatoire incluant les nouvelles rubriques requis
+    if (!this.job.title || !this.job.location || !this.job.missions_desc || !this.job.profile_desc || !this.job.skills_desc || !this.job.languages_desc) {
       this.showFlashMessage("Veuillez renseigner l'intégralité des champs obligatoires marqués d'un astérisque (*).", 'error');
       return;
     }

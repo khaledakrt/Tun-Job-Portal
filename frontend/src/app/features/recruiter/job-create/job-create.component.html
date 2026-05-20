@@ -8,7 +8,7 @@
     </div>
   </div>
 
-  <!-- Intégration de la notification flash professionnelle temporisée (si configurée) -->
+  <!-- Intégration de la notification flash professionnelle temporisée -->
   @if (notification.show) {
     <div class="toast-notification" [ngClass]="notification.type">
       <div class="toast-content">
@@ -91,13 +91,45 @@
         <!-- Missions principales -->
         <div class="form-group-compact">
           <label for="missions">Missions principales *</label>
-          <textarea id="missions" name="missions_desc" [(ngModel)]="job.missions_desc" rows="4" placeholder="Décrivez les responsabilités quotidiennes et les projets techniques..." required></textarea>
+          <textarea id="missions" name="missions_desc" [(ngModel)]="job.missions_desc" rows="3" placeholder="Décrivez les responsabilités quotidiennes et les projets techniques..." required></textarea>
         </div>
 
         <!-- Profil recherché -->
         <div class="form-group-compact">
           <label for="profile">Profil recherché & Prérequis *</label>
-          <textarea id="profile" name="profile_desc" [(ngModel)]="job.profile_desc" rows="4" placeholder="Compétences clés, technologies maîtrisées, soft skills..." required></textarea>
+          <textarea id="profile" name="profile_desc" [(ngModel)]="job.profile_desc" rows="3" placeholder="Compétences clés, technologies maîtrisées, soft skills..." required></textarea>
+        </div>
+
+        <!-- Compétences clés & Technologies (Avec rendu de badges en direct) -->
+        <div class="form-group-compact">
+          <label for="skills">Compétences clés & Technologies *</label>
+          <textarea id="skills" name="skills_desc" [(ngModel)]="job.skills_desc" rows="2" placeholder="Ex: Docker, Kubernetes, MySQL, JavaScript... (Séparez par des virgules)" required></textarea>
+          
+          @if (getSkillsArray().length > 0) {
+            <div class="skills-badge-preview-grid" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+              @for (skill of getSkillsArray(); track $index) {
+                <span class="live-skill-tag" style="background-color: #f0f9ff; color: #0369a1; border: 1px solid #e0f2fe; padding: 5px 12px; border-radius: 6px; font-size: 12.5px; font-weight: 600;">
+                  {{ skill }}
+                </span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Langues exigées (Avec rendu de badges en direct) -->
+        <div class="form-group-compact">
+          <label for="languages">Langues exigées *</label>
+          <textarea id="languages" name="languages_desc" [(ngModel)]="job.languages_desc" rows="2" placeholder="Ex: Français (Excellent), Anglais (Technique)... (Séparez par des virgules)" required></textarea>
+          
+          @if (getLanguagesArray().length > 0) {
+            <div class="skills-badge-preview-grid" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+              @for (lang of getLanguagesArray(); track $index) {
+                <span class="live-skill-tag" style="background-color: #f0f9ff; color: #0369a1; border: 1px solid #e0f2fe; padding: 5px 12px; border-radius: 6px; font-size: 12.5px; font-weight: 600;">
+                  {{ lang }}
+                </span>
+              }
+            </div>
+          }
         </div>
       </div>
 

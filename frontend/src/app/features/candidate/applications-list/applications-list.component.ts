@@ -14,6 +14,7 @@ export class ApplicationsListComponent implements OnInit {
   historyList: any[] = [];
   isLoading: boolean = true;
   selectedRecruiter: any = null; // 🚀 Gère le recruteur sélectionné pour la pop-up
+  selectedJob: any = null;       // 🚀 Gère l'offre sélectionnée pour la pop-up de détails
 
   ngOnInit() {
     this.fetchCandidateHistory();
@@ -69,5 +70,41 @@ export class ApplicationsListComponent implements OnInit {
   onCloseRecruiterModal() {
     this.selectedRecruiter = null;
     this.cdr.detectChanges();
+  }
+
+  // 🚀 INTERCEPTE LE CLIC SUR LE TITRE DU POSTE POUR CONSTUIRE L'OBJET DE LA MODALE
+  onViewJobDetails(app: any) {
+    if (!app) return;
+    this.selectedJob = {
+      title: app.job_title || app.title,
+      company_name: app.company_name || 'REC',
+      contract_type: app.contract_type || 'CDI',
+      location: app.location || 'Tunisie',
+      missions_desc: app.missions_desc || 'Aucune description des missions disponible.',
+      profile_desc: app.profile_desc || 'Aucun prérequis spécifié.',
+      skills_desc: app.skills_desc || null,
+      languages_desc: app.languages_desc || null,
+      expires_at: app.expires_at || null,
+      company_logo: app.company_logo || null,
+      recruiter_id: app.recruiter_id
+    };
+    this.cdr.detectChanges();
+  }
+
+  onCloseJobModal() {
+    this.selectedJob = null;
+    this.cdr.detectChanges();
+  }
+
+  // 🌟 Découpe les compétences textuelles de la base MySQL pour la boucle Angular
+  getSearchJobSkillsArray(skillsText: string): string[] {
+    if (!skillsText) return [];
+    return skillsText.split(',').map(s => s.trim()).filter(s => s !== '');
+  }
+
+  // 🌟 Découpe les langues textuelles de la base MySQL pour la boucle Angular
+  getSearchJobLanguagesArray(langText: string): string[] {
+    if (!langText) return [];
+    return langText.split(',').map(s => s.trim()).filter(s => s !== '');
   }
 }

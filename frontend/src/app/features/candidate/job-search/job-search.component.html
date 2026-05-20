@@ -85,7 +85,7 @@
 
   <!-- 👁️ MODALE 1 : DETAILS DU POSTE (INTEGRATION DU LOGO ALIGNÉ) -->
     <!-- 👁️ MODALE 1 : DETAILS DU POSTE (DESIGN PREMIUM UNIFIÉ) -->
-  @if (selectedJob) {
+     @if (selectedJob) {
     <div class="modal-overlay" (click)="onCloseModal()">
       <div class="modal-card" (click)="$event.stopPropagation()">
         
@@ -116,6 +116,13 @@
               <div class="job-badges-row">
                 <span class="premium-badge badge-contract"><i class="bi bi-file-earmark-text"></i> {{ selectedJob.contract_type }}</span>
                 <span class="premium-badge badge-location"><i class="bi bi-geo-alt-fill"></i> {{ selectedJob.location }}</span>
+                
+                <!-- 📅 BADGE EXCLUSIF : DATE LIMITE D'EXPIRATION DU POSTE -->
+                @if (selectedJob.expires_at) {
+                  <span class="premium-badge badge-expiration" style="background-color: #fff7ed; color: #c2410c; border-color: #ffedd5; font-weight: 600;">
+                    <i class="bi bi-calendar-x-fill" style="color: #ea580c;"></i> Expire le : {{ selectedJob.expires_at | date:'dd/MM/yyyy' }}
+                  </span>
+                }
               </div>
             </div>
           </div>
@@ -124,17 +131,49 @@
           <div class="job-text-block-section">
             <span class="job-block-title"><i class="bi bi-list-task"></i> Missions principales</span>
             <div class="job-block-card">
-              <p>{{ selectedJob.missions_desc }}</p>
+              <p style="white-space: pre-line; margin: 0; line-height: 1.65; color: #334155;">{{ selectedJob.missions_desc }}</p>
             </div>
           </div>
 
           <!-- Section 2 : Profil Requis -->
           <div class="job-text-block-section">
-            <span class="job-block-title"><i class="bi bi-person-badge-fill"></i> Profil requis & Compétences</span>
+            <span class="job-block-title"><i class="bi bi-person-badge-fill"></i> Profil requis & Prérequis</span>
             <div class="job-block-card">
-              <p>{{ selectedJob.profile_desc }}</p>
+              <p style="white-space: pre-line; margin: 0; line-height: 1.65; color: #334155;">{{ selectedJob.profile_desc }}</p>
             </div>
           </div>
+
+          <!-- Section 3 : Compétences clés & Technologies -->
+          @if (selectedJob.skills_desc) {
+            <div class="job-text-block-section">
+              <span class="job-block-title"><i class="bi bi-tags-fill"></i> Compétences clés & Technologies</span>
+              <div class="job-block-card">
+                <div class="skills-badge-grid">
+                  @for (skill of getSearchJobSkillsArray(selectedJob.skills_desc); track $index) {
+                    <span class="skill-tag">
+                      <i class="bi bi-check2"></i> {{ skill }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Section 4 : Langues exigées -->
+          @if (selectedJob.languages_desc) {
+            <div class="job-text-block-section">
+              <span class="job-block-title"><i class="bi bi-translate"></i> Langues exigées</span>
+              <div class="job-block-card">
+                <div class="skills-badge-grid">
+                  @for (lang of getSearchJobLanguagesArray(selectedJob.languages_desc); track $index) {
+                    <span class="skill-tag" style="background-color: #faf5ff; color: #6b21a8; border-color: #f3e8ff;">
+                      <i class="bi bi-globe"></i> {{ lang }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
 
           <!-- Pied de page avec bouton d'action principal -->
           <div class="modal-footer-action-row">
@@ -151,8 +190,6 @@
       </div>
     </div>
   }
-
-
   <!-- 🏢 🌟 MODALE 2 : FICHE DU RECRUTEUR EN LIGNE (D'origine, inchangée) -->
   @if (selectedRecruiter) {
     <div class="modal-overlay">
@@ -192,3 +229,24 @@
   }
 
 </div>
+  <!-- 🎛️ UNIQUE POP-UP DE CONFIRMATION DE CANDIDATURE EN SURIMPRESSION -->
+  @if (showConfirmApplyPopup) {
+    <div class="modal-overlay" style="z-index: 100005;" (click)="showConfirmApplyPopup = false">
+      <div class="modal-card" (click)="$event.stopPropagation()" style="max-width: 440px; padding: 28px; text-align: center; display: flex; flex-direction: column; gap: 16px;">
+        <div style="font-size: 42px; margin-bottom: 4px;">🚀</div>
+        <h4 style="margin: 0; font-size: 17px; font-weight: 700; color: #0f172a;">Confirmer votre candidature</h4>
+        <p style="margin: 0; font-size: 13.5px; color: #64748b; line-height: 1.6;">
+          Souhaitez-vous transmettre votre profil TunJob et votre CV pour l'offre de poste de : <br>
+          <strong style="color: #0ea5e9;">{{ jobToApply?.title }}</strong> ?
+        </p>
+        <div style="display: flex; gap: 12px; margin-top: 12px; width: 100%;">
+          <button type="button" (click)="showConfirmApplyPopup = false" class="btn-close-modal" style="flex: 1; height: 42px; border-radius: 8px; width: 100%; font-weight: 600; font-size: 13px;">
+            Annuler
+          </button>
+          <button type="button" (click)="executeApplySubmit()" class="btn-submit-apply-large" style="flex: 1; height: 42px; border-radius: 8px; font-size: 13px;">
+            Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+  }

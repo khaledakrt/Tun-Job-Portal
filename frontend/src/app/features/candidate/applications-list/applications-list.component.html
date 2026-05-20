@@ -8,15 +8,15 @@
     </div>
   </div>
 
-  <!-- 📋 CARTE DU TABLEAU DE SUIVI -->
-  <div class="manage-card">
-    <div class="table-wrapper">
-      <table class="jobs-table">
+  <!-- 📋 CARTE DU TABLEAU DE SUIVI ASSAINIE -->
+  <div class="manage-card-premium">
+    <div class="table-wrapper-premium">
+      <table class="jobs-table-premium">
         <thead>
           <tr>
-            <th style="padding-left: 20px;">Poste / Entreprise</th>
+            <th class="th-left-padding">Poste / Entreprise</th>
             <th>Date d'envoi</th>
-            <th style="text-align: center; padding-right: 20px;">Statut</th>
+            <th class="th-center-align">Statut</th>
           </tr>
         </thead>
         <tbody>
@@ -24,7 +24,7 @@
           <!-- ⏳ État de chargement asynchrone -->
           @if (isLoading) {
             <tr>
-              <td colspan="3" style="text-align: center; padding: 25px; color: #64748b; font-weight: 500;">
+              <td colspan="3" style="text-align: center; padding: 30px; color: #64748b; font-weight: 500;">
                 <i class="bi bi-arrow-clockwise" style="display: inline-block; animation: spin 1s linear infinite; margin-right: 8px;"></i>
                 Chargement de votre historique de postulation...
               </td>
@@ -34,37 +34,45 @@
           <!-- 🚫 Cas où le catalogue est vide -->
           @if (!isLoading && historyList.length === 0) {
             <tr>
-              <td colspan="3" style="text-align: center; padding: 35px; color: #64748b;">
-                <i class="bi bi-send-x-fill" style="font-size: 26px; display: block; margin-bottom: 6px; color: #cbd5e1;"></i>
+              <td colspan="3" style="text-align: center; padding: 40px; color: #64748b;">
+                <i class="bi bi-send-x-fill" style="font-size: 28px; display: block; margin-bottom: 8px; color: #cbd5e1;"></i>
                 Vous n'avez pas encore envoyé de candidatures.
               </td>
             </tr>
           }
 
-          <!-- 🚀 RENDU DYNAMIQUE DES LIGNES MYSQL -->
+          <!-- 🚀 RENDU DYNAMIQUE DES LIGNES MYSQL NETTOYÉES -->
           @for (app of historyList; track app.job_id) {
-            <tr class="table-row-hover">
-              <td style="padding-left: 20px;">
-                <span class="job-main-title">{{ app.job_title }}</span>
-                <!-- 🌟 AJOUT DE L'INTERACTION : REND LE NOM DU RECRUTEUR CLIQUABLE -->
+            <tr class="table-row-premium">
+  <td class="job-company-cell">
+    <!-- MODIFIÉ : Classe nettoyée et taille forcée à 14px pour le tableau -->
+    <span class="clickable-job-title" style="font-size: 14px !important; font-weight: 700;" (click)="onViewJobDetails(app)">
+      {{ app.job_title }}
+    </span>
+
                 <span class="company-sub-badge clickable-recruiter" (click)="onViewRecruiterProfile(app.recruiter_id)">
                   <i class="bi bi-building-check"></i> {{ app.company_name }}
                 </span>
               </td>
               
-              <td class="date-text-cell">
-                <i class="bi bi-calendar3"></i> {{ app.applied_at | date:'dd/MM/yyyy' }}
+              <td class="date-text-cell-premium">
+                <div class="date-container-premium">
+                  <i class="bi bi-calendar3"></i> 
+                  <span>{{ app.applied_at | date:'dd/MM/yyyy' }}</span>
+                </div>
               </td>
               
-              <td style="text-align: center; padding-right: 20px;">
-                <span class="status-badge" [ngClass]="{
+              <td class="status-cell-premium">
+                <span class="status-badge-fixed" [ngClass]="{
                   'bg-amber': app.status === 'Nouveau' || app.status === 'en_attente',
                   'bg-blue': app.status === 'Entretien',
-                  'bg-emerald': app.status === 'retenu' || app.status === 'Acceptée',
-                  'bg-red': app.status === 'refuse' || app.status === 'Refusée'
+                  'bg-emerald': app.status === 'retenu' || app.status === 'Acceptée' || app.status === 'Proposition',
+                  'bg-red': app.status === 'refuse' || app.status === 'Refusée' || app.status === 'Rejete'
                 }">
                   <span class="dot-status"></span>
-                  {{ app.status === 'Nouveau' || app.status === 'en_attente' ? 'En attente' : app.status === 'retenu' || app.status === 'Acceptée' ? 'Retenu' : app.status === 'refuse' || app.status === 'Refusée' ? 'Refusé' : app.status }}
+                  <span class="badge-text-span">
+                    {{ app.status === 'Nouveau' || app.status === 'en_attente' ? 'En attente' : app.status === 'retenu' || app.status === 'Acceptée' || app.status === 'Proposition' ? 'Retenu' : app.status === 'refuse' || app.status === 'Refusée' || app.status === 'Rejete' ? 'Refusé' : app.status }}
+                  </span>
                 </span>
               </td>
             </tr>
@@ -77,8 +85,8 @@
 
   <!-- 🏢 🌟 FEUILLE MODALE : CONSULTATION DU PROFIL COMPLET DE L'ENTREPRISE -->
   @if (selectedRecruiter) {
-    <div class="modal-overlay">
-      <div class="modal-card recruiter-profile-card">
+    <div class="modal-overlay" (click)="onCloseRecruiterModal()">
+      <div class="modal-card recruiter-profile-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h3><i class="bi bi-building-fill"></i> Fiche de l'entreprise</h3>
           <button (click)="onCloseRecruiterModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
@@ -108,6 +116,96 @@
             <strong>À propos de l'entreprise :</strong>
             <p class="bio-text-box">{{ selectedRecruiter.company_bio || 'Aucune description fournie par l\'entreprise.' }}</p>
           </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- 👁️ 🌟 FEUILLE MODALE : DETAILS COMPLETS DE L'OFFRE D'EMPLOI SUIVIE -->
+  @if (selectedJob) {
+    <div class="modal-overlay" (click)="onCloseJobModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        
+        <div class="modal-header">
+          <h3><i class="bi bi-file-earmark-text-fill"></i> Détails de l'offre d'emploi</h3>
+          <button (click)="onCloseJobModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="job-hero-section">
+            <div class="job-logo-wrapper">
+              <img [src]="selectedJob.company_logo ? 'http://localhost:3000/logos/' + selectedJob.company_logo : 'https://placehold.co'" 
+                   (error)="$any($event.target).src='https://placehold.co'"
+                   alt="Logo entreprise">
+            </div>
+            
+            <div class="job-meta-content">
+              <h4 class="job-main-title">{{ selectedJob.title }}</h4>
+              <span class="job-company-link" (click)="onViewRecruiterProfile(selectedJob.recruiter_id)">
+                <i class="bi bi-building"></i> {{ selectedJob.company_name }}
+              </span>
+              
+              <div class="job-badges-row">
+                <span class="premium-badge badge-contract"><i class="bi bi-file-earmark-text"></i> {{ selectedJob.contract_type }}</span>
+                <span class="premium-badge badge-location"><i class="bi bi-geo-alt-fill"></i> {{ selectedJob.location }}</span>
+                
+                @if (selectedJob.expires_at) {
+                  <span class="premium-badge badge-expiration" style="background-color: #fff7ed; color: #c2410c; border-color: #ffedd5; font-weight: 600;">
+                    <i class="bi bi-calendar-x-fill" style="color: #ea580c;"></i> Expire le : {{ selectedJob.expires_at | date:'dd/MM/yyyy' }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="job-text-block-section">
+            <span class="job-block-title"><i class="bi bi-list-task"></i> Missions principales</span>
+            <div class="job-block-card">
+              <p style="white-space: pre-line; margin: 0; line-height: 1.65; color: #334155;">{{ selectedJob.missions_desc }}</p>
+            </div>
+          </div>
+
+          <div class="job-text-block-section">
+            <span class="job-block-title"><i class="bi bi-person-badge-fill"></i> Profil requis & Prérequis</span>
+            <div class="job-block-card">
+              <p style="white-space: pre-line; margin: 0; line-height: 1.65; color: #334155;">{{ selectedJob.profile_desc }}</p>
+            </div>
+          </div>
+
+          @if (selectedJob.skills_desc) {
+            <div class="job-text-block-section">
+              <span class="job-block-title"><i class="bi bi-tags-fill"></i> Compétences clés & Technologies</span>
+              <div class="job-block-card">
+                <div class="skills-badge-grid">
+                  @for (skill of getSearchJobSkillsArray(selectedJob.skills_desc); track $index) {
+                    <span class="skill-tag">
+                      <i class="bi bi-check2"></i> {{ skill }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (selectedJob.languages_desc) {
+            <div class="job-text-block-section">
+              <span class="job-block-title"><i class="bi bi-translate"></i> Langues exigées</span>
+              <div class="job-block-card">
+                <div class="skills-badge-grid">
+                  @for (lang of getSearchJobLanguagesArray(selectedJob.languages_desc); track $index) {
+                    <span class="skill-tag" style="background-color: #faf5ff; color: #6b21a8; border-color: #f3e8ff;">
+                      <i class="bi bi-globe"></i> {{ lang }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <div class="modal-footer-action-row">
+            <span class="premium-applied-banner"><i class="bi bi-check-circle-fill"></i> Vous avez envoyé votre dossier de candidature à ce poste</span>
+          </div>
+          
         </div>
       </div>
     </div>

@@ -423,3 +423,13 @@
   width: 100%;
   text-align: center;
 }
+.badge-expiration {
+  background-color: #fff7ed !important; /* Fond orange/ambré très clair */
+  color: #c2410c !important;            /* Écriture orange foncé */
+  border-color: #ffedd5 !important;
+  font-weight: 600;
+}
+
+.badge-expiration i {
+  color: #ea580c;
+}

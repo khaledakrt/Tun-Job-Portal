@@ -1,10 +1,24 @@
 const db = require('../../config/db');
 
 // ==========================================================================
-// 🚀 1. CRÉATION D'UNE ANNONCE D'EMPLOI
+// 🚀 1. CRÉATION D'UNE ANNONCE D'EMPLOI (CORRIGÉE AVEC COMPÉTENCES & LANGUES)
 // ==========================================================================
 exports.createJob = async (req, res) => {
-    const { title, contract_type, location, workplace_type, salary, experience_level, missions_desc, profile_desc, expires_at } = req.body;
+    // 🚀 Extraction mise à jour intégrant les propriétés envoyées par le formulaire Angular
+    const { 
+        title, 
+        contract_type, 
+        location, 
+        workplace_type, 
+        salary, 
+        experience_level, 
+        missions_desc, 
+        profile_desc, 
+        skills_desc,      // 🚀 Nouveau champ
+        languages_desc,   // 🚀 Nouveau champ
+        expires_at 
+    } = req.body;
+    
     const recruiter_id = req.user && req.user.id ? req.user.id : null;
     
     if (!recruiter_id) {
@@ -12,14 +26,16 @@ exports.createJob = async (req, res) => {
     }
 
     try {
+        // 🚀 Requête SQL mise à jour avec les colonnes complémentaires
         const sqlQuery = `
             INSERT INTO jobs 
-            (recruiter_id, title, contract_type, location, workplace_type, salary, experience_level, missions_desc, profile_desc, status, expires_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (recruiter_id, title, contract_type, location, workplace_type, salary, experience_level, missions_desc, profile_desc, skills_desc, languages_desc, status, expires_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const formattedDate = expires_at && expires_at.trim() !== '' ? expires_at : null;
 
+        // 🚀 Injection ordonnée des variables dans le tableau de paramètres
         await db.execute(sqlQuery, [
             recruiter_id, 
             title, 
@@ -30,6 +46,8 @@ exports.createJob = async (req, res) => {
             experience_level, 
             missions_desc, 
             profile_desc, 
+            skills_desc || null,    // 🚀 Enregistre la chaîne textuelle ou null
+            languages_desc || null, // 🚀 Enregistre la chaîne textuelle ou null
             'disponible', 
             formattedDate
         ]);
@@ -40,6 +58,7 @@ exports.createJob = async (req, res) => {
         return res.status(400).json({ message: "Impossible d'insérer l'offre en base de données.", error: e.message }); 
     }
 };
+
 
 // ==========================================================================
 // 📥 2. RÉCUPÉRATION DES ANNONCES DU RECRUTEUR

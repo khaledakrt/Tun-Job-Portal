@@ -97,6 +97,7 @@ export class JobManageComponent implements OnInit {
     .then(() => { job.status = (job.status === 'disponible' || job.status === 'Actif') ? 'masqué' : 'disponible'; this.cdr.detectChanges(); })
     .catch(err => alert(err.message));
   }
+  
   onDeleteJob(jobId: number) {
     if (!confirm("Voulez-vous supprimer cette annonce ?")) return;
     const targetUrl = `http://localhost:3000/api/recruiter/jobs/delete/${jobId}`;
@@ -106,4 +107,21 @@ export class JobManageComponent implements OnInit {
     .then(() => { this.jobsList = this.jobsList.filter(job => job.id !== jobId); this.currentPage = 1; this.cdr.detectChanges(); })
     .catch(err => alert(err.message));
   }
+
+  // ==========================================================================
+  // 🚀 🌟 COUPLAGE GRAPHIQUE DES BADGES COMPÉTENCES & LANGUES POUR LE HTML
+  // ==========================================================================
+  
+  // Transforme la chaîne textuelle brute des compétences MySQL en un tableau de tags
+  getJobSkillsArray(skillsText: string): string[] {
+    if (!skillsText) return [];
+    return skillsText.split(',').map(s => s.trim()).filter(s => s !== '');
+  }
+
+  // Transforme la chaîne textuelle brute des langues MySQL en un tableau de tags
+  getJobLanguagesArray(langText: string): string[] {
+    if (!langText) return [];
+    return langText.split(',').map(s => s.trim()).filter(s => s !== '');
+  }
+  
 }

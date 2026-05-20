@@ -206,12 +206,16 @@ exports.getRecruiterByNotificationId = async (req, res) => {
 
 // 💼 2. DÉDIÉE UNIQUEMENT AU RECRUTEUR Connecté (Votre code d'origine intact pour le candidat)
 // 💼 DÉDIÉE UNIQUEMENT AU RECRUTEUR Connecté (Protection totale anti-500)
+// ==========================================================================
+// 💼 RECRUTEUR : RÉCUPÉRATION DYNAMIQUE DES DONNÉES DU CANDIDAT (ROBUSTE)
+// ==========================================================================
 exports.getCandidateByNotificationId = async (req, res) => {
     try {
         const notificationId = req.params.id;
         const currentUserId = req.user.id; // ID du recruteur connecté
 
-        // 1. Tentative avec votre jointure textuelle d'origine
+        // 1. TENTATIVE ROBUSTE PAR IDENTIFIANT UNIQUE (Optionnelle si liée) ET COMPARAISON DU NOM PERMISSIF
+        // On cherche le nom du candidat n'importe où dans le texte de la notification, sans être bloqué par les émojis
         const [rows] = await db.execute(`
             SELECT 
                 a.id AS application_id,
@@ -222,22 +226,25 @@ exports.getCandidateByNotificationId = async (req, res) => {
                 u.address AS address,
                 u.company_logo AS avatar_logo,
                 j.title AS job_title,
-                c.summary AS cv_summary
+                c.summary AS cv_summary,
+                a.status AS status
             FROM notifications n
-            JOIN users u ON LOWER(n.message) LIKE CONCAT(LOWER(u.name), '%')
+            JOIN users u ON LOWER(TRIM(n.message)) LIKE CONCAT('%', LOWER(TRIM(u.name)), '%')
             JOIN applications a ON u.id = a.candidate_id
             JOIN jobs j ON a.job_id = j.id
+            LEFT JOIN cvs c ON u.id = c.candidate_id
             WHERE n.id = ? AND j.recruiter_id = ? 
             LIMIT 1`,
             [notificationId, currentUserId]
         );
 
         if (rows && rows.length > 0) {
+            console.log("🟢 [BACKEND] Candidat identifié avec succès par correspondance de nom.");
             return res.json(rows[0]);
         }
 
-        // 2. 🛡️ PLAN DE SECOURS ULTRA-PERMISSIF POUR LE RECRUTEUR (Si le message commence par un emoji ou du texte)
-        // On cherche le nom du candidat n'importe où dans le texte de la notification
+        // 2. 🛡️ PLAN DE SECOURS DE DEUXIÈME CHANCE (Si l'émoji ou un pseudonyme bloque la jointure textuelle)
+        // On cherche l'offre correspondante dans le texte, puis on récupère la candidature liée
         const [permissiveRows] = await db.execute(`
             SELECT 
                 a.id AS application_id,
@@ -248,22 +255,26 @@ exports.getCandidateByNotificationId = async (req, res) => {
                 u.address AS address,
                 u.company_logo AS avatar_logo,
                 j.title AS job_title,
-                c.summary AS cv_summary
+                c.summary AS cv_summary,
+                a.status AS status
             FROM notifications n
-            JOIN users u ON LOWER(n.message) LIKE CONCAT('%', LOWER(u.name), '%')
-            JOIN applications a ON u.id = a.candidate_id
-            JOIN jobs j ON a.job_id = j.id
-            WHERE n.id = ? AND j.recruiter_id = ? 
+            JOIN jobs j ON LOWER(TRIM(n.message)) LIKE CONCAT('%', LOWER(TRIM(j.title)), '%')
+            JOIN applications a ON j.id = a.job_id
+            JOIN users u ON a.candidate_id = u.id
+            LEFT JOIN cvs c ON u.id = c.candidate_id
+            WHERE n.id = ? AND j.recruiter_id = ?
+            ORDER BY a.id DESC
             LIMIT 1`,
             [notificationId, currentUserId]
         );
 
         if (permissiveRows && permissiveRows.length > 0) {
+            console.log("ℹ️ [BACKEND - SECOURS 1] Candidat identifié via le titre de l'offre.");
             return res.json(permissiveRows[0]);
         }
 
-        // 3. 🛡️ PLAN DE SECOURS DE DERNIÈRE CHANCE
-        // Si le nom du candidat est introuvable par texte, on prend la dernière candidature reçue par ce recruteur
+        // 3. 🛡️ PLAN DE SECOURS ULTRA-PERMISSIF DE DERNIÈRE CHANCE
+        // En cas d'incohérence totale du texte, on renvoie la dernière candidature reçue sur les offres du recruteur
         const [ultimateRows] = await db.execute(`
             SELECT 
                 a.id AS application_id,
@@ -274,7 +285,8 @@ exports.getCandidateByNotificationId = async (req, res) => {
                 u.address AS address,
                 u.company_logo AS avatar_logo,
                 j.title AS job_title,
-                c.summary AS cv_summary
+                c.summary AS cv_summary,
+                a.status AS status
             FROM applications a
             JOIN jobs j ON a.job_id = j.id
             JOIN users u ON a.candidate_id = u.id
@@ -286,6 +298,7 @@ exports.getCandidateByNotificationId = async (req, res) => {
         );
 
         if (ultimateRows && ultimateRows.length > 0) {
+            console.log("ℹ️ [BACKEND - SECOURS 2] Renvoi de la dernière candidature active pour ce recruteur.");
             return res.json(ultimateRows[0]);
         }
 
@@ -293,18 +306,7 @@ exports.getCandidateByNotificationId = async (req, res) => {
 
     } catch (e) {
         console.error("❌ CRASH INTERNE RECRUTEUR CANDIDATE BY NOTIF :", e.message);
-        // Renvoie un statut 200 avec un objet vide propre pour empêcher Angular de lever une exception
-        return res.json({
-            application_id: null,
-            candidate_id: null,
-            name: "Candidat",
-            email: "Contact via plateforme",
-            phone: "Non renseigné",
-            address: "Non spécifiée",
-            avatar_logo: null,
-            job_title: "Offre d'emploi",
-            cv_summary: ""
-        });
+        return res.status(500).json({ message: "Erreur interne du serveur lors de la récupération du candidat.", error: e.message });
     }
 };
 
