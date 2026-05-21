@@ -40,15 +40,14 @@ import { from } from 'rxjs';
 })
 export class LoginComponent implements OnInit {
   private router = inject(Router);
-  private route = inject(ActivatedRoute); // 🔑 Injection de la route active pour chasser l'URL
+  private route = inject(ActivatedRoute); 
   private cdr = inject(ChangeDetectorRef);
 
   credentials = { email: '', password: '' };
   errorMessage = '';
-  isEmailVerified = false; // 🔑 Variable d'état pour le message vert
+  isEmailVerified = false; 
 
   ngOnInit() {
-    // 🔍 Écoute si l'URL contient "?verified=true" lors de la redirection du Backend
     this.route.queryParams.subscribe(params => {
       if (params['verified'] === 'true') {
         this.isEmailVerified = true;
@@ -58,9 +57,9 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(event: Event) {
-    event.preventDefault(); // Stoppe le refresh automatique
+    event.preventDefault(); 
     this.errorMessage = '';
-    this.isEmailVerified = false; // Cache le message vert si l'utilisateur tente un login
+    this.isEmailVerified = false; 
 
     if (!this.credentials.email || !this.credentials.password) {
       this.errorMessage = "Veuillez saisir vos identifiants.";
@@ -77,7 +76,6 @@ export class LoginComponent implements OnInit {
       if (!res.ok) {
         const errorBody = await res.json().catch(() => ({}));
         
-        // 🛑 Capture chirurgicale du code statut 403 (Forbidden) envoyé par votre Backend
         if (res.status === 403) {
           throw { message: errorBody.message || "Votre compte n'est pas activé. Veuillez vérifier vos e-mails." };
         }
@@ -93,12 +91,19 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('role', res.role);
         localStorage.setItem('name', res.name);
         
+        // 🏢 🔒 ENREGISTREMENT DE L'ÉTAT VÉRIFIÉ D'ENTREPRISE DANS LA SESSION FRONTEND
+        if (res.is_verified_company !== undefined) {
+          localStorage.setItem('is_verified_company', res.is_verified_company.toString());
+        } else {
+          localStorage.setItem('is_verified_company', '0');
+        }
+        
         // Redirection vers le layout
         this.router.navigate([`/${res.role}`]);
       },
       error: (err: any) => {
         this.errorMessage = err.message || "Identifiants ou mot de passe incorrects.";
-        this.cdr.detectChanges(); // Affiche la box rouge
+        this.cdr.detectChanges(); 
       }
     });
   }

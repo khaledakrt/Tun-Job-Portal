@@ -1,1 +1,67 @@
  
+<div class="manage-container">
+  <div class="card-header-flex">
+    <div class="card-header-left">
+      <h3><i class="bi bi-person-gear"></i> Gestion des Utilisateurs</h3>
+      <p>Consultez la liste des membres inscrits et modérez les accès à la plateforme.</p>
+    </div>
+  </div>
+
+  <div class="manage-card-premium">
+    <div class="table-wrapper-premium">
+      
+      <div *ngIf="isLoading" class="loading-box">
+        <i class="bi bi-arrow-clockwise spinning"></i> Chargement des comptes utilisateurs...
+      </div>
+
+      <table *ngIf="!isLoading" class="jobs-table-premium">
+        <thead>
+          <tr>
+            <th class="th-left-padding">Nom / Rôle</th>
+            <th>Adresse E-mail</th>
+            <th>Statut du compte</th>
+            <th class="th-center-align">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of usersList" class="table-row-premium">
+            <td class="job-company-cell">
+              <span class="clickable-job-title" style="font-size: 14px !important; font-weight: 700;">{{ user.name }}</span>
+              <span class="company-sub-badge">
+                <i class="bi" [ngClass]="user.role === 'recruiter' ? 'bi-building' : 'bi-person'"></i> 
+                {{ user.role === 'recruiter' ? 'Recruteur' : 'Candidat' }}
+              </span>
+            </td>
+            <td class="date-text-cell-premium">{{ user.email }}</td>
+            <td>
+              <span class="status-badge-fixed" [ngClass]="user.is_verified ? 'bg-emerald' : 'bg-amber'">
+                <span class="dot-status"></span>
+                <span class="badge-text-span">{{ user.is_verified ? 'Vérifié' : 'En attente' }}</span>
+              </span>
+            </td>
+                        <td class="status-cell-premium" style="display: flex; gap: 8px; justify-content: center;">
+              
+              <!-- 👑 Bouton Certifier : S'affiche UNIQUEMENT pour les recruteurs -->
+              <button *ngIf="user.role === 'recruiter'" 
+                      [style.background-color]="user.is_verified_company ? '#e0f2fe' : '#f1f5f9'"
+                      [style.color]="user.is_verified_company ? '#0369a1' : '#475569'"
+                      [style.border]="user.is_verified_company ? '1px solid #bae6fd' : '1px solid #cbd5e1'"
+                      style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;"
+                      (click)="onToggleVerification(user)">
+                <i class="bi" [ngClass]="user.is_verified_company ? 'bi-patch-check-fill' : 'bi-patch-check'"></i>
+                {{ user.is_verified_company ? 'Vérifié' : 'Certifier' }}
+              </button>
+
+              <button class="btn-action-delete" (click)="onDeleteUser(user.id)">
+                <i class="bi bi-trash3-fill"></i> Supprimer
+              </button>
+              
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

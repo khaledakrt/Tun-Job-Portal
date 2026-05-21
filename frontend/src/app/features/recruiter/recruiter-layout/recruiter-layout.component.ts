@@ -21,6 +21,9 @@ export class RecruiterLayoutComponent implements OnInit, OnDestroy {
   recruiterName = 'Recruteur';
   selectedDirectCandidate: any = null;
   
+  // 🏢 L'état du badge passe par cette variable mise à jour par l'API
+  isVerifiedCompany = false;
+  
   private notifSubscription: Subscription | null = null;
 
   ngOnInit() {
@@ -28,6 +31,9 @@ export class RecruiterLayoutComponent implements OnInit, OnDestroy {
     if (storedName) {
       this.recruiterName = storedName;
     }
+
+    // 🚀 FIX CHIRURGICAL : Plus de localStorage. On interroge directement MySQL au chargement
+    this.checkRealtimeVerification();
 
     // 🚀 LIAISON SÉCURISÉE AVEC RÉINITIALISATION DYNAMIQUE DU CANDIDAT
     this.notifSubscription = this.notificationService.openApplication$.subscribe(candidateObject => {
@@ -51,6 +57,24 @@ export class RecruiterLayoutComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges(); 
       });
     });
+  }
+
+  // 📡 SYNCHRONISATION EN DIRECT PAR API : Cherche la valeur fraîche dans votre table users
+  checkRealtimeVerification() {
+    const token = localStorage.getItem('token');
+    fetch('http://localhost:3000/api/auth/profile', {
+      method: 'GET',
+      headers: { 
+        'Authorization': token ? `Bearer ${token}` : '' 
+      }
+    })
+    .then(res => res.json())
+    .then(user => {
+      // Met à jour la variable avec le vrai état de votre table MySQL (0 ou 1)
+      this.isVerifiedCompany = user.is_verified_company === 1;
+      this.cdr.detectChanges(); // Force le rafraîchissement visuel du menu
+    })
+    .catch(err => console.error("❌ Erreur de synchronisation du statut recruteur :", err));
   }
 
   changeCandidateStatus(applicationId: number, newStatus: string) {

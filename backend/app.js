@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 require('dotenv').config();
+
 // 1. CONFIGURATION DES SECURITY MIDDLEWARES SÉCURISÉE ET MISE À JOUR
 app.use(cors({
     origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
@@ -30,6 +31,7 @@ app.use('/cv_files', express.static(path.join(__dirname, 'uploads/cv_files')));
 const authRoutes = require('./routes/auth.routes');
 const candidateRoutes = require('./routes/candidate.routes');
 const recruiterRoutes = require('./routes/recruiter.routes');
+const adminRoutes = require('./routes/admin.routes'); // 🔑 Chargement des routes d'administration
 const notificationRoutes = require('./routes/notification.routes');
 
 // Importation des middlewares de protection d'accès
@@ -43,6 +45,9 @@ app.use('/api/candidate', verifyToken, checkRole(['candidate']), candidateRoutes
 
 // Espace Recruteur privé
 app.use('/api/recruiter', verifyToken, recruiterRoutes);
+
+// 🔑 Espace Administrateur privé : Token JWT valide + Rôle 'admin' obligatoire
+app.use('/api/admin', verifyToken, checkRole(['admin']), adminRoutes);
 
 // Centre de Notifications partagé : Nécessite simplement d'être connecté
 app.use('/api/notifications', verifyToken, notificationRoutes);

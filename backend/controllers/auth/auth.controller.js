@@ -104,10 +104,12 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
         
+        // 🚀 RETOUR LOGGED : Ajout de la valeur de certification d'entreprise pour Angular
         return res.status(200).json({ 
             token, 
             role: user.role, 
-            name: user.name 
+            name: user.name,
+            is_verified_company: user.is_verified_company 
         });
     } catch (e) {
         console.error("❌ Erreur de connexion :", e);
@@ -148,7 +150,11 @@ exports.verifyEmail = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
     try {
-        const [users] = await db.execute('SELECT id, name, email, role, phone, address, company_name, company_bio, company_logo FROM users WHERE id = ?', [req.user.id]);
+        // 🚀 REQUÊTE PROFIL : Ajout chirurgical de is_verified_company dans la sélection MySQL
+        const [users] = await db.execute(
+            'SELECT id, name, email, role, phone, address, company_name, company_bio, company_logo, is_verified_company FROM users WHERE id = ?', 
+            [req.user.id]
+        );
         if (users.length === 0) return res.status(404).json({ message: "Profil introuvable." });
         
         return res.status(200).json(users[0]);

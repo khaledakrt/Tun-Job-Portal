@@ -83,14 +83,34 @@ export const routes: Routes = [
     ]
   },
 
-  // ==========================================================================
-  // 🛡️ ESPACE ADMIN
+    // ==========================================================================
+  // 🛡️ ESPACE ADMIN : CONFIGURATION SÉCURISÉE DES ROUTES ENFANTS MAPPED
   // ==========================================================================
   { 
     path: 'admin', 
     canActivate: [adminGuard],
-    loadComponent: () => import('./features/admin/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent)
+    loadComponent: () => import('./features/admin/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'overview',
+        pathMatch: 'full'
+      },
+      {
+        path: 'overview',
+        loadComponent: () => import('./features/admin/admin-overview/admin-overview.component').then(m => m.AdminOverviewComponent)
+      },
+      {
+        path: 'manage-users',
+        loadComponent: () => import('./features/admin/manage-users/manage-users.component').then(m => m.ManageUsersComponent)
+      },
+      {
+        path: 'manage-jobs',
+        loadComponent: () => import('./features/admin/manage-jobs/manage-jobs.component').then(m => m.ManageJobsComponent)
+      }
+    ]
   },
   
   { path: '**', redirectTo: 'login' }
-];
+]; // 👈 Fermeture finale et propre du tableau des routes d'Angular
+
