@@ -1,5 +1,5 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { from } from 'rxjs';
@@ -31,29 +31,43 @@ import { from } from 'rxjs';
     /* 🔴 BANDEAU ALERTE ROUGE PROFESSIONNEL */
     .alert-box { padding: 14px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; font-weight: 500; text-align: center; animation: slideDown 0.3s ease-out; }
     .alert-error { background-color: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
+    
+    /* 🟢 NOUVEAU : BANDEAU ALERTE VERT PROFESSIONNEL D'ACTIVATION */
+    .alert-success { background-color: #e6f4ea; color: #137333; border: 1px solid #ceead6; }
+    
     @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   `]
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private router = inject(Router);
+  private route = inject(ActivatedRoute); // 🔑 Injection de la route active pour chasser l'URL
   private cdr = inject(ChangeDetectorRef);
 
   credentials = { email: '', password: '' };
   errorMessage = '';
+  isEmailVerified = false; // 🔑 Variable d'état pour le message vert
+
+  ngOnInit() {
+    // 🔍 Écoute si l'URL contient "?verified=true" lors de la redirection du Backend
+    this.route.queryParams.subscribe(params => {
+      if (params['verified'] === 'true') {
+        this.isEmailVerified = true;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   onSubmit(event: Event) {
     event.preventDefault(); // Stoppe le refresh automatique
     this.errorMessage = '';
+    this.isEmailVerified = false; // Cache le message vert si l'utilisateur tente un login
 
     if (!this.credentials.email || !this.credentials.password) {
       this.errorMessage = "Veuillez saisir vos identifiants.";
       return;
     }
 
-// 🚀 REMPLACEZ VOTRE LIGNE PAR CELLE-CI (Complète et valide) :
-const cleanUrl = 'http://127.0.0.1:3000/api/auth/login';
-
-
+    const cleanUrl = 'http://127.0.0.1:3000/api/auth/login';
 
     const loginPromise = fetch(cleanUrl, {
       method: 'POST',
@@ -62,6 +76,12 @@ const cleanUrl = 'http://127.0.0.1:3000/api/auth/login';
     }).then(async res => {
       if (!res.ok) {
         const errorBody = await res.json().catch(() => ({}));
+        
+        // 🛑 Capture chirurgicale du code statut 403 (Forbidden) envoyé par votre Backend
+        if (res.status === 403) {
+          throw { message: errorBody.message || "Votre compte n'est pas activé. Veuillez vérifier vos e-mails." };
+        }
+        
         throw { message: errorBody.message || "Identifiants ou mot de passe incorrects." };
       }
       return res.json();

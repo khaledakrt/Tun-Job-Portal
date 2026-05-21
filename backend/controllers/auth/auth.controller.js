@@ -1,7 +1,19 @@
 const db = require('../../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+
 const JWT_SECRET = 'TUN_JOB_SECRET_TOKEN_2026_KEY';
+
+// 🌐 Configuration de Nodemailer (Utilise votre email et mot de passe d'application généré)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 exports.register = async (req, res) => {
     const { name, email, password, role } = req.body;
@@ -15,7 +27,6 @@ exports.register = async (req, res) => {
         // 2. Interception chirurgicale du doublon MySQL avant insertion
         const [existingUser] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
         if (existingUser.length > 0) {
-            // Renvoie un code 400 propre avec le format 'message' attendu par Angular
             return res.status(400).json({ message: "Cette adresse e-mail est déjà utilisée en Tunisie." });
         }
 
@@ -23,24 +34,50 @@ exports.register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // 4. Insertion réelle en base de données MySQL
+        // 4. Génération du jeton (token) d'activation unique
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+
+        // 5. Insertion réelle en base de données MySQL avec vos nouvelles colonnes HeidiSQL
         await db.execute(
-            'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-            [name, email, hashedPassword, role || 'candidate']
+            'INSERT INTO users (name, email, password, role, is_verified, verification_token) VALUES (?, ?, ?, ?, 0, ?)',
+            [name, email, hashedPassword, role || 'candidate', verificationToken]
         );
 
-        // Succès : Déclenchera la Box Verte sur le Frontend
-        return res.status(201).json({ message: "Utilisateur créé avec succès !" });
+        // 6. Envoi automatique de l'e-mail de confirmation
+        const confirmationUrl = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
+        const mailOptions = {
+            from: '"Tun-Job Portal" <no-reply@tunjob.com>',
+            to: email,
+            subject: 'Tun-Job - Activez votre compte candidat/recruteur',
+            html: `
+              <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; padding: 30px; border-radius: 12px; background-color: #ffffff;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                  <h2 style="color: #0ea5e9; margin: 0; font-size: 24px; font-weight: 700;">Bienvenue sur Tun-Job !</h2>
+                </div>
+                <p style="font-size: 14px; color: #334155; line-height: 1.6;">Bonjour <strong>${name}</strong>,</p>
+                <p style="font-size: 14px; color: #334155; line-height: 1.6;">Merci de vous être inscrit sur Tun-Job Portal. Pour pouvoir vous connecter et utiliser la plateforme, veuillez confirmer votre adresse e-mail en cliquant sur le bouton ci-dessous :</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${confirmationUrl}" style="display: inline-block; background-color: #0ea5e9; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">Activer mon compte Tun-Job</a>
+                </div>
+                <p style="font-size: 12px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 15px;">Si le bouton ne fonctionne pas, copiez-collez ce lien : <br> ${confirmationUrl}</p>
+              </div>
+            `
+        };
+
+        transporter.sendMail(mailOptions, (mailErr) => {
+            if (mailErr) console.error("❌ Erreur d'envoi d'e-mail de confirmation:", mailErr);
+        });
+
+        // Succès : Déclenchera la Box Verte sur le Frontend Angular
+        return res.status(201).json({ message: "Inscription réussie ! Un e-mail de validation vous a été envoyé." });
 
     } catch (e) {
         console.error("❌ Erreur MySQL interceptée lors de l'inscription :", e);
         
-        // Sécurité de secours au cas où l'index unique de MySQL bloque (Code d'erreur ER_DUP_ENTRY = 1062)
         if (e.errno === 1062 || e.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({ message: "Cette adresse e-mail est déjà utilisée en Tunisie." });
         }
-
-        // En cas de vrai problème de table ou de connexion de base de données
         return res.status(400).json({ message: "Impossible de créer le compte actuellement." });
     }
 };
@@ -55,19 +92,57 @@ exports.login = async (req, res) => {
         const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (users.length === 0) return res.status(400).json({ message: "Identifiants ou mot de passe incorrects." });
 
-        const isMatch = await bcrypt.compare(password, users[0].password);
+        const user = users[0];
+
+        // 🛑 SÉCURITÉ : Interception et blocage si l'adresse e-mail n'est pas vérifiée (is_verified === 0)
+        if (user.is_verified === 0) {
+            return res.status(403).json({ message: "Votre adresse e-mail n'a pas été confirmée. Veuillez vérifier votre boîte de réception." });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Identifiants ou mot de passe incorrects." });
 
-        const token = jwt.sign({ id: users[0].id, role: users[0].role }, JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
         
         return res.status(200).json({ 
             token, 
-            role: users[0].role, 
-            name: users[0].name 
+            role: user.role, 
+            name: user.name 
         });
     } catch (e) {
         console.error("❌ Erreur de connexion :", e);
         return res.status(400).json({ message: "Une erreur est survenue lors de la tentative de connexion." });
+    }
+};
+
+// 🔑 NOUVELLE MÉTHODE : Traite la validation lors du clic sur l'e-mail
+exports.verifyEmail = async (req, res) => {
+    const { token } = req.query;
+
+    if (!token) {
+        return res.status(400).send("Jeton de vérification manquant.");
+    }
+
+    try {
+        // Rechercher l'utilisateur avec ce jeton
+        const [users] = await db.execute('SELECT id FROM users WHERE verification_token = ?', [token]);
+        
+        if (users.length === 0) {
+            return res.status(400).send("Le lien de confirmation est invalide ou a expiré.");
+        }
+
+        // Mettre à jour le statut et purger le jeton
+        await db.execute(
+            'UPDATE users SET is_verified = 1, verification_token = NULL WHERE verification_token = ?',
+            [token]
+        );
+
+        // Redirection vers le formulaire Angular local avec paramètre de succès
+        return res.redirect('http://localhost:4200/login?verified=true');
+
+    } catch (e) {
+        console.error("❌ Erreur lors de la vérification de l'e-mail :", e);
+        return res.status(500).send("Erreur interne lors de la validation du compte.");
     }
 };
 

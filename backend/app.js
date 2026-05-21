@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const app = express();
-
+require('dotenv').config();
 // 1. CONFIGURATION DES SECURITY MIDDLEWARES SÉCURISÉE ET MISE À JOUR
 app.use(cors({
     origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],

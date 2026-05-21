@@ -5,7 +5,12 @@
       <p class="brand-subtitle">Connectez-vous pour accéder à votre espace membre</p>
     </div>
 
-    <!-- 🔴 BOX ERREUR IMMÉDIATE : Apparaît si le mot de passe est faux ou le compte inexistant -->
+    <!-- 🟢 BANDEAU VERT : Apparaît suite au clic dans le mail (?verified=true) -->
+    <div *ngIf="isEmailVerified" class="alert-box alert-success">
+      ✅ Votre adresse e-mail a été validée avec succès ! Vous pouvez maintenant vous connecter.
+    </div>
+
+    <!-- 🔴 BANDEAU ROUGE : Apparaît si le compte n'est pas activé (403) ou identifiants faux -->
     <div *ngIf="errorMessage" class="alert-box alert-error">
       ⚠️ {{ errorMessage }}
     </div>
