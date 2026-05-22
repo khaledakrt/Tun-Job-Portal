@@ -26,7 +26,10 @@ export class CvBuilderComponent implements OnInit {
   candidateContact = { email: '', phone: '', address: '' };
   successMessage: string = '';
   isSaving: boolean = false;
-
+showSaveConfirmationModal: boolean = false;
+ // 🛠️ Ajoutez ces deux lignes manquantes ici :
+  showDeleteConfirmationModal: boolean = false;
+  pendingDeleteAction: { type: 'experience' | 'education', index: number } | null = null;
   // 🔒 État du formulaire principal (false = verrouillé/incliquable, true = éditable)
   isEditable: boolean = true;
 
@@ -142,10 +145,12 @@ export class CvBuilderComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  removeExperience(index: number) { 
-    this.cvData.experiences.splice(index, 1); 
-    this.cdr.detectChanges(); 
+  removeExperience(index: number) {
+    this.pendingDeleteAction = { type: 'experience', index: index };
+    this.showDeleteConfirmationModal = true;
+    this.cdr.detectChanges();
   }
+
 
   // ➕ POPUP ÉTUDES : Mode Ajouter
   openEducationModal() {
@@ -185,53 +190,78 @@ export class CvBuilderComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  removeEducation(index: number) { 
-    this.cvData.educations.splice(index, 1); 
-    this.cdr.detectChanges(); 
+  // 2. Déclenché lors du clic sur le bouton Supprimer de la formation
+  removeEducation(index: number) {
+    this.pendingDeleteAction = { type: 'education', index: index };
+    this.showDeleteConfirmationModal = true;
+    this.cdr.detectChanges();
   }
-
+ // 3. Exécuté uniquement si l'utilisateur clique sur "Confirmer" dans la popup de suppression
+  confirmDelete() {
+    if (this.pendingDeleteAction) {
+      const { type, index } = this.pendingDeleteAction;
+      
+      if (type === 'experience') {
+        this.cvData.experiences.splice(index, 1);
+      } else if (type === 'education') {
+        this.cvData.educations.splice(index, 1);
+      }
+    }
+    
+    // Réinitialisation et fermeture
+    this.showDeleteConfirmationModal = false;
+    this.pendingDeleteAction = null;
+    this.cdr.detectChanges();
+  }
   getSkillsArray(): string[] { return this.cvData.skills ? this.cvData.skills.split(',').filter(s => s.trim() !== '') : []; }
   getInterestsArray(): string[] { return this.cvData.interests ? this.cvData.interests.split(',').filter(i => i.trim() !== '') : []; }
 
-  onSaveCV(event: Event) {
-    event.preventDefault();
-    this.isSaving = true;
-    const token = localStorage.getItem('token');
-    
-    const nameParts = this.candidateName.trim().split(' ');
-    const firstname = nameParts[0] || '';
-    const lastname = nameParts.slice(1).join(' ') || '';
+// 1. Déclenché par le clic sur le bouton de soumission
+onSaveCV(event: Event) {
+  event.preventDefault();
+  // Ouvre la popup de confirmation personnalisée
+  this.showSaveConfirmationModal = true;
+  this.cdr.detectChanges();
+}
 
-    const payload = {
-      title: this.cvData.title,
-      summary: this.cvData.summary,
-      skills: this.cvData.skills,
-      interests: this.cvData.interests,
-      experience: JSON.stringify(this.cvData.experiences),
-      education: JSON.stringify(this.cvData.educations),
-      firstname: firstname,
-      lastname: lastname,
-      email: this.candidateContact.email,
-      phone: this.candidateContact.phone,
-      address: this.candidateContact.address
-    };
+// 2. Déclenché uniquement si l'utilisateur clique sur "Confirmer" dans la popup
+confirmAndSaveCV() {
+  this.showSaveConfirmationModal = false; // Ferme la popup
+  this.isSaving = true;
+  const token = localStorage.getItem('token');
+  
+  const nameParts = this.candidateName.trim().split(' ');
+  const firstname = nameParts[0] || '';
+  const lastname = nameParts.slice(1).join(' ') || '';
 
-    fetch('http://localhost:3000/api/candidate/cv/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
-      body: JSON.stringify(payload)
-    })
-    .then(res => res.ok ? res.json() : null)
-    .then(() => {
-      this.successMessage = "Toutes les modifications de votre profil ont été enregistrées !";
-      this.isSaving = false;
-      
-      // 🔒 Le formulaire devient instantanément incliquable après succès
-      this.isEditable = false; 
-      
-      this.cdr.detectChanges();
-      setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 3000);
-    })
-    .catch(() => { this.isSaving = false; this.cdr.detectChanges(); });
-  }
+  const payload = {
+    title: this.cvData.title,
+    summary: this.cvData.summary,
+    skills: this.cvData.skills,
+    interests: this.cvData.interests,
+    experience: JSON.stringify(this.cvData.experiences),
+    education: JSON.stringify(this.cvData.educations),
+    firstname: firstname,
+    lastname: lastname,
+    email: this.candidateContact.email,
+    phone: this.candidateContact.phone,
+    address: this.candidateContact.address
+  };
+
+  fetch('http://localhost:3000/api/candidate/cv/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.ok ? res.json() : null)
+  .then(() => {
+    this.successMessage = "Toutes les modifications de votre profil ont été enregistrées !";
+    this.isSaving = false;
+    this.isEditable = false; 
+    this.cdr.detectChanges();
+    setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 3000);
+  })
+  .catch(() => { this.isSaving = false; this.cdr.detectChanges(); });
+}
+
 }

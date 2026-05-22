@@ -184,9 +184,12 @@
   background: #ffffff;
   padding: 28px;
   border-radius: 12px;
-  width: 500px;
-  max-width: 90%;
+  width: 640px !important;    /* Laisse de la place pour les 5 boutons côte à côte */
+  max-width: 95%;
+  height: auto !important;    /* 🆕 AJOUT : La boîte grandit selon le texte */
+  max-height: 90vh;           /* Sécurité pour ne pas dépasser l'écran */
   box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+  overflow-y: auto;           /* Ajoute un défilement propre si le résumé IA est très long */
 }
 
 .modal-header {
@@ -280,8 +283,11 @@
   margin-top: 22px;
   border-top: 1px solid #f1f5f9;
   padding-top: 14px;
-  display: flex;
-  justify-content: flex-end;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important; /* 🟢 Modifié : Empêche le bouton Fermer de sauter à la ligne */
 }
 
 .btn-secondary {
@@ -303,4 +309,56 @@
 @keyframes fadeIn { 
   from { opacity: 0; transform: translateY(4px); } 
   to { opacity: 1; transform: translateY(0); } 
+}
+/* ==========================================================================
+   🆕 AJOUTS EXCLUSIFS POUR LES NOUVEAUX CHAMPS PROS DU CANDIDAT (ATS MODALE)
+   ========================================================================== */
+
+/* Badge de situation professionnelle (ex: En poste, Recherche active) */
+.badge-status-pro-ats {
+  background-color: #f0fdf4; 
+  color: #166534; 
+  padding: 3px 10px; 
+  border-radius: 6px; 
+  font-size: 12.5px; 
+  font-weight: 600;
+  display: inline-block;
+  border: 1px solid #dcfce7;
+}
+
+/* Style de base unifié pour les boutons réseaux sociaux */
+.social-badge-btn {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px; 
+  padding: 5px 12px; 
+  border-radius: 6px; 
+  font-size: 12.5px; 
+  font-weight: 600; 
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Style spécifique LinkedIn avec effet au survol */
+.linkedin-badge { 
+  background: #e0f2fe; 
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+.linkedin-badge:hover { 
+  background: #0369a1; 
+  color: #ffffff;
+}
+
+/* Style spécifique GitHub avec effet au survol */
+.github-badge { 
+  background: #f8fafc; 
+  color: #0f172a; 
+  border: 1px solid #cbd5e1; 
+}
+.github-badge:hover { 
+  background: #0f172a; 
+  color: #ffffff;
+  border-color: #0f172a;
 }

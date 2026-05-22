@@ -1,142 +1,276 @@
 <div class="profile-container-compact">
-  
+
+  <!-- HEADER -->
   <div class="card-header-flex-compact">
     <div class="card-header-left">
       <h3><i class="bi bi-person-fill-gear"></i> Mon Profil Candidat</h3>
     </div>
   </div>
 
-  <!-- Zone de notifications flashez fines -->
+  <!-- ALERTS -->
   @if (successMessage) {
     <div class="alert-box-compact alert-success">{{ successMessage }}</div>
   }
+
   @if (passwordSuccessMessage) {
     <div class="alert-box-compact alert-success">{{ passwordSuccessMessage }}</div>
   }
+
   @if (passwordErrorMessage) {
     <div class="alert-box-compact alert-danger">{{ passwordErrorMessage }}</div>
   }
 
-  <!-- DISPOSITION SPLIT 2 PANNEAUX SANS SCROLL -->
-  <div class="profile-split-layout">
-    
-    <!-- ================= COLONNE GAUCHE : INFORMATIONS PERSONNELLES ================= -->
-    <div class="profile-panel-card">
-      <form (ngSubmit)="onSaveProfile($event)">
-        
-        <!-- Téléchargement de la photo de profil / Avatar -->
+  <!-- FORM GLOBAL -->
+  <form (ngSubmit)="onSaveProfile($event)">
+
+    <div class="profile-split-layout">
+
+      <!-- ================= LEFT ================= -->
+      <div class="profile-panel-card">
+
+        <!-- AVATAR -->
         <div class="logo-section-compact">
           <div class="logo-preview-compact">
-            @if (logoPreviewUrl) {
-              <!-- 🟢 CORRECTION : Assurez-vous que l'attribut src est lié dynamiquement à logoPreviewUrl -->
-<img [src]="logoPreviewUrl || 'assets/images/default-avatar.png'" alt="Avatar candidat" class="avatar-img">
 
+            @if (logoPreviewUrl) {
+              <img [src]="logoPreviewUrl || 'assets/images/default-avatar.png'" class="avatar-img">
             } @else {
               <i class="bi bi-person-circle" style="font-size: 26px; color: #cbd5e1;"></i>
             }
+
           </div>
+
           <div class="upload-actions-compact">
-            <input type="file" id="avatarInput" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
-            <button type="button" class="btn-secondary-upload-compact" [disabled]="!isEditMode" onclick="document.getElementById('avatarInput').click()">
+            <input type="file" id="avatarInput" accept="image/*" (change)="onFileSelected($event)" style="display:none">
+
+            <button type="button"
+                    class="btn-secondary-upload-compact"
+                    [disabled]="!isEditMode"
+                    onclick="document.getElementById('avatarInput').click()">
               <i class="bi bi-camera-fill"></i> Modifier ma photo
             </button>
           </div>
         </div>
 
-        <!-- Formulaire Candidat -->
-        <div class="compact-form-grid" style="grid-template-columns: 1fr;">
-          <!-- Nom complet -->
+        <!-- FORM FIELDS -->
+        <div class="compact-form-grid">
+
           <div class="form-group-compact">
             <label>Nom & Prénom *</label>
             @if (isEditMode) {
-              <input type="text" name="name" [(ngModel)]="profile.name" required placeholder="Votre nom complet">
+              <input [(ngModel)]="profile.name" name="name" required>
             } @else {
               <div class="static-text-compact">{{ profile.name || 'Non renseigné' }}</div>
             }
           </div>
 
-          <!-- Téléphone -->
           <div class="form-group-compact">
-            <label>Téléphone de contact *</label>
+            <label>Téléphone *</label>
             @if (isEditMode) {
-              <input type="text" name="phone" [(ngModel)]="profile.phone" required placeholder="Ex: +216 99 000 000">
+              <input [(ngModel)]="profile.phone" name="phone">
             } @else {
               <div class="static-text-compact">{{ profile.phone || 'Non renseigné' }}</div>
             }
           </div>
 
-          <!-- Adresse de résidence -->
           <div class="form-group-compact">
-            <label>Adresse complète *</label>
+            <label>Adresse *</label>
             @if (isEditMode) {
-              <input type="text" name="address" [(ngModel)]="profile.address" required placeholder="Ex: Ariana, Tunis, Tunisie">
+              <input [(ngModel)]="profile.address" name="address">
             } @else {
               <div class="static-text-compact">{{ profile.address || 'Non renseigné' }}</div>
             }
           </div>
+
         </div>
 
-        <!-- Boutons d'actions Profil -->
+        <!-- ACTIONS -->
         <div class="form-actions-compact">
+
           @if (!isEditMode) {
             <button type="button" class="btn-save-compact" (click)="toggleEditMode(true)">
-              <i class="bi bi-pencil-square"></i> Modifier le profil
+              <i class="bi bi-pencil-square"></i> Modifier
             </button>
           } @else {
-            <button type="button" class="btn-cancel-compact" (click)="toggleEditMode(false)">Annuler</button>
-            <button type="submit" class="btn-save-compact"><i class="bi bi-shield-check"></i> Enregistrer</button>
+            <button type="button" class="btn-cancel-compact" (click)="toggleEditMode(false)">
+              Annuler
+            </button>
+
+            <button type="submit" class="btn-save-compact">
+              <i class="bi bi-shield-check"></i> Enregistrer
+            </button>
           }
-        </div>
-      </form>
-    </div>
 
-    <!-- ================= COLONNE DROITE : SÉCURITÉ ET MOT DE PASSE ================= -->
-    <div class="profile-panel-card">
-      <div class="panel-inner-title"><i class="bi bi-shield-lock-fill"></i> Sécurité du compte</div>
-      
-      <form (ngSubmit)="onUpdatePassword($event)">
-        <div class="compact-form-grid vertical-stack">
-          
-          <div class="form-group-compact">
-            <label>Mot de passe actuel *</label>
-            @if (isPasswordEditMode) {
-              <input type="password" name="current_password" [(ngModel)]="passwordData.currentPassword" required placeholder="••••••••">
-            } @else {
-              <div class="static-text-compact text-muted-dots">••••••••••••</div>
-            }
-          </div>
-
-          <div class="form-group-compact">
-            <label>Nouveau mot de passe *</label>
-            @if (isPasswordEditMode) {
-              <input type="password" name="new_password" [(ngModel)]="passwordData.newPassword" required placeholder="Min. 6 caractères">
-            } @else {
-              <div class="static-text-compact text-muted-dots">••••••••••••</div>
-            }
-          </div>
-
-          <div class="form-group-compact">
-            <label>Confirmer le mot de passe *</label>
-            @if (isPasswordEditMode) {
-              <input type="password" name="confirm_password" [(ngModel)]="passwordData.confirmPassword" required placeholder="••••••••">
-            } @else {
-              <div class="static-text-compact text-muted-dots">••••••••••••</div>
-            }
-          </div>
         </div>
 
-        <div class="form-actions-compact" style="margin-top: 24px;">
+      </div>
+
+      <!-- ================= RIGHT ================= -->
+      <div class="profile-panel-card">
+
+        <div class="panel-inner-title">
+          <i class="bi bi-shield-lock-fill"></i> Sécurité du compte
+        </div>
+
+        <div class="compact-form-grid">
+
+          <div class="form-group-compact">
+            <label>Mot de passe actuel</label>
+
+            @if (isPasswordEditMode) {
+              <input type="password" [(ngModel)]="passwordData.currentPassword" name="currentPassword">
+            } @else {
+              <div class="static-text-compact">••••••••</div>
+            }
+          </div>
+
+          <div class="form-group-compact">
+            <label>Nouveau mot de passe</label>
+
+            @if (isPasswordEditMode) {
+              <input type="password" [(ngModel)]="passwordData.newPassword" name="newPassword">
+            } @else {
+              <div class="static-text-compact">••••••••</div>
+            }
+          </div>
+
+          <div class="form-group-compact">
+            <label>Confirmation</label>
+
+            @if (isPasswordEditMode) {
+              <input type="password" [(ngModel)]="passwordData.confirmPassword" name="confirmPassword">
+            } @else {
+              <div class="static-text-compact">••••••••</div>
+            }
+          </div>
+
+        </div>
+
+        <div class="form-actions-compact">
+
           @if (!isPasswordEditMode) {
-            <button type="button" class="btn-save-compact btn-dark-theme" (click)="togglePasswordEditMode(true)">
-              <i class="bi bi-key-fill"></i> Modifier le mot de passe
+            <button type="button" class="btn-save-compact btn-dark-theme"
+                    (click)="togglePasswordEditMode(true)">
+              <i class="bi bi-key-fill"></i> Modifier mot de passe
             </button>
           } @else {
-            <button type="button" class="btn-cancel-compact" (click)="togglePasswordEditMode(false)">Annuler</button>
-            <button type="submit" class="btn-save-compact btn-dark-theme"><i class="bi bi-shield-check"></i> Enregistrer</button>
+
+            <button type="button" class="btn-cancel-compact"
+                    (click)="togglePasswordEditMode(false)">
+              Annuler
+            </button>
+
+            <button type="button" class="btn-save-compact btn-dark-theme"
+                    (click)="onUpdatePassword($event)">
+              Enregistrer
+            </button>
+
           }
+
         </div>
-      </form>
+
+      </div>
+
     </div>
 
-  </div>
+    <!-- ================= FULL WIDTH ================= -->
+    <div class="profile-panel-card full-width-card-compact">
+
+      <div class="panel-inner-title">
+        <i class="bi bi-briefcase-fill"></i>
+        Profil professionnel
+      </div>
+
+      <div class="horizontal-form-grid-compact">
+
+        <div class="form-group-compact">
+          <label>Date de naissance</label>
+
+          @if (!isEditMode) {
+            <div class="static-text-compact">
+              {{ profile.birth_date ? (profile.birth_date | date:'dd/MM/yyyy') : 'Non renseignée' }}
+            </div>
+          } @else {
+            <input type="date" [(ngModel)]="profile.birth_date" name="birth_date">
+          }
+        </div>
+
+        <div class="form-group-compact">
+          <label>LinkedIn</label>
+
+          @if (!isEditMode) {
+            <div class="static-text-compact">
+              {{ profile.linkedin || 'Non renseigné' }}
+            </div>
+          } @else {
+            <input type="url" [(ngModel)]="profile.linkedin" name="linkedin">
+          }
+        </div>
+
+        <div class="form-group-compact">
+          <label>GitHub</label>
+
+          @if (!isEditMode) {
+            <div class="static-text-compact">
+              {{ profile.github || 'Non renseigné' }}
+            </div>
+          } @else {
+            <input type="url" [(ngModel)]="profile.github" name="github">
+          }
+        </div>
+
+        <div class="form-group-compact">
+          <label>Situation</label>
+
+          @if (!isEditMode) {
+            <div class="static-text-compact">{{ profile.job_status }}</div>
+          } @else {
+            <select [(ngModel)]="profile.job_status" name="job_status">
+              <option value="">Choisir</option>
+              <option value="En recherche active">En recherche active</option>
+              <option value="En poste">En poste</option>
+              <option value="Étudiant">Étudiant</option>
+              <option value="Freelance">Freelance</option>
+            </select>
+          }
+        </div>
+
+        <!-- DISPONIBILITÉ -->
+        <div class="form-group-compact">
+          <label>Disponibilité</label>
+
+          @if (!isEditMode) {
+            <div class="static-text-compact">{{ profile.availability }}</div>
+          } @else {
+            <select [(ngModel)]="profile.availability" name="availability">
+              <option value="">Choisir</option>
+              <option value="Immédiate">Immédiate</option>
+              <option value="1 mois">1 mois</option>
+              <option value="3 mois">3 mois</option>
+            </select>
+          }
+        </div>
+
+        <!-- CONTRAT -->
+        <div class="form-group-compact">
+          <label>Contrat recherché</label>
+
+          @if (!isEditMode) {
+            <div class="static-text-compact">{{ profile.job_type }}</div>
+          } @else {
+            <select [(ngModel)]="profile.job_type" name="job_type">
+              <option value="">Choisir</option>
+              <option value="CDI">CDI</option>
+              <option value="CDD">CDD</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Stage">Stage</option>
+            </select>
+          }
+        </div>
+
+      </div>
+
+    </div>
+
+  </form>
 </div>

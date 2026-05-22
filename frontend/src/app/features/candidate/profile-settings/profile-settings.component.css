@@ -1,137 +1,296 @@
- 
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+.profile-container-compact { 
+  max-width: 100% !important; 
+  margin: 0 auto; 
+  padding: 0 20px !important; 
+  font-family: inherit; 
+  box-sizing: border-box; 
+}
 
-@Component({
-  selector: 'app-profile-settings',
-  standalone: true,
-  imports: [FormsModule],
-  templateUrl: './profile-settings.component.html',
-  styles: [`
-    .profile-container { max-width: 800px; margin: 0 auto; padding-top: 10px; }
-    .profile-card { background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 30px; }
-    .card-header { margin-bottom: 25px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
-    .card-header h3 { margin: 0 0 6px 0; color: #0f172a; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-    .card-header p { margin: 0; color: #64748b; font-size: 14px; }
-    .logo-upload-section { display: flex; align-items: center; gap: 24px; background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
-    .logo-preview { width: 100px; height: 100px; border-radius: 8px; border: 2px solid #e2e8f0; background: #fff; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-    .logo-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .btn-secondary-upload { background-color: #ffffff; border: 1px solid #cbd5e1; color: #334155; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 13px; font-weight: 600; color: #334155; }
-    .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box; font-family: inherit; }
-    .url-group { grid-column: span 2; }
-    .btn-save { background-color: #0ea5e9; color: white; border: none; border-radius: 6px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 25px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-    .alert-box { padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; text-align: center; font-weight: 600; }
-    .alert-success { background-color: #e6f4ea; color: #137333; border: 1px solid #ceead6; }
-  `]
-})
-export class ProfileSettingsComponent implements OnInit {
-  private cdr = inject(ChangeDetectorRef);
+.card-header-flex-compact { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 15px; 
+}
 
-  profile = { company_name: '', phone: '', address: '', company_bio: '' };
-  logoPreviewUrl: string | null = null;
-  selectedFile: File | null = null; // 🚀 Permet de stocker le fichier image binaire
-  successMessage = '';
+.card-header-left h3 { 
+  margin: 0; 
+  color: #0f172a; 
+  font-size: 18px; 
+  font-weight: 700; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+}
 
-  ngOnInit() {
-    this.loadCurrentProfile();
+/* Grille principale en deux colonnes pour le haut de page */
+.profile-split-layout { 
+  display: grid; 
+  grid-template-columns: 1.2fr 1fr; 
+  gap: 24px; 
+  align-items: start; 
+  width: 100%; 
+}
+
+/* Ajout d'une marge sous le layout split pour ne pas étouffer la carte du bas */
+form > .profile-split-layout {
+  margin-bottom: 24px;
+}
+
+.profile-panel-card { 
+  background: #ffffff; 
+  border-radius: 12px; 
+  border: 1px solid #e2e8f0; 
+  padding: 26px; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02); 
+  box-sizing: border-box; 
+}
+
+.panel-inner-title { 
+  font-size: 14px; 
+  font-weight: 700; 
+  color: #0f172a; 
+  text-align: left; 
+  margin-bottom: 18px; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+}
+
+.panel-inner-title i { 
+  color: #0ea5e9; 
+}
+
+.logo-section-compact { 
+  display: flex; 
+  align-items: center; 
+  gap: 16px; 
+  background: #f8fafc; 
+  padding: 12px 16px; 
+  border-radius: 8px; 
+  margin-bottom: 16px; 
+  border: 1px solid #f1f5f9; 
+}
+
+.logo-preview-compact { 
+  width: 52px; 
+  height: 52px; 
+  border-radius: 50%; 
+  border: 1px solid #cbd5e1; 
+  background: #ffffff; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  overflow: hidden; 
+}
+
+.logo-preview-compact img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+}
+
+.btn-secondary-upload-compact { 
+  background: #ffffff; 
+  border: 1px solid #cbd5e1; 
+  color: #334155; 
+  padding: 6px 12px; 
+  border-radius: 4px; 
+  font-size: 12px; 
+  font-weight: 600; 
+  cursor: pointer; 
+}
+
+.btn-secondary-upload-compact:disabled { 
+  opacity: 0.5; 
+  cursor: not-allowed; 
+  background: #f1f5f9; 
+}
+
+.compact-form-grid { 
+  display: grid; 
+  grid-template-columns: 1fr; 
+  gap: 14px; 
+}
+
+.form-group-compact { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 6px; 
+}
+
+.form-group-compact label { 
+  font-size: 11px; 
+  font-weight: 700; 
+  color: #64748b; 
+  text-align: left; 
+  text-transform: uppercase; 
+  letter-spacing: 0.3px; 
+}
+
+/* Prise en charge uniforme des inputs et des listes déroulantes */
+.form-group-compact input, 
+.form-group-compact select { 
+  width: 100%; 
+  padding: 10px 14px; 
+  border: 1px solid #cbd5e1; 
+  border-radius: 6px; 
+  font-size: 13.5px; 
+  box-sizing: border-box; 
+  color: #1e293b; 
+  background: #ffffff; 
+  height: 41px;
+}
+
+.form-group-compact input:disabled,
+.form-group-compact select:disabled {
+  background: #f8fafc;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.static-text-compact { 
+  background: #f8fafc; 
+  padding: 10px 14px; 
+  border-radius: 6px; 
+  border: 1px solid #e2e8f0; 
+  font-size: 13.5px; 
+  font-weight: 500; 
+  color: #0f172a; 
+  text-align: left; 
+  min-height: 41px; 
+  box-sizing: border-box; 
+  display: flex; 
+  align-items: center; 
+}
+
+.text-muted-dots { 
+  color: #94a3b8 !important; 
+  letter-spacing: 3px; 
+  font-weight: bold; 
+  background-color: #fafbfc; 
+}
+
+.form-actions-compact { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 10px; 
+  margin-top: 20px; 
+  padding-top: 15px; 
+  border-top: 1px solid #f1f5f9; 
+}
+
+.btn-cancel-compact { 
+  background: #f1f5f9; 
+  color: #475569; 
+  border: 1px solid #cbd5e1; 
+  padding: 8px 16px; 
+  font-size: 13px; 
+  font-weight: 600; 
+  border-radius: 6px; 
+  cursor: pointer; 
+}
+
+.btn-save-compact { 
+  background: #0ea5e9; 
+  color: white; 
+  border: none; 
+  padding: 8px 20px; 
+  font-size: 13px; 
+  font-weight: 600; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px; 
+}
+
+.btn-save-compact.btn-dark-theme { 
+  background: #0f172a !important; 
+  color: #ffffff !important; 
+}
+
+.btn-save-compact.btn-dark-theme:hover { 
+  background: #1e293b !important; 
+}
+
+.alert-box-compact { 
+  padding: 10px; 
+  border-radius: 6px; 
+  margin-bottom: 14px; 
+  font-size: 13px; 
+  text-align: center; 
+  font-weight: 600; 
+}
+
+.alert-success { 
+  background-color: #e6f4ea; 
+  color: #137333; 
+  border: 1px solid #ceead6; 
+}
+
+.alert-danger { 
+  background-color: #fef2f2; 
+  color: #991b1b; 
+  border: 1px solid #fee2e2; 
+}
+
+/* ================= GRILLE PROFESSIONNELLE (Ajustements visuels) ================= */
+.full-width-card-compact {
+  margin-top: 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Aligne proprement les éléments sur 3 colonnes de tailles identiques */
+.horizontal-form-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* Permet au champ géographique d'occuper tout le bas pour équilibrer la ligne */
+.grid-span-full {
+  grid-column: span 3;
+}
+
+.input-with-icon-compact { 
+  position: relative; 
+  display: flex; 
+  align-items: center; 
+  width: 100%; 
+}
+
+.input-with-icon-compact i { 
+  position: absolute; 
+  left: 14px; 
+  color: #64748b; 
+  font-size: 14px; 
+  z-index: 2;
+}
+
+.input-with-icon-compact input { 
+  padding-left: 38px !important; 
+}
+
+/* Reste parfaitement fluide si la fenêtre se réduit */
+@media (max-width: 1024px) {
+  .horizontal-form-grid-compact {
+    grid-template-columns: repeat(2, 1fr);
   }
-
-  // 📥 1. CHARGEMENT DYNAMIQUE DES DONNÉES DEPUIS VOTRE API RECRUTEUR
-  loadCurrentProfile() {
-    const targetUrl = 'http://localhost:3000/api/recruiter/profile/details'; // Ajustez si la route de lecture porte un autre nom
-    const token = localStorage.getItem('token');
-
-    fetch(targetUrl, {
-      method: 'GET',
-      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
-    })
-    .then(async res => {
-      if (res.ok) return res.json();
-      throw new Error();
-    })
-    .then(data => {
-      if (data) {
-        this.profile.company_name = data.company_name || localStorage.getItem('name') || '';
-        this.profile.phone = data.phone || '';
-        this.profile.address = data.address || '';
-        this.profile.company_bio = data.company_bio || '';
-        
-        if (data.company_logo) {
-          this.logoPreviewUrl = `http://localhost:3000/uploads/${data.company_logo}`;
-        }
-        this.cdr.detectChanges();
-      }
-    })
-    .catch(() => {
-      // Fallback par défaut si la table est vierge lors de la première ouverture
-      this.profile.company_name = localStorage.getItem('name') || '';
-      this.cdr.detectChanges();
-    });
+  .grid-span-full {
+    grid-column: span 2;
   }
+}
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file; // Enregistrement binaire pour le FormData
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.logoPreviewUrl = reader.result as string;
-        this.cdr.detectChanges();
-      };
-      reader.readAsDataURL(file);
-    }
+@media (max-width: 768px) {
+  .profile-split-layout,
+  .horizontal-form-grid-compact {
+    grid-template-columns: 1fr;
   }
-
-  // 📤 2. EXPÉDITION DU FORMDATA ENTIÈREMENT SÉCURISÉ VERS VOTRE ROUTE AVEC LOGO
-  onSaveProfile(event: Event) {
-    event.preventDefault();
-
-    const targetUrl = 'http://localhost:3000/api/recruiter/profile/update';
-    const token = localStorage.getItem('token');
-
-    // 🚀 Création du FormData requis par multer pour le traitement du logo
-    const formData = new FormData();
-    formData.append('company_name', this.profile.company_name);
-    formData.append('phone', this.profile.phone);
-    formData.append('address', this.profile.address);
-    formData.append('company_bio', this.profile.company_bio);
-
-    if (this.selectedFile) {
-      formData.append('logo', this.selectedFile); // 'logo' correspond à upload.single('logo') dans votre routeur
-    }
-
-    fetch(targetUrl, {
-      method: 'POST',
-      headers: { 
-        'Authorization': token ? `Bearer ${token}` : ''
-        // ⚠️ SURTOUT PAS de Content-Type: application/json ici, le navigateur le configure lui-même pour le FormData
-      },
-      body: formData
-    })
-    .then(async res => {
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || "Impossible de sauvegarder votre profil.");
-      }
-      return res.json();
-    })
-    .then(resData => {
-      // Synchronise le nom de l'entreprise de la barre latérale instantanément
-      localStorage.setItem('name', this.profile.company_name);
-      
-      this.successMessage = resData.message || "Les informations de votre profil et votre logo ont été mis à jour.";
-      this.cdr.detectChanges();
-
-      setTimeout(() => {
-        this.successMessage = '';
-        this.cdr.detectChanges();
-      }, 3000);
-    })
-    .catch(err => {
-      alert(err.message);
-    });
+  .grid-span-full {
+    grid-column: span 1;
   }
 }

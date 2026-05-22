@@ -1,10 +1,8 @@
 const db = require('../../config/db');
 
+
 // ==========================================================================
-// 📥 1. RÉCUPÉRATION DES CANDIDATURES DU RECRUTEUR
-// ==========================================================================
-// ==========================================================================
-// 📥 1. RÉCUPÉRATION DES CANDIDATURES DU RECRUTEUR
+// 📥 1. RÉCUPÉRATION DES CANDIDATURES DU RECRUTEUR (AVEC PROFIL PRO ENRICHI)
 // ==========================================================================
 exports.getApplications = async (req, res) => {
     try {
@@ -14,17 +12,27 @@ exports.getApplications = async (req, res) => {
                 a.status AS status, 
                 a.applied_at AS applied_at, 
                 j.title AS job_title, 
-                u.id AS candidate_id, -- 🚀 AJOUT : Indispensable pour retrouver le CV
+                u.id AS candidate_id,
                 u.name AS name, 
                 u.email AS email, 
                 u.phone AS phone, 
                 u.address AS address, 
                 u.company_logo AS avatar_logo, 
-                c.summary AS cv_summary
+                c.summary AS cv_summary,
+                -- 🆕 AJOUT : Récupération des nouveaux critères de recherche du candidat
+                cp.birth_date, 
+                cp.linkedin, 
+                cp.github, 
+                cp.job_status, 
+                cp.availability, 
+                cp.job_type, 
+                cp.location_pref
             FROM applications a
             JOIN jobs j ON a.job_id = j.id
             JOIN users u ON a.candidate_id = u.id
             LEFT JOIN cvs c ON u.id = c.candidate_id
+            -- 🆕 AJOUT : Jointure de sécurité vers la table isolée des profils candidats
+            LEFT JOIN candidate_profiles cp ON u.id = cp.user_id
             WHERE j.recruiter_id = ? 
             ORDER BY a.applied_at DESC`, [req.user.id]);
 

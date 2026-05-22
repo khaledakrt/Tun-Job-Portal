@@ -100,13 +100,14 @@
 <!-- 🚀 FENÊTRE MODALE DE CONSULTATION DE LA CANDIDATURE                        -->
 <!-- ========================================================================== -->
 <div *ngIf="selectedApplication" class="modal-overlay" (click)="onCloseDetails()">
-<div class="modal-content" (click)="$event.stopPropagation()" style="width: 720px; height: 500px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
+<div class="modal-content" (click)="$event.stopPropagation()" style="width: 640px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column; gap: 16px;">
     
     <!-- En-tête -->
     <div class="modal-header">
       <h3>Candidature de {{ selectedApplication.name }}</h3>
       <button class="close-btn" (click)="onCloseDetails()">&times;</button>
     </div>
+
 
         <!-- Corps des détails avec intégration de l'avatar -->
     <div class="modal-body">
@@ -142,31 +143,91 @@
   <!-- Texte Dynamique basé sur la présence du résumé de CV -->
   {{ selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'Consulter le CV' : 'Aucun CV' }}
 </button>
-
-
-
         </div>
+        <!-- Bloc des informations textuelles aligné au millimètre près -->
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
+  
+  <div class="info-row" style="display: flex;">
+    <span class="info-label" style="width: 150px; flex-shrink: 0;">Poste ciblé :</span> 
+    <strong class="info-value text-slate">{{ selectedApplication.job_title }}</strong>
+  </div>
+  
+  <div class="info-row" style="display: flex;">
+    <span class="info-label" style="width: 150px; flex-shrink: 0;">Adresse e-mail :</span> 
+    <span class="info-value">{{ selectedApplication.email }}</span>
+  </div>
+  
+  <div class="info-row" style="display: flex;">
+    <span class="info-label" style="width: 150px; flex-shrink: 0;">Téléphone :</span> 
+    <span class="info-value">{{ selectedApplication.phone || 'Non renseigné' }}</span>
+  </div>
+  
+  <div class="info-row" style="display: flex;">
+    <span class="info-label" style="width: 150px; flex-shrink: 0;">Ville / Région :</span> 
+    <span class="info-value">{{ selectedApplication.address || 'Non spécifiée' }}</span>
+  </div>
+
+  <!-- 🟢 Aligné : Situation actuelle -->
+  <div class="info-row" style="display: flex; align-items: center;">
+    <span class="info-label" style="width: 150px; flex-shrink: 0;">Situation actuelle :</span> 
+    <span class="info-value">
+      <span class="badge-status-pro-ats">{{ selectedApplication.job_status || 'Non renseignée' }}</span>
+    </span>
+  </div>
+  
+  <!-- 🟢 Aligné : Disponibilité -->
+  <div class="info-row" style="display: flex;">
+    <span class="info-label" style="width: 150px; flex-shrink: 0;">Disponibilité :</span> 
+    <span class="info-value">{{ selectedApplication.availability || 'Non renseignée' }}</span>
+  </div>
+  
+  <!-- 🟢 Aligné : Contrat souhaité -->
+  <div class="info-row" style="display: flex;">
+    <span class="info-label" style="width: 150px; flex-shrink: 0;">Contrat souhaité :</span> 
+    <span class="info-value">{{ selectedApplication.job_type || 'Non renseigné' }}</span>
+  </div>
+  
+  <!-- 🟢 Aligné : Date de naissance -->
+  <div class="info-row" style="display: flex;">
+    <span class="info-label" style="width: 150px; flex-shrink: 0;">Date de naissance :</span> 
+    <span class="info-value">
+      {{ selectedApplication.birth_date ? (selectedApplication.birth_date | date:'dd/MM/yyyy') : 'Non renseignée' }}
+    </span>
+  </div>
+
+   <!-- 🟢 Aligné : Boutons réseaux ou message Non renseigné -->
+  <div class="info-row" style="display: flex; align-items: center; margin-top: 4px;">
+    <span class="info-label" style="width: 150px; flex-shrink: 0;">Réseaux :</span>
+    <div style="display: flex; gap: 10px;">
+      
+      <!-- S'affiche uniquement si le lien LinkedIn existe -->
+      <a *ngIf="selectedApplication.linkedin && selectedApplication.linkedin.trim() !== ''" 
+         [href]="selectedApplication.linkedin" 
+         target="_blank" 
+         class="social-badge-btn linkedin-badge">
+        <i class="bi bi-linkedin"></i> LinkedIn
+      </a>
+      
+      <!-- S'affiche uniquement si le lien GitHub existe -->
+      <a *ngIf="selectedApplication.github && selectedApplication.github.trim() !== ''" 
+         [href]="selectedApplication.github" 
+         target="_blank" 
+         class="social-badge-btn github-badge">
+        <i class="bi bi-github"></i> GitHub
+      </a>
+      
+      <!-- 🆕 S'affiche uniquement si les DEUX liens sont vides ou inexistants -->
+      <span *ngIf="(!selectedApplication.linkedin || selectedApplication.linkedin.trim() === '') && (!selectedApplication.github || selectedApplication.github.trim() === '')" 
+            style="color: #94a3b8; font-style: italic; font-size: 13px; font-weight: 500;">
+        Non renseigné
+      </span>
+
+    </div>
+  </div>
 
 
-        <!-- Bloc des informations textuelles -->
-        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
-          <div class="info-row" style="display: flex;">
-            <span class="info-label" style="width: 150px; flex-shrink: 0;">Poste ciblé :</span> 
-            <strong class="info-value text-slate">{{ selectedApplication.job_title }}</strong>
-          </div>
-          <div class="info-row" style="display: flex;">
-            <span class="info-label" style="width: 150px; flex-shrink: 0;">Adresse e-mail :</span> 
-            <span class="info-value">{{ selectedApplication.email }}</span>
-          </div>
-          <div class="info-row" style="display: flex;">
-            <span class="info-label" style="width: 150px; flex-shrink: 0;">Numéro de téléphone :</span> 
-            <span class="info-value">{{ selectedApplication.phone || 'Non renseigné' }}</span>
-          </div>
-          <div class="info-row" style="display: flex;">
-            <span class="info-label" style="width: 150px; flex-shrink: 0;">Ville / Région :</span> 
-            <span class="info-value">{{ selectedApplication.address || 'Non spécifiée' }}</span>
-          </div>
-        </div>
+</div>
+
 
       </div>
       
@@ -182,50 +243,51 @@
     </div>
 
 
-    <!-- Pied de page avec boutons de décision ATS Pro -->
-    <div class="modal-footer" style="display: flex; flex-direction: column; gap: 15px; margin-top: 22px; border-top: 1px solid #f1f5f9; padding-top: 16px; width: 100%;">
-      <div class="action-buttons-group" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
-        
-        <!-- Actions de recrutement à gauche -->
-        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-          
-          <!-- 1. Bouton Accepter (Vert) -->
-          <button (click)="changeCandidateStatus(selectedApplication.id, 'Proposition')" 
-                  style="background: #10b981; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;">
-            <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
-            Accepter
-          </button>
+<!-- Pied de page avec boutons de décision ATS Pro corrigé par le CSS -->
+<!-- Pied de page unifié géré par le CSS corrigé -->
+<!-- ================= PIED DE PAGE ATS UNIFIÉ ET CENTRÉ ================= -->
+<div class="modal-footer">
+  
+  <!-- 1. Bouton Accepter (Vert) -->
+  <button type="button" 
+          (click)="changeCandidateStatus(selectedApplication.id, 'Proposition')" 
+          style="background: #10b981; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">
+    <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
+    Accepter
+  </button>
 
-          <!-- 2. Bouton En attente (Gris Ardoise) -->
-          <button (click)="changeCandidateStatus(selectedApplication.id, 'Nouveau')" 
-                  style="background: #64748b; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;">
-            <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 0 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M5 6.25a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0zm4 0a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0z"/></svg>
-            En attente
-          </button>
-          
-          <!-- 3. Bouton Entretien Technique (Orange) -->
-          <button (click)="changeCandidateStatus(selectedApplication.id, 'Entretien')" 
-                  style="background: #f97316; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;">
-            <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0m-8.5-4.5A.5.5 0 0 1 7 4v3.5h2.5a.5.5 0 0 1 0 1H6.5a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5"/></svg>
-            Entretien Technique
-          </button>
+  <!-- 2. Bouton En attente (Gris Ardoise) -->
+  <button type="button" 
+          (click)="changeCandidateStatus(selectedApplication.id, 'Nouveau')" 
+          style="background: #64748b; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">
+    <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 0 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M5 6.25a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0zm4 0a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0z"/></svg>
+    En attente
+  </button>
+  
+  <!-- 3. Bouton Entretien Technique (Orange) -->
+  <button type="button" 
+          (click)="changeCandidateStatus(selectedApplication.id, 'Entretien')" 
+          style="background: #f97316; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">
+    <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0m-8.5-4.5A.5.5 0 0 1 7 4v3.5h2.5a.5.5 0 0 1 0 1H6.5a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5"/></svg>
+    Entretien
+  </button>
 
-          <!-- 4. Bouton Rejeter (Rouge) -->
-          <button (click)="changeCandidateStatus(selectedApplication.id, 'Rejete')" 
-                  style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;">
-            <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/></svg>
-            Rejeter
-          </button>
+  <!-- 4. Bouton Rejeter (Rouge) -->
+  <button type="button" 
+          (click)="changeCandidateStatus(selectedApplication.id, 'Rejete')" 
+          style="background: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">
+    <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/></svg>
+    Rejeter
+  </button>
 
-        </div>
+  <!-- 5. Bouton Fermer -->
+  <button type="button" 
+          class="btn-secondary" 
+          (click)="onCloseDetails()" 
+          style="padding: 8px 18px; font-size: 12px; font-weight: 600; border-radius: 6px; cursor: pointer; margin: 0;">
+    Fermer
+  </button>
 
-        <!-- Bouton de fermeture à droite -->
-        <button class="btn-secondary" (click)="onCloseDetails()" style="padding: 8px 14px; font-size: 12px;">
-          Fermer
-        </button>
-
-      </div>
-    </div>
-
+</div>
   </div>
 </div>
