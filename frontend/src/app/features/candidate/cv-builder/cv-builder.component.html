@@ -1,7 +1,6 @@
+<div class="app-container-cv-builder">
 <div class="cv-container-compact">
   
-  
-
   @if (successMessage) {
     <div class="alert-box-compact alert-success">{{ successMessage }}</div>
   }
@@ -32,44 +31,57 @@
 
         <div class="form-group-compact">
           <label>Nom & Prénom *</label>
-          <input type="text" name="candidate_name" [(ngModel)]="candidateName" placeholder="Ex: Mohamed Ali" required>
+          <!-- 🔒 Champ verrouillable dynamiquement -->
+          <input type="text" name="candidate_name" [(ngModel)]="candidateName" [disabled]="!isEditable" placeholder="Ex: Mohamed Ali" required>
         </div>
 
         <div class="form-group-compact">
           <label>Titre du poste recherché *</label>
-          <input type="text" name="cv_title" [(ngModel)]="cvData.title" placeholder="Ex: Développeur Fullstack Angular" required>
+          <!-- 🔒 Champ verrouillable dynamiquement -->
+          <input type="text" name="cv_title" [(ngModel)]="cvData.title" [disabled]="!isEditable" placeholder="Ex: Développeur Fullstack Angular" required>
         </div>
 
         <div class="form-group-compact">
           <label>Résumé / Accroche professionnelle *</label>
-          <textarea name="summary" [(ngModel)]="cvData.summary" rows="3" placeholder="Ex: Développeur motivé spécialisé dans..." required></textarea>
+          <!-- 🔒 Champ verrouillable dynamiquement -->
+          <textarea name="summary" [(ngModel)]="cvData.summary" [disabled]="!isEditable" rows="3" placeholder="Ex: Développeur motivé spécialisé dans..." required></textarea>
         </div>
 
         <div class="form-section-title-inline" style="margin-top: 15px;"><i class="bi bi-geo-alt-fill"></i> Informations Personnelles & Contact</div>
 
         <div class="form-group-compact">
           <label>Adresse Email *</label>
-          <input type="email" name="candidate_email" [(ngModel)]="candidateContact.email" placeholder="exemple@mail.com" required>
+          <!-- 🔒 Champ verrouillable dynamiquement -->
+          <input type="email" name="candidate_email" [(ngModel)]="candidateContact.email" [disabled]="!isEditable" placeholder="exemple@mail.com" required>
         </div>
 
         <div class="form-group-compact">
           <label>Numéro de Téléphone *</label>
-          <input type="text" name="candidate_phone" [(ngModel)]="candidateContact.phone" placeholder="+216 -- --- ---" required>
+          <!-- 🔒 Champ verrouillable dynamiquement -->
+          <input type="text" name="candidate_phone" [(ngModel)]="candidateContact.phone" [disabled]="!isEditable" placeholder="+216 -- --- ---" required>
         </div>
 
         <div class="form-group-compact">
           <label>Adresse Géographique *</label>
-          <input type="text" name="candidate_address" [(ngModel)]="candidateContact.address" placeholder="Ex: Tunis, Tunisie" required>
+          <!-- 🔒 Champ verrouillable dynamiquement -->
+          <input type="text" name="candidate_address" [(ngModel)]="candidateContact.address" [disabled]="!isEditable" placeholder="Ex: Tunis, Tunisie" required>
         </div>
 
         <!-- Inputs masqués nécessaires pour la liaison NgModel -->
         <input type="hidden" name="skills" [(ngModel)]="cvData.skills">
         <input type="hidden" name="interests" [(ngModel)]="cvData.interests">
 
+        <!-- 🎛️ SYSTEME DE BOUTONS INTERACTIFS ENREGISTRER / MODIFIER -->
         <div class="form-actions-compact" style="margin-top: 15px;">
-          <button type="submit" class="btn-save-cv-compact" [disabled]="isSaving">
-            <i class="bi bi-cloud-arrow-up-fill"></i> Enregistrer les Informations
-          </button>
+          @if (!isEditable) {
+            <button type="button" class="btn-modify-cv-compact" (click)="enableEdit()" style="background-color: #475569; color: white; padding: 10px 16px; border: none; border-radius: 6px; font-size: 13.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+              <i class="bi bi-pencil-square"></i> Modifier le Formulaire
+            </button>
+          } @else {
+            <button type="submit" class="btn-save-cv-compact" [disabled]="isSaving">
+              <i class="bi bi-cloud-arrow-up-fill"></i> {{ isSaving ? 'Enregistrement...' : 'Enregistrer les Informations' }}
+            </button>
+          }
         </div>
       </form>
     </div>
@@ -82,22 +94,19 @@
         <div class="preview-section-item">
           <div class="section-flex-header-pro">
             <span class="preview-section-label"><i class="bi bi-briefcase-fill"></i> Expériences Professionnelles</span>
-            <button type="button" class="btn-add-dynamic" (click)="addExperience()"><i class="bi bi-plus-circle-fill"></i> Ajouter</button>
+            <!-- ➕ Déclenche la popup d'ajout au premier plan -->
+            <button type="button" class="btn-add-dynamic" (click)="openExperienceModal()"><i class="bi bi-plus-circle-fill"></i> Ajouter</button>
           </div>
-          
           @if (cvData.experiences.length > 0) {
             @for (exp of cvData.experiences; track $index) {
-              <div class="dynamic-entry-card-pro">
-                <div class="dynamic-entry-header-pro">
-                  <span>Saisie Expérience #{{ $index + 1 }}</span>
+              <!-- 📋 Rendu des expériences sous forme de cartes d'affichage épurées -->
+              <div class="dynamic-entry-card-pro" style="padding: 16px !important; background: #ffffff !important; border-left: 4px solid #0ea5e9 !important;">
+                <div class="dynamic-entry-header-pro" style="margin-bottom: 6px !important;">
+                  <strong style="font-size: 14.5px; color: #0f172a;">{{ exp.job_title }} — <span style="color: #0284c7;">{{ exp.company }}</span></strong>
                   <button type="button" class="btn-remove-dynamic-pro" (click)="removeExperience($index)"><i class="bi bi-trash3-fill"></i> Supprimer</button>
                 </div>
-                <div class="dynamic-fields-grid-pro">
-                  <input type="text" name="exp_title_{{$index}}" [(ngModel)]="exp.job_title" placeholder="Intitulé du poste occupé" required>
-                  <input type="text" name="exp_comp_{{$index}}" [(ngModel)]="exp.company" placeholder="Nom de l'entreprise" required>
-                  <input type="text" name="exp_date_{{$index}}" [(ngModel)]="exp.duration" placeholder="Ex: Janv 2024 - Présent" required>
-                  <textarea name="exp_desc_{{$index}}" [(ngModel)]="exp.description" rows="2" class="span-all-field-pro" placeholder="Description des tâches et missions accomplies..." required></textarea>
-                </div>
+                <div style="font-size: 12.5px; color: #64748b; font-weight: 600; margin-bottom: 8px;"><i class="bi bi-calendar3"></i> {{ exp.duration }}</div>
+                <p style="margin: 0; color: #475569; font-size: 13px; line-height: 1.5; white-space: pre-line;">{{ exp.description }}</p>
               </div>
             }
           } @else {
@@ -109,21 +118,20 @@
         <div class="preview-section-item" style="margin-top: 24px;">
           <div class="section-flex-header-pro">
             <span class="preview-section-label"><i class="bi bi-mortarboard-fill"></i> Formations & Études</span>
-            <button type="button" class="btn-add-dynamic" (click)="addEducation()"><i class="bi bi-plus-circle-fill"></i> Ajouter</button>
+            <!-- ➕ Déclenche la popup d'ajout de diplôme au premier plan -->
+            <button type="button" class="btn-add-dynamic" (click)="openEducationModal()"><i class="bi bi-plus-circle-fill"></i> Ajouter</button>
           </div>
 
           @if (cvData.educations.length > 0) {
             @for (edu of cvData.educations; track $index) {
-              <div class="dynamic-entry-card-pro">
-                <div class="dynamic-entry-header-pro">
-                  <span>Saisie Formation #{{ $index + 1 }}</span>
+              <!-- 📋 Rendu des formations sous forme de cartes d'affichage épurées -->
+              <div class="dynamic-entry-card-pro" style="padding: 14px 16px !important; background: #ffffff !important; border-left: 4px solid #10b981 !important;">
+                <div class="dynamic-entry-header-pro" style="margin-bottom: 4px !important;">
+                  <strong style="font-size: 14px; color: #0f172a;">{{ edu.degree }}</strong>
                   <button type="button" class="btn-remove-dynamic-pro" (click)="removeEducation($index)"><i class="bi bi-trash3-fill"></i> Supprimer</button>
                 </div>
-                <div class="dynamic-fields-grid-pro">
-                  <input type="text" name="edu_deg_{{$index}}" [(ngModel)]="edu.degree" placeholder="Diplôme ou certification" required>
-                  <input type="text" name="edu_sch_{{$index}}" [(ngModel)]="edu.school" placeholder="Université / École" required>
-                  <input type="text" name="edu_year_{{$index}}" [(ngModel)]="edu.year" placeholder="Ex: 2023" required>
-                </div>
+                <div style="font-size: 13px; color: #475569; font-weight: 500;">{{ edu.school }}</div>
+                <small style="color: #94a3b8; font-weight: 600; display: block; margin-top: 4px;"><i class="bi bi-calendar-check"></i> Année d'obtention : {{ edu.year }}</small>
               </div>
             }
           } @else {
@@ -135,7 +143,7 @@
         <div class="preview-section-item" style="margin-top: 24px;">
           <span class="preview-section-label"><i class="bi bi-star-fill"></i> Compétences Clés</span>
           <div style="margin-top: 8px; margin-bottom: 12px;">
-            <input type="text" name="skills_input" [(ngModel)]="cvData.skills" placeholder="Ex: Angular, TypeScript, SQL, Git (Séparez par des virgules)" class="tag-input-field-pro">
+            <input type="text" name="skills_input" [(ngModel)]="cvData.skills" [disabled]="!isEditable" placeholder="Ex: Angular, TypeScript, SQL, Git (Séparez par des virgules)" class="tag-input-field-pro">
           </div>
           <div class="cv-tags-container">
             @if (cvData.skills) {
@@ -152,7 +160,7 @@
         <div class="preview-section-item" style="margin-top: 24px;">
           <span class="preview-section-label"><i class="bi bi-heart-fill"></i> Centres d'intérêt</span>
           <div style="margin-top: 8px; margin-bottom: 12px;">
-            <input type="text" name="interests_input" [(ngModel)]="cvData.interests" placeholder="Ex: Voyages, Football, Lecture (Séparez par des virgules)" class="tag-input-field-pro">
+            <input type="text" name="interests_input" [(ngModel)]="cvData.interests" [disabled]="!isEditable" placeholder="Ex: Voyages, Football, Lecture (Séparez par des virgules)" class="tag-input-field-pro">
           </div>
           <div class="cv-tags-container">
             @if (cvData.interests) {
@@ -169,4 +177,69 @@
     </div>
 
   </div>
+</div>
+
+<!-- ==========================================================================
+     🎛️ INJECTION DES STRUCTURES POPUPS DE CONTRÔLE (MODALES EN SURIMPRESSION)
+     ========================================================================== -->
+
+<!-- 1. POPUP D'AJOUT D'UNE EXPÉRIENCE PROFESSIONNELLE -->
+<div *ngIf="showExperienceModal" class="cv-modal-overlay">
+  <div class="cv-modal-card">
+    <div class="modal-header">
+      <h3><i class="bi bi-plus-circle-fill"></i> Ajouter une Expérience</h3>
+      <button type="button" class="close-x" (click)="showExperienceModal = false">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group-compact">
+        <label>Intitulé du poste occupied *</label>
+        <input type="text" [(ngModel)]="newExperience.job_title" placeholder="Ex: Administrateur Systèmes et Réseaux">
+      </div>
+      <div class="form-group-compact">
+        <label>Entreprise / Employeur *</label>
+        <input type="text" [(ngModel)]="newExperience.company" placeholder="Ex: VETRACOM">
+      </div>
+      <div class="form-group-compact">
+        <label>Période ou Durée *</label>
+        <input type="text" [(ngModel)]="newExperience.duration" placeholder="Ex: Jan 2024 - Présent">
+      </div>
+      <div class="form-group-compact">
+        <label>Description des réalisations et missions *</label>
+        <textarea [(ngModel)]="newExperience.description" rows="3" placeholder="Détaillez vos tâches quotidiennes et compétences utilisées..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="showExperienceModal = false">Annuler</button>
+      <button type="button" class="btn-submit-save" (click)="saveExperienceModal()">Opp, Enregistrer !</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. POPUP D'AJOUT D'UNE FORMATION OU DIPLÔME -->
+<div *ngIf="showEducationModal" class="cv-modal-overlay">
+  <div class="cv-modal-card">
+    <div class="modal-header">
+      <h3><i class="bi bi-plus-circle-fill"></i> Ajouter une Formation / Diplôme</h3>
+      <button type="button" class="close-x" (click)="showEducationModal = false">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group-compact">
+        <label>Intitulé du Diplôme / Certification *</label>
+        <input type="text" [(ngModel)]="newEducation.degree" placeholder="Ex: Diplôme d'Ingénieur ou Certification Cloud">
+      </div>
+      <div class="form-group-compact">
+        <label>Université / École ou Organisme *</label>
+        <input type="text" [(ngModel)]="newEducation.school" placeholder="Ex: Faculté de Tunis / Institut Supérieur">
+      </div>
+      <div class="form-group-compact">
+        <label>Année d'obtention *</label>
+        <input type="text" [(ngModel)]="newEducation.year" placeholder="Ex: 2024">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="showEducationModal = false">Annuler</button>
+      <button type="button" class="btn-submit-save" (click)="saveEducationModal()">Opp, Enregistrer !</button>
+    </div>
+  </div>
+</div>
 </div>

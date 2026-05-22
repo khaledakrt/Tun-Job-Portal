@@ -17,11 +17,15 @@ if (!verifyToken) {
     throw new Error("❌ Impossible de charger le middleware d'authentification.");
 }
 
+// Sécurise automatiquement toutes les routes déclarées en dessous
 router.use(verifyToken);
 
 // ==========================================================================
 // 🚀 ENDPOINTS RECRUTEUR STANDARD ET SÉCURISÉS
 // ==========================================================================
+
+// 📊 Statistiques du Dashboard
+router.get('/stats', jobCtrl.getRecruiterStats);
 
 // Profil
 router.get('/profile/details', profileCtrl.getCompanyDetails);
@@ -38,10 +42,8 @@ router.delete('/jobs/delete/:id', jobCtrl.deleteJob);
 router.get('/ats/applications', atsCtrl.getApplications);
 router.post('/ats/update-status', atsCtrl.updateStatus);
 
-
-// 🚀 REMPLACEZ LES DEUX LIGNES TOUT EN BAS PAR CELLES-CI :
+// Profil candidat et CV
 router.get('/candidate-profile/:id', atsCtrl.getCandidateProfileById);
 router.get('/candidate-cv/:id', atsCtrl.getCandidateCvById);
-
 
 module.exports = router;

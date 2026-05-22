@@ -4,7 +4,6 @@ const db = require('../../config/db');
 // 🚀 1. CRÉATION D'UNE ANNONCE D'EMPLOI (CORRIGÉE AVEC COMPÉTENCES & LANGUES)
 // ==========================================================================
 exports.createJob = async (req, res) => {
-    // 🚀 Extraction mise à jour intégrant les propriétés envoyées par le formulaire Angular
     const { 
         title, 
         contract_type, 
@@ -14,8 +13,8 @@ exports.createJob = async (req, res) => {
         experience_level, 
         missions_desc, 
         profile_desc, 
-        skills_desc,      // 🚀 Nouveau champ
-        languages_desc,   // 🚀 Nouveau champ
+        skills_desc,      
+        languages_desc,   
         expires_at 
     } = req.body;
     
@@ -26,7 +25,6 @@ exports.createJob = async (req, res) => {
     }
 
     try {
-        // 🚀 Requête SQL mise à jour avec les colonnes complémentaires
         const sqlQuery = `
             INSERT INTO jobs 
             (recruiter_id, title, contract_type, location, workplace_type, salary, experience_level, missions_desc, profile_desc, skills_desc, languages_desc, status, expires_at) 
@@ -35,7 +33,6 @@ exports.createJob = async (req, res) => {
 
         const formattedDate = expires_at && expires_at.trim() !== '' ? expires_at : null;
 
-        // 🚀 Injection ordonnée des variables dans le tableau de paramètres
         await db.execute(sqlQuery, [
             recruiter_id, 
             title, 
@@ -46,8 +43,8 @@ exports.createJob = async (req, res) => {
             experience_level, 
             missions_desc, 
             profile_desc, 
-            skills_desc || null,    // 🚀 Enregistre la chaîne textuelle ou null
-            languages_desc || null, // 🚀 Enregistre la chaîne textuelle ou null
+            skills_desc || null,    
+            languages_desc || null, 
             'disponible', 
             formattedDate
         ]);
@@ -129,5 +126,54 @@ exports.toggleJobStatus = async (req, res) => {
 
     } catch (e) {
         return res.status(500).json({ message: "Erreur interne du serveur.", error: e.message });
+    }
+};
+
+// ==========================================================================
+// 📊 5. RÉCUPÉRATION DES STATISTIQUES DU DASHBOARD RECRUTEUR (CORRIGÉ)
+// ==========================================================================
+exports.getRecruiterStats = async (req, res) => {
+    const recruiter_id = req.user && req.user.id ? req.user.id : null;
+    
+    if (!recruiter_id) {
+        return res.status(401).json({ message: "Utilisateur non authentifié." });
+    }
+
+    try {
+        // 1. Compter toutes les candidatures liées aux offres de ce recruteur
+        const [appRows] = await db.execute(`
+            SELECT COUNT(a.id) AS total_applications 
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.id
+            WHERE j.recruiter_id = ?
+        `, [recruiter_id]);
+
+        // 2. Compter les entretiens planifiés (Accepte les variantes de casse SQL)
+        const [interviewRows] = await db.execute(`
+            SELECT COUNT(a.id) AS total_interviews 
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.id
+            WHERE j.recruiter_id = ? AND LOWER(a.status) = 'entretien'
+        `, [recruiter_id]);
+
+        // Correction fondamentale : Accéder à l'index [0] du tableau de lignes retourné
+        const totalApplications = appRows[0] ? appRows[0].total_applications : 0;
+        const totalInterviews = interviewRows[0] ? interviewRows[0].total_interviews : 0;
+
+        // 3. Calculer un taux de conversion réel
+        let conversionRate = 0;
+        if (totalApplications > 0) {
+            conversionRate = Math.round((totalInterviews / totalApplications) * 100);
+        }
+
+        return res.json({
+            applicationsCount: totalApplications,
+            interviewsCount: totalInterviews,
+            conversionRate: conversionRate
+        });
+
+    } catch (e) {
+        console.error("❌ ERREUR GET RECRUITER STATS :", e.message);
+        return res.status(500).json({ error: e.message });
     }
 };

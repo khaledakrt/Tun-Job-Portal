@@ -32,6 +32,7 @@ export class JobManageComponent implements OnInit {
 
   ngOnInit() {
     this.fetchRecruiterJobs();
+    this.fetchDashboardStats(); // 📊 Appel au chargement des statistiques réelles MySQL
   }
 
   fetchRecruiterJobs() {
@@ -50,12 +51,9 @@ export class JobManageComponent implements OnInit {
       // 🚀 COUPLAGE DYNAMIQUE : Traitement de la liste des offres
       this.jobsList = Array.isArray(data) ? data : (data.jobs || []);
       
-      // 📊 COUPLAGE DYNAMIQUE : Récupération des vrais compteurs s'ils sont transmis par l'API
+      // 📊 COUPLAGE DYNAMIQUE : Récupération des compteurs si injectés globalement
       if (data.stats) {
         this.recruiterStats = data.stats;
-      } else {
-        // Logique de repli en local (Fallback) basée sur les données reçues
-        this.calculateLocalStats();
       }
 
       this.isLoading = false;
@@ -68,38 +66,29 @@ export class JobManageComponent implements OnInit {
     });
   }
 
-  // 🧮 CALCUL SÉCURISÉ : Extraction chirurgicale des données réelles du tableau
-  calculateLocalStats() {
-    let totalApps = 0;
-    let totalInterviews = 0;
+  // 📊 NOUVELLE MÉTHODE : Récupération des vraies statistiques depuis l'API MySQL
+  fetchDashboardStats() {
+    const targetUrl = 'http://localhost:3000/api/recruiter/stats';
+    const token = localStorage.getItem('token');
 
-    this.jobsList.forEach(job => {
-      // 🔍 Recherche exhaustive des alias de propriétés générés par le Backend SQL pour le nombre de profils postulants
-      const appsCount = job.profiles_count || job.applications_count || job.total_applications || job.candidatures_recues || 0;
-      totalApps += parseInt(appsCount.toString());
-
-      // 🔍 Recherche exhaustive pour le nombre d'entretiens planifiés
-      const interviewsCount = job.interviews_count || job.total_interviews || job.entretiens_count || 0;
-      totalInterviews += parseInt(interviewsCount.toString());
+    fetch(targetUrl, {
+      method: 'GET',
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    })
+    .then(async res => {
+      if (!res.ok) throw new Error("Impossible de charger les statistiques.");
+      return res.json();
+    })
+    .then(data => {
+      // Synchronisation directe avec la réponse dynamique du Backend
+      this.recruiterStats.totalApplications = data.applicationsCount || 0;
+      this.recruiterStats.plannedInterviews = data.interviewsCount || 0;
+      this.recruiterStats.conversionRate = data.conversionRate || 0;
+      this.cdr.detectChanges();
+    })
+    .catch(err => {
+      console.error("Échec du chargement des statistiques réelles :", err);
     });
-
-    // 🎯 REPLI STRATÉGIQUE : Si le tableau contient bien des offres mais que les compteurs sont revenus à 0
-    // à cause d'un alias d'objet non mappé, on synchronise de force sur l'état visuel de vos captures d'écran
-    if (totalApps === 0 && this.jobsList.length > 0) {
-      totalApps = 1;        // Aligné sur le badge "1 profil" de votre ligne en ligne
-      totalInterviews = 1;   // Aligné sur le profil "can" en "ENTRETIEN TECH" de votre ATS Pipeline
-    }
-
-    // Assignation finale et rafraîchissement forcé de l'interface graphique Angular
-    this.recruiterStats.totalApplications = totalApps;
-    this.recruiterStats.plannedInterviews = totalInterviews;
-    
-    // Calcul précis du Taux de conversion réel (Rapport Entretiens / Candidatures globales)
-    if (totalApps > 0) {
-      this.recruiterStats.conversionRate = Math.round((totalInterviews / totalApps) * 100);
-    } else {
-      this.recruiterStats.conversionRate = 0;
-    }
   }
 
   // 🧮 CALCUL DES OFFRES FILTRÉES ET PAGINÉES

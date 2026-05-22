@@ -6,7 +6,7 @@ import { from, Observable } from 'rxjs';
 })
 export class JobService {
   // 🚀 RESTRUCTURATION COMPLÈTE ET FIXE : 127.0.0.1 (avec un 1) ET le port :3000 de l'API !
-  private apiUrl = 'http://127.0.0'; 
+  private apiUrl = 'http://127.0.0.1:3000'; 
 
   private getHeaders() {
     const token = localStorage.getItem('token');
@@ -61,4 +61,15 @@ export class JobService {
     });
     return from(promise);
   }
+    getStats(): Observable<any> {
+    const promise = fetch(`${this.apiUrl}/recruiter/stats`, {
+      method: 'GET',
+      headers: this.getHeaders()
+    }).then(res => {
+      if (!res.ok) throw new Error("Erreur lors de la récupération des stats");
+      return res.json();
+    });
+    return from(promise);
+  }
+
 }

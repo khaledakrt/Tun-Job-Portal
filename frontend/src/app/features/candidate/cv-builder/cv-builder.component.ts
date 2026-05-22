@@ -27,6 +27,17 @@ export class CvBuilderComponent implements OnInit {
   successMessage: string = '';
   isSaving: boolean = false;
 
+  // 🔒 État du formulaire principal (false = verrouillé/incliquable, true = éditable)
+  isEditable: boolean = true;
+
+  // 🎛️ États de contrôle pour les popups (Modales)
+  showExperienceModal: boolean = false;
+  showEducationModal: boolean = false;
+
+  // Modèles tampons pour la saisie dans les popups d'ajout
+  newExperience = { job_title: '', company: '', duration: '', description: '' };
+  newEducation = { degree: '', school: '', year: '' };
+
   ngOnInit() {
     this.candidateName = localStorage.getItem('name') || '';
     this.fetchProfileDetails();
@@ -71,15 +82,67 @@ export class CvBuilderComponent implements OnInit {
         this.cvData.interests = data.interests || '';
         this.cvData.experiences = typeof data.experience === 'string' ? JSON.parse(data.experience) : (data.experience || []);
         this.cvData.educations = typeof data.education === 'string' ? JSON.parse(data.education) : (data.education || []);
+        
+        // 🔒 Optionnel : Si le CV contient déjà des données, on peut le verrouiller au chargement initial
+        if (this.cvData.title || this.cvData.summary) {
+          this.isEditable = false;
+        }
         this.cdr.detectChanges();
       }
     }).catch(() => {});
   }
 
-  addExperience() { this.cvData.experiences.push({ job_title: '', company: '', duration: '', description: '' }); this.cdr.detectChanges(); }
-  removeExperience(index: number) { this.cvData.experiences.splice(index, 1); this.cdr.detectChanges(); }
-  addEducation() { this.cvData.educations.push({ degree: '', school: '', year: '' }); this.cdr.detectChanges(); }
-  removeEducation(index: number) { this.cvData.educations.splice(index, 1); this.cdr.detectChanges(); }
+  // 🔓 Active le mode modification
+  enableEdit() {
+    this.isEditable = true;
+    this.cdr.detectChanges();
+  }
+
+  // ➕ POPUP EXPÉRIENCE : Ouvrir la carte de saisie au premier plan
+  openExperienceModal() {
+    this.newExperience = { job_title: '', company: '', duration: '', description: '' }; // Reset
+    this.showExperienceModal = true;
+    this.cdr.detectChanges();
+  }
+
+  // 💾 POPUP EXPÉRIENCE : Opp, on ajoute l'élément en tête du tableau
+  saveExperienceModal() {
+    if (!this.newExperience.job_title || !this.newExperience.company) {
+      alert("Veuillez renseigner le poste et l'entreprise.");
+      return;
+    }
+    this.cvData.experiences.unshift({ ...this.newExperience });
+    this.showExperienceModal = false;
+    this.cdr.detectChanges();
+  }
+
+  removeExperience(index: number) { 
+    this.cvData.experiences.splice(index, 1); 
+    this.cdr.detectChanges(); 
+  }
+
+  // ➕ POPUP ÉTUDES : Ouvrir la carte de saisie au premier plan
+  openEducationModal() {
+    this.newEducation = { degree: '', school: '', year: '' }; // Reset
+    this.showEducationModal = true;
+    this.cdr.detectChanges();
+  }
+
+  // 💾 POPUP ÉTUDES : Opp, on ajoute l'élément en tête du tableau
+  saveEducationModal() {
+    if (!this.newEducation.degree || !this.newEducation.school) {
+      alert("Veuillez renseigner le diplôme et l'établissement.");
+      return;
+    }
+    this.cvData.educations.unshift({ ...this.newEducation });
+    this.showEducationModal = false;
+    this.cdr.detectChanges();
+  }
+
+  removeEducation(index: number) { 
+    this.cvData.educations.splice(index, 1); 
+    this.cdr.detectChanges(); 
+  }
 
   getSkillsArray(): string[] { return this.cvData.skills ? this.cvData.skills.split(',').filter(s => s.trim() !== '') : []; }
   getInterestsArray(): string[] { return this.cvData.interests ? this.cvData.interests.split(',').filter(i => i.trim() !== '') : []; }
@@ -90,7 +153,7 @@ export class CvBuilderComponent implements OnInit {
     const token = localStorage.getItem('token');
     
     const nameParts = this.candidateName.trim().split(' ');
-    const firstname = nameParts || '';
+    const firstname = nameParts[0] || '';
     const lastname = nameParts.slice(1).join(' ') || '';
 
     const payload = {
@@ -116,6 +179,10 @@ export class CvBuilderComponent implements OnInit {
     .then(() => {
       this.successMessage = "Toutes les modifications de votre profil ont été enregistrées !";
       this.isSaving = false;
+      
+      // 🔒 Le formulaire devient instantanément incliquable après succès
+      this.isEditable = false; 
+      
       this.cdr.detectChanges();
       setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 3000);
     })

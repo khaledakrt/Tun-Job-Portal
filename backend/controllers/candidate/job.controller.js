@@ -22,3 +22,49 @@ exports.getAllAvailableJobs = async (req, res) => {
     }
 };
 
+// ==========================================================================
+// 📊 5. RÉCUPÉRATION DES STATISTIQUES DUPATH DASHBOARD RECRUTEUR
+// ==========================================================================
+exports.getRecruiterStats = async (req, res) => {
+    const recruiter_id = req.user && req.user.id ? req.user.id : null;
+    
+    if (!recruiter_id) {
+        return res.status(401).json({ message: "Utilisateur non authentifié." });
+    }
+
+    try {
+        // 1. Compter le nombre total de candidatures pour ce recruteur
+        const [appRows] = await db.execute(`
+            SELECT COUNT(a.id) AS total_applications 
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.id
+            WHERE j.recruiter_id = ?
+        `, [recruiter_id]);
+
+        // 2. Compter le nombre d'entretiens (statut 'Entretien' ou selon votre mot-clé ATS)
+        const [interviewRows] = await db.execute(`
+            SELECT COUNT(a.id) AS total_interviews 
+            FROM applications a
+            JOIN jobs j ON a.job_id = j.id
+            WHERE j.recruiter_id = ? AND a.status = 'Entretien'
+        `, [recruiter_id]);
+
+        const totalApplications = appRows[0].total_applications || 0;
+        const totalInterviews = interviewRows[0].total_interviews || 0;
+
+        // 3. Calculer un taux de conversion dynamique (ex: entretiens / candidatures)
+        let conversionRate = 0;
+        if (totalApplications > 0) {
+            conversionRate = Math.round((totalInterviews / totalApplications) * 100);
+        }
+
+        return res.json({
+            applicationsCount: totalApplications,
+            interviewsCount: totalInterviews,
+            conversionRate: conversionRate
+        });
+
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+};
