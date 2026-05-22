@@ -5,24 +5,21 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-profile-settings',
   standalone: true,
-  imports: [FormsModule, CommonModule], // ✅ ICI
+  imports: [CommonModule, FormsModule],
   templateUrl: './profile-settings.component.html',
-styleUrl: './profile-settings.component.css', // 🔄 Remplacement ici
-  
-  
+  styleUrl: './profile-settings.component.css'
 })
-
 export class ProfileSettingsComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   // 📝 Modèle de données enrichi pour le profil candidat
   profile = { 
-    name: '', phone: '', email: '', address: '',
+    name: '', phone: '', email: '', address: '', avatar_logo: null,
     birth_date: '', linkedin: '', github: '', job_status: '', availability: '', job_type: '', location_pref: ''
   };
   
   backupProfile = { 
-    name: '', phone: '', email: '', address: '',
+    name: '', phone: '', email: '', address: '', avatar_logo: null,
     birth_date: '', linkedin: '', github: '', job_status: '', availability: '', job_type: '', location_pref: ''
   };
   
@@ -30,8 +27,10 @@ export class ProfileSettingsComponent implements OnInit {
   selectedFile: File | null = null;
   successMessage = '';
   
-  isEditMode = false;
-  isPasswordEditMode = false;
+  // 🎛️ États de contrôle des formulaires indépendants
+  isEditMode = false;         // Pour "Mon Profil Candidat"
+  isProEditMode = false;      // 🆕 Pour "Profil Professionnel"
+  isPasswordEditMode = false; // Pour "Sécurité du compte"
 
   passwordData = { currentPassword: '', newPassword: '', confirmPassword: '' };
   passwordSuccessMessage = '';
@@ -41,8 +40,20 @@ export class ProfileSettingsComponent implements OnInit {
     this.loadCurrentProfile();
   }
 
+  // 🔄 Bascule d'édition pour les informations personnelles
   toggleEditMode(mode: boolean) {
     this.isEditMode = mode;
+    if (mode) {
+      this.backupProfile = { ...this.profile };
+    } else {
+      this.profile = { ...this.backupProfile };
+    }
+    this.cdr.detectChanges();
+  }
+
+  // 🔄 Bascule d'édition pour le profil professionnel
+  toggleProEditMode(mode: boolean) {
+    this.isProEditMode = mode;
     if (mode) {
       this.backupProfile = { ...this.profile };
     } else {
@@ -78,8 +89,8 @@ export class ProfileSettingsComponent implements OnInit {
         this.profile.email = data.email || '';
         this.profile.address = data.address || '';
         
-        // 📥 Récupération et assignation des nouveaux champs
-        this.profile.birth_date = data.birth_date ? data.birth_date.split('T')[0] : ''; // Formate la date pour l'input HTML
+        // Formate correctement la date pour l'input HTML type="date"
+        this.profile.birth_date = data.birth_date ? data.birth_date.split('T')[0] : '';
         this.profile.linkedin = data.linkedin || '';
         this.profile.github = data.github || '';
         this.profile.job_status = data.job_status || '';
@@ -148,7 +159,7 @@ export class ProfileSettingsComponent implements OnInit {
   }
 
   onSaveProfile(event: Event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
 
     const targetUrl = 'http://localhost:3000/api/candidate/profile/update';
     const token = localStorage.getItem('token');
@@ -163,7 +174,6 @@ export class ProfileSettingsComponent implements OnInit {
         name: this.profile.name,
         phone: this.profile.phone,
         address: this.profile.address,
-        // 📤 Envoi des nouveaux critères pro au serveur Node.js
         birth_date: this.profile.birth_date,
         linkedin: this.profile.linkedin,
         github: this.profile.github,
@@ -180,6 +190,7 @@ export class ProfileSettingsComponent implements OnInit {
     .then(resData => {
       this.successMessage = resData.message || "Les informations de votre profil ont été mises à jour.";
       this.isEditMode = false;
+      this.isProEditMode = false; // Ferme l'état d'édition
       this.cdr.detectChanges();
 
       setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 3000);
@@ -235,4 +246,3 @@ export class ProfileSettingsComponent implements OnInit {
     });
   }
 }
-
