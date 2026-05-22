@@ -34,7 +34,13 @@ export class CvBuilderComponent implements OnInit {
   showExperienceModal: boolean = false;
   showEducationModal: boolean = false;
 
-  // Modèles tampons pour la saisie dans les popups d'ajout
+  // ✏️ Indicateurs et index pour le mode édition
+  isEditingExp: boolean = false;
+  editingExpIndex: number | null = null;
+  isEditingEdu: boolean = false;
+  editingEduIndex: number | null = null;
+
+  // Modèles tampons pour la saisie dans les popups
   newExperience = { job_title: '', company: '', duration: '', description: '' };
   newEducation = { degree: '', school: '', year: '' };
 
@@ -98,20 +104,40 @@ export class CvBuilderComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // ➕ POPUP EXPÉRIENCE : Ouvrir la carte de saisie au premier plan
+  // ➕ POPUP EXPÉRIENCE : Mode Ajouter
   openExperienceModal() {
+    this.isEditingExp = false;
+    this.editingExpIndex = null;
     this.newExperience = { job_title: '', company: '', duration: '', description: '' }; // Reset
     this.showExperienceModal = true;
     this.cdr.detectChanges();
   }
 
-  // 💾 POPUP EXPÉRIENCE : Opp, on ajoute l'élément en tête du tableau
+  // ✏️ POPUP EXPÉRIENCE : Mode Modifier (Nouvelle méthode)
+  openEditExperienceModal(exp: any, index: number) {
+    this.isEditingExp = true;
+    this.editingExpIndex = index;
+    // On clone l'objet pour éviter la modification en temps réel dans le tableau avant validation
+    this.newExperience = { ...exp }; 
+    this.showExperienceModal = true;
+    this.cdr.detectChanges();
+  }
+
+  // 💾 POPUP EXPÉRIENCE : Enregistrement (Ajout ou Mise à jour)
   saveExperienceModal() {
     if (!this.newExperience.job_title || !this.newExperience.company) {
       alert("Veuillez renseigner le poste et l'entreprise.");
       return;
     }
-    this.cvData.experiences.unshift({ ...this.newExperience });
+
+    if (this.isEditingExp && this.editingExpIndex !== null) {
+      // Mode modification : on remplace l'élément existant à son index
+      this.cvData.experiences[this.editingExpIndex] = { ...this.newExperience };
+    } else {
+      // Mode ajout : on ajoute l'élément en tête
+      this.cvData.experiences.unshift({ ...this.newExperience });
+    }
+
     this.showExperienceModal = false;
     this.cdr.detectChanges();
   }
@@ -121,20 +147,40 @@ export class CvBuilderComponent implements OnInit {
     this.cdr.detectChanges(); 
   }
 
-  // ➕ POPUP ÉTUDES : Ouvrir la carte de saisie au premier plan
+  // ➕ POPUP ÉTUDES : Mode Ajouter
   openEducationModal() {
+    this.isEditingEdu = false;
+    this.editingEduIndex = null;
     this.newEducation = { degree: '', school: '', year: '' }; // Reset
     this.showEducationModal = true;
     this.cdr.detectChanges();
   }
 
-  // 💾 POPUP ÉTUDES : Opp, on ajoute l'élément en tête du tableau
+  // ✏️ POPUP ÉTUDES : Mode Modifier (Nouvelle méthode)
+  openEditEducationModal(edu: any, index: number) {
+    this.isEditingEdu = true;
+    this.editingEduIndex = index;
+    // On clone l'objet d'études
+    this.newEducation = { ...edu }; 
+    this.showEducationModal = true;
+    this.cdr.detectChanges();
+  }
+
+  // 💾 POPUP ÉTUDES : Enregistrement (Ajout ou Mise à jour)
   saveEducationModal() {
     if (!this.newEducation.degree || !this.newEducation.school) {
       alert("Veuillez renseigner le diplôme et l'établissement.");
       return;
     }
-    this.cvData.educations.unshift({ ...this.newEducation });
+
+    if (this.isEditingEdu && this.editingEduIndex !== null) {
+      // Mode modification
+      this.cvData.educations[this.editingEduIndex] = { ...this.newEducation };
+    } else {
+      // Mode ajout
+      this.cvData.educations.unshift({ ...this.newEducation });
+    }
+
     this.showEducationModal = false;
     this.cdr.detectChanges();
   }
