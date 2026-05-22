@@ -249,4 +249,33 @@
         </div>
       </div>
     </div>
-  }
+  
+
+}
+<!-- Popup Professionnelle d'Invitation à la Connexion / Inscription -->
+@if (showAuthRequiredPopup) {
+  <div class="custom-modal-overlay-auth" (click)="showAuthRequiredPopup = false">
+    <div class="custom-modal-box-auth" (click)="$event.stopPropagation()">
+      
+      <div class="custom-modal-header-auth">
+        <i class="bi bi-box-arrow-in-right login-icon-ats"></i>
+        <h3>Connexion requise</h3>
+      </div>
+      
+      <div class="custom-modal-body-auth">
+        <p>Pour postuler à cette offre et transmettre votre dossier aux recruteurs sur <strong>TunJob Portal</strong>, vous devez posséder un compte candidat connecté.</p>
+        <p class="sub-text-auth">L'inscription est gratuite et prend moins de 2 minutes !</p>
+      </div>
+      
+      <div class="custom-modal-footer-auth">
+        <button type="button" class="btn-modal-cancel-auth" (click)="showAuthRequiredPopup = false">
+          Plus tard
+        </button>
+        <button type="button" class="btn-modal-confirm-auth" (click)="goToLogin()">
+          Se connecter / S'inscrire
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

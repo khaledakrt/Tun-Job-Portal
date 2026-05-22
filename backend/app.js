@@ -40,17 +40,28 @@ const { verifyToken, checkRole } = require('./middleware/auth.middleware');
 // 4. MAPPING ET PROTECTION DES ENDPOINTS DE L'API DE PRODUCTION
 app.use('/api/auth', authRoutes); // Entièrement public (Connexion / Inscription)
 
-// Espace Candidat privé : Token JWT valide + Rôle 'candidate' obligatoire
+// 🔓 1. NOUVEAU & PUBLIC : On charge le contrôleur des offres directement ici pour le rendre accessible à tous
+const candidateJobCtrl = require('./controllers/candidate/job.controller'); 
+app.use('/api/candidate/jobs/list', candidateJobCtrl.getAllAvailableJobs);
+
+// 🔒 2. RESTE DE L'ESPACE CANDIDAT : Protégé globalement (verifyToken + checkRole)
 app.use('/api/candidate', verifyToken, checkRole(['candidate']), candidateRoutes);
 
 // Espace Recruteur privé
 app.use('/api/recruiter', verifyToken, recruiterRoutes);
 
-// 🔑 Espace Administrateur privé : Token JWT valide + Rôle 'admin' obligatoire
+// Espace Administrateur privé
 app.use('/api/admin', verifyToken, checkRole(['admin']), adminRoutes);
 
-// Centre de Notifications partagé : Nécessite simplement d'être connecté
+// Centre de Notifications partagé
 app.use('/api/notifications', verifyToken, notificationRoutes);
+
+
+// 🔑 Espace Administrateur privé : Token JWT valide + Rôle 'admin' obligatoire
+//app.use('/api/admin', verifyToken, checkRole(['admin']), adminRoutes);
+
+// Centre de Notifications partagé : Nécessite simplement d'être connecté
+//app.use('/api/notifications', verifyToken, notificationRoutes);
 
 // 5. GESTION DES ROUTES INCONNUES (MIDDLEWARE DE SECOURS)
 app.use((req, res, next) => {

@@ -44,8 +44,10 @@
       <button type="submit" class="btn-submit">Créer mon compte</button>
     </form>
 
-    <div class="register-footer">
-      <p>Déjà inscrit ? <a (click)="goToLogin()">Se connecter</a></p>
+        <div class="register-footer">
+      <!-- 🟢 Correction avec routerLink pour forcer la page login -->
+      <p>Déjà inscrit ? <a routerLink="/login" style="cursor: pointer; color: #0ea5e9; font-weight: 600; text-decoration: none;">Se connecter</a></p>
     </div>
+
   </div>
 </div>

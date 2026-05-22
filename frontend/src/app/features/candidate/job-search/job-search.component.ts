@@ -1,25 +1,28 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router'; // 🚀 IMPORTATION DU ROUTER POUR LA REDIRECTION
 
 @Component({
   selector: 'app-job-search',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './job-search.component.html',
-  styleUrls: ['./job-search.component.css']
+  styleUrls: ['./job-search.component.css'],
 })
 export class JobSearchComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router); // 🚀 INJECTION DU ROUTER
 
   allJobs: any[] = [];
   isLoading: boolean = true;
   selectedJob: any = null;
-  selectedRecruiter: any = null; // 🚀 Stocke les infos de l'entreprise à afficher
+  selectedRecruiter: any = null; 
 
   // 🚀 VARIABLES COMPLÉMENTAIRES POUR LA MODALE DE CONFIRMATION PREMIUM
   showConfirmApplyPopup: boolean = false;
   jobToApply: any = null;
+  showAuthRequiredPopup: boolean = false;
 
   searchFilters = { title: '', location: '', experience: '', contract: '' };
 
@@ -27,13 +30,20 @@ export class JobSearchComponent implements OnInit {
 
   fetchAvailableJobs() {
     const token = localStorage.getItem('token');
+    
+    // 🔓 APPEL DE L'API PUBLIQUE (Fonctionne avec ou sans Token)
     const jobsPromise = fetch('http://localhost:3000/api/candidate/jobs/list', {
-      method: 'GET', headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+      method: 'GET', headers: { 'Content-Type': 'application/json' }
     }).then(res => res.json());
 
-    const historyPromise = fetch('http://localhost:3000/api/candidate/history', {
-      method: 'GET', headers: { 'Authorization': token ? `Bearer ${token}` : '' }
-    }).then(res => res.json()).catch(() => []);
+    // 🔒 GESTION DE L'HISTORIQUE SÉCURISÉE (Seulement si le token existe)
+    // 🔒 GESTION DE L'HISTORIQUE SÉCURISÉE (Typé explicitement en any pour corriger TS2339)
+    let historyPromise: Promise<any> = Promise.resolve([]);
+    if (token) {
+      historyPromise = fetch('http://localhost:3000/api/candidate/history', {
+        method: 'GET', headers: { 'Authorization': `Bearer ${token}` }
+      }).then(res => res.json()).catch(() => []);
+    }
 
     Promise.all([jobsPromise, historyPromise])
       .then(([jobsData, historyData]) => {
@@ -43,7 +53,7 @@ export class JobSearchComponent implements OnInit {
 
         this.allJobs = jobsList.map((job: any) => ({
           ...job,
-          isAlreadyApplied: appliedJobIds.includes(job.id)
+          isAlreadyApplied: token ? appliedJobIds.includes(job.id) : false
         }));
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -93,14 +103,32 @@ export class JobSearchComponent implements OnInit {
   onViewJobDetails(job: any) { this.selectedJob = job; this.cdr.detectChanges(); }
   onCloseModal() { this.selectedJob = null; this.cdr.detectChanges(); }
 
-  // 🚀 tape 1 : Ouvre d'abord le calque de confirmation HTML élégant
+  // 🚀 Étape 1 : Interception et vérification d'authentification avant de postuler
+   // 🚀 Étape 1 : Interception et vérification d'authentification avant de postuler
   onOpenApplyModal(job: any) { 
+    const token = localStorage.getItem('token');
+
+    // 🛑 Si le visiteur n'est pas connecté, on ouvre la popup professionnelle
+    if (!token) {
+      this.showAuthRequiredPopup = true;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // 🟢 Si l'utilisateur possède une session active, la procédure normale continue
     this.jobToApply = job;
     this.showConfirmApplyPopup = true;
     this.cdr.detectChanges();
   }
 
-  // 🚀 tape 2 : Exécute l'insertion réelle dans MySQL si confirmation validée
+  // 🚪 Fonction utilitaire pour rediriger vers la connexion
+  goToLogin() {
+    this.showAuthRequiredPopup = false;
+    this.router.navigate(['/login']);
+  }
+
+
+  // 🚀 Étape 2 : Exécute l'insertion réelle dans MySQL si confirmation validée
   executeApplySubmit() {
     if (!this.jobToApply) return;
     const token = localStorage.getItem('token');
@@ -114,7 +142,7 @@ export class JobSearchComponent implements OnInit {
     .then(() => { 
       this.jobToApply.isAlreadyApplied = true; 
       this.showConfirmApplyPopup = false;
-      this.selectedJob = null; // Ferme la grande fiche descriptive
+      this.selectedJob = null; 
       this.jobToApply = null;
       this.cdr.detectChanges(); 
     })

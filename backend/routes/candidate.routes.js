@@ -16,20 +16,15 @@ const candidateJobCtrl = require('../controllers/candidate/job.controller');
 // ==========================================================================
 // 👤 MODULE PROFIL CANDIDAT (PROTÉGÉ PAR TOKEN JWT)
 // ==========================================================================
-// 🟢 Utilise upload.single('photo') pour intercepter l'image incluse dans le formulaire global
 router.post('/profile/update', verifyToken, upload.single('photo'), profileCtrl.updateProfile);
-
-// 🚀 ROUTE POUR LA PHOTO : Attend le mot-clé 'photo'
-// 🟢 CORRECTION : Remplacer upload.single('photo') par upload.single('logo')
 router.post('/profile/update-avatar', verifyToken, upload.single('logo'), profileCtrl.updateAvatar);
-
-
 router.get('/profile/details', verifyToken, profileCtrl.getProfileDetails);
 
 // ==========================================================================
 // 💼 MOTEUR DE RECHERCHE D'OFFRES
 // ==========================================================================
-router.get('/jobs/list', verifyToken, candidateJobCtrl.getAllAvailableJobs); 
+// 🔓 ROUTE PUBLIQUE : 'verifyToken' a été supprimé pour permettre l'accès à tout le monde
+router.get('/jobs/list', candidateJobCtrl.getAllAvailableJobs); 
 
 // ==========================================================================
 // 📄 GESTIONNAIRE DE CV & CANDIDATURES
@@ -37,6 +32,7 @@ router.get('/jobs/list', verifyToken, candidateJobCtrl.getAllAvailableJobs);
 router.post('/cv/save', verifyToken, cvCtrl.saveCV);
 router.get('/cv/details', verifyToken, cvCtrl.getCVDetails); 
 
+// 🔒 ROUTE PRIVÉE : Reste protégée, l'utilisateur DOIT être connecté pour postuler
 router.post('/apply', verifyToken, appCtrl.apply);
 router.get('/history', verifyToken, appCtrl.getHistory);
 

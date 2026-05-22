@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router'; // 🚀 1. AJOUT DE RouterLink ICI
 import { AuthService } from '../../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
@@ -7,7 +7,7 @@ import { NgIf } from '@angular/common';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [FormsModule, NgIf],
+  imports: [FormsModule, NgIf, RouterLink], // 🚀 2. AJOUT DE RouterLink DANS LES IMPORTS
   templateUrl: './register.component.html',
   styles: [`
     .register-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100vw; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; position: absolute; top: 0; left: 0; }
@@ -44,7 +44,7 @@ export class RegisterComponent {
   countdown = 3;
 
   onSubmit(event: Event) {
-    event.preventDefault(); // Stoppe le rechargement de la page
+    event.preventDefault();
 
     this.errorMessage = '';
     this.showSuccessMessage = false;
@@ -55,8 +55,6 @@ export class RegisterComponent {
       return;
     }
 
-    // 🟢 SÉCURITÉ RADICALE : Utilisation de Fetch natif avec l'URL IP:PORT 100% correcte
-    // On contourne le service pour forcer le passage direct vers votre backend Express
     const targetUrl = 'http://localhost:3000/api/auth/register';
     console.log("🚀 Envoi de la requête d'inscription vers :", targetUrl);
 
@@ -79,10 +77,10 @@ export class RegisterComponent {
       
       const interval = setInterval(() => {
         this.countdown--;
-        this.cdr.detectChanges(); // Met à jour le décompte (3, 2, 1) à l'écran
+        this.cdr.detectChanges(); 
         if (this.countdown === 0) {
           clearInterval(interval);
-          this.router.navigate(['/auth/login']); // Ajustement vers votre route de connexion
+          this.router.navigate(['/login']); // 🟢 CORRECTION : Redirection automatique vers /login après succès
         }
       }, 1000);
     })
@@ -94,6 +92,6 @@ export class RegisterComponent {
   }
 
   goToLogin() {
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/login']); // 🟢 CORRECTION : Redirection manuelle vers /login au clic sur le lien
   }
 }

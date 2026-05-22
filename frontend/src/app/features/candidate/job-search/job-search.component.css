@@ -433,3 +433,113 @@
 .badge-expiration i {
   color: #ea580c;
 }
+
+/* Arrière-plan flouté et assombri de force au premier plan */
+.custom-modal-overlay-auth {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 🟢 MODIFICATION : On applique un z-index maximal pour passer devant la grande carte des détails */
+  z-index: 999999 !important; 
+}
+
+
+/* Boîte de la popup */
+.custom-modal-box-auth {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  animation: modalSlideUp 0.25s ease-out;
+}
+
+.custom-modal-header-auth {
+  background: #f8fafc;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.custom-modal-header-auth h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.login-icon-ats {
+  color: #0ea5e9; /* Bleu moderne pour correspondre à votre thème TunJob */
+  font-size: 1.5rem;
+}
+
+.custom-modal-body-auth {
+  padding: 24px;
+  color: #334155;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.sub-text-auth {
+  margin-top: 10px;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.custom-modal-footer-auth {
+  padding: 16px 24px;
+  background: #f8fafc;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* Boutons de la popup */
+.btn-modal-cancel-auth {
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+
+.btn-modal-cancel-auth:hover {
+  background: #f8fafc;
+}
+
+.btn-modal-confirm-auth {
+  background: #0ea5e9;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+
+.btn-modal-confirm-auth:hover {
+  background: #0284c7;
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

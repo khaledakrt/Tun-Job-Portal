@@ -4,20 +4,24 @@ import { candidateGuard } from './core/guards/candidate.guard';
 import { recruiterGuard } from './core/guards/recruiter.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'job-search', pathMatch: 'full' }, 
   { path: 'login', loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
   
   // ==========================================================================
-  // 🌍 ROUTE COMMUNE/PUBLIQUE : Ajoutée ici pour le recruteur (sans guard bloquant)
+  // 🌍 ENTRÉE PUBLIQUE (Pour les visiteurs anonymes / plein écran)
   // ==========================================================================
   { 
     path: 'candidate/cv-view/:id', 
     loadComponent: () => import('./features/candidate/cv-view/cv-view.component').then(m => m.CvViewComponent) 
   },
+  {
+    path: 'job-search',
+    loadComponent: () => import('./features/candidate/job-search/job-search.component').then(m => m.JobSearchComponent)
+  },
 
   // ==========================================================================
-  // 🧭 ESPACE CANDIDAT : CONFIGURATION DES ROUTES ENFANTS INCHANGÉE (Zéro bug candidat)
+  // 🧭 ESPACE CANDIDAT CONNECTÉ (Avec Layout complet + Menu de navigation)
   // ==========================================================================
   { 
     path: 'candidate', 
@@ -26,10 +30,11 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'job-search',
+        redirectTo: 'job-search', // 🟢 Redirige vers la version AVEC menu pour le connecté
         pathMatch: 'full'
       },
       {
+        // 🟢 RÉINTRODUIT : Permet au candidat connecté d'avoir la recherche AVEC le menu latéral !
         path: 'job-search',
         loadComponent: () => import('./features/candidate/job-search/job-search.component').then(m => m.JobSearchComponent)
       },
@@ -42,7 +47,7 @@ export const routes: Routes = [
         loadComponent: () => import('./features/candidate/cv-builder/cv-builder.component').then(m => m.CvBuilderComponent)
       },
       {
-        path: 'cv-view', // 👈 Laissée ici pour que l'accès classique du candidat ne change pas d'un poil
+        path: 'cv-view', 
         loadComponent: () => import('./features/candidate/cv-view/cv-view.component').then(m => m.CvViewComponent)
       },
       {
@@ -83,8 +88,8 @@ export const routes: Routes = [
     ]
   },
 
-    // ==========================================================================
-  // 🛡️ ESPACE ADMIN : CONFIGURATION SÉCURISÉE DES ROUTES ENFANTS MAPPED
+  // ==========================================================================
+  // 🛡️ ESPACE ADMIN
   // ==========================================================================
   { 
     path: 'admin', 
@@ -111,6 +116,5 @@ export const routes: Routes = [
     ]
   },
   
-  { path: '**', redirectTo: 'login' }
-]; // 👈 Fermeture finale et propre du tableau des routes d'Angular
-
+  { path: '**', redirectTo: 'job-search' }
+];
