@@ -1,13 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer');
+const { frontendUrl } = require('./config/env');
 const app = express();
-require('dotenv').config();
 
 // 1. CONFIGURATION DES SECURITY MIDDLEWARES SÉCURISÉE ET MISE À JOUR
 app.use(cors({
-    origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    origin: [frontendUrl, 'http://localhost:4200', 'http://127.0.0.1:4200'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'], 
     credentials: true
 }));
@@ -41,8 +42,11 @@ const { verifyToken, checkRole } = require('./middleware/auth.middleware');
 app.use('/api/auth', authRoutes); // Entièrement public (Connexion / Inscription)
 
 // 🔓 1. NOUVEAU & PUBLIC : On charge le contrôleur des offres directement ici pour le rendre accessible à tous
-const candidateJobCtrl = require('./controllers/candidate/job.controller'); 
-app.use('/api/candidate/jobs/list', candidateJobCtrl.getAllAvailableJobs);
+const candidateJobCtrl = require('./controllers/candidate/job.controller');
+const candidateQuizCtrl = require('./controllers/candidate/quiz.controller');
+
+app.get('/api/candidate/jobs/list', candidateJobCtrl.getAllAvailableJobs);
+app.get('/api/public/jobs/:jobId/quiz', candidateQuizCtrl.getJobQuizForCandidate);
 
 // 🔒 2. RESTE DE L'ESPACE CANDIDAT : Protégé globalement (verifyToken + checkRole)
 app.use('/api/candidate', verifyToken, checkRole(['candidate']), candidateRoutes);
@@ -70,10 +74,19 @@ app.use((req, res, next) => {
 
 // 6. GESTIONNAIRE GLOBAL DES ERREURS SERVEUR (SÉCURITÉ ANTI-CRASH)
 app.use((err, req, res, next) => {
-    console.error("❌ CRASH SERVEUR INTERNE INTERCEPTÉ :", err.stack);
-    res.status(500).json({ 
-        message: "Une erreur interne est survenue sur le serveur Express.",
-        error: err.message 
+    if (err instanceof multer.MulterError) {
+        const message = err.code === 'LIMIT_FILE_SIZE'
+            ? 'Fichier trop volumineux.'
+            : 'Erreur lors du téléversement du fichier.';
+        return res.status(400).json({ message });
+    }
+    if (err.message && err.message.includes('Type de fichier')) {
+        return res.status(400).json({ message: err.message });
+    }
+    console.error('❌ Erreur serveur :', err.stack);
+    res.status(500).json({
+        message: 'Une erreur interne est survenue sur le serveur Express.',
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
 });
 

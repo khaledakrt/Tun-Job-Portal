@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'TUN_JOB_SECRET_TOKEN_2026_KEY';
+const { jwt: jwtConfig } = require('../config/env');
 
 exports.verifyToken = (req, res, next) => {
     let token = null;
@@ -35,7 +35,7 @@ exports.verifyToken = (req, res, next) => {
 
     try {
         // Décodage et injection de l'utilisateur (inchangé)
-        req.user = jwt.verify(token, JWT_SECRET);
+        req.user = jwt.verify(token, jwtConfig.secret);
         next();
     } catch (err) {
         console.error("❌ Middleware Auth : Échec de la vérification JWT :", err.message);

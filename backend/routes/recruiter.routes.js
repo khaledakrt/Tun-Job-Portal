@@ -5,7 +5,12 @@ const router = express.Router();
 const profileCtrl = require('../controllers/recruiter/profile.controller');
 const jobCtrl = require('../controllers/recruiter/job.controller');
 const atsCtrl = require('../controllers/recruiter/ats.controller');
+const quizCtrl = require('../controllers/recruiter/quiz.controller');
 const upload = require('../config/multer.config');
+const { validate } = require('../middleware/validate.middleware');
+const jobSchemas = require('../validators/job.validator');
+const appSchemas = require('../validators/application.validator');
+const quizSchemas = require('../validators/quiz.validator');
 
 // 2. Middleware d'authentification
 const authMiddleware = require('../middleware/auth.middleware');
@@ -33,14 +38,20 @@ router.post('/profile/update', upload.single('logo'), profileCtrl.updateCompany)
 router.post('/profile/change-password', profileCtrl.changePassword);
 
 // Gestion des offres (Jobs)
-router.post('/jobs/create', jobCtrl.createJob); 
+router.post('/jobs/create', validate(jobSchemas.createJob), jobCtrl.createJob);
 router.get('/jobs/list', jobCtrl.getRecruiterJobs); 
-router.post('/jobs/toggle-status', jobCtrl.toggleJobStatus);
+router.post('/jobs/toggle-status', validate(jobSchemas.toggleStatus), jobCtrl.toggleJobStatus);
 router.delete('/jobs/delete/:id', jobCtrl.deleteJob);
 
 // Suivi des candidatures (ATS)
 router.get('/ats/applications', atsCtrl.getApplications);
-router.post('/ats/update-status', atsCtrl.updateStatus);
+router.get('/ats/applications/:applicationId/quiz-answers', atsCtrl.getApplicationQuizAnswers);
+router.post('/ats/update-status', validate(appSchemas.updateStatus), atsCtrl.updateStatus);
+
+router.get('/jobs/:jobId/quiz', quizCtrl.getJobQuiz);
+router.post('/jobs/:jobId/quiz', validate(quizSchemas.upsertQuiz), quizCtrl.saveJobQuiz);
+router.patch('/jobs/:jobId/quiz/visibility', validate(quizSchemas.toggleVisibility), quizCtrl.toggleQuizVisibility);
+router.delete('/jobs/:jobId/quiz', quizCtrl.deleteJobQuiz);
 
 // Profil candidat et CV
 router.get('/candidate-profile/:id', atsCtrl.getCandidateProfileById);

@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-// Chargement unique du contrôleur (qui contient déjà la logique et le modèle User)
-const ctrl = require('../controllers/auth/auth.controller'); 
+const ctrl = require('../controllers/auth/auth.controller');
 const { verifyToken } = require('../middleware/auth.middleware');
+const { validate } = require('../middleware/validate.middleware');
+const authSchemas = require('../validators/auth.validator');
 
-// Déclaration propre des endpoints de l'API publique
-router.post('/register', ctrl.register);
-router.post('/login', ctrl.login);
+router.post('/register', validate(authSchemas.register), ctrl.register);
+router.post('/login', validate(authSchemas.login), ctrl.login);
 
 // 🔑 NOUVEAU : Endpoint public pour intercepter le clic de confirmation par e-mail
 router.get('/verify-email', ctrl.verifyEmail);

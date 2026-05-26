@@ -72,3 +72,40 @@ exports.getCVDetails = async (req, res) => {
     }
 };
 
+exports.uploadCvPdf = async (req, res) => {
+    const candidate_id = req.user?.id;
+    if (!candidate_id) {
+        return res.status(401).json({ message: 'Action non autorisée.' });
+    }
+    if (!req.file) {
+        return res.status(400).json({ message: 'Aucun fichier PDF reçu.' });
+    }
+
+    try {
+        const [existing] = await db.execute('SELECT id FROM cvs WHERE candidate_id = ?', [candidate_id]);
+        if (existing.length > 0) {
+            await db.execute('UPDATE cvs SET cv_pdf = ? WHERE candidate_id = ?', [
+                req.file.filename,
+                candidate_id,
+            ]);
+        } else {
+            await db.execute(
+                'INSERT INTO cvs (candidate_id, cv_pdf, title, summary) VALUES (?, ?, ?, ?)',
+                [candidate_id, req.file.filename, 'CV PDF', '']
+            );
+        }
+        return res.status(200).json({
+            message: 'CV PDF téléversé avec succès.',
+            filename: req.file.filename,
+            url: `/cv_files/${req.file.filename}`,
+        });
+    } catch (e) {
+        if (e.code === 'ER_BAD_FIELD_ERROR') {
+            return res.status(500).json({
+                message: 'Colonne cv_pdf absente. Exécutez database/migrations/002_cv_pdf.sql',
+            });
+        }
+        return res.status(500).json({ error: e.message });
+    }
+};
+

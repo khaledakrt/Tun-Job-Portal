@@ -2,18 +2,9 @@ const db = require('../../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-
-const JWT_SECRET = 'TUN_JOB_SECRET_TOKEN_2026_KEY';
-
-// 🌐 Configuration de Nodemailer (Utilise votre email et mot de passe d'application généré)
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+const { jwt: jwtConfig, apiBaseUrl, frontendUrl } = require('../../config/env');
+const emailService = require('../../services/email.service');
+const { emailLayout } = require('../../templates/email/layout');
 
 exports.register = async (req, res) => {
     const { name, email, password, role } = req.body;
@@ -25,7 +16,10 @@ exports.register = async (req, res) => {
         }
 
         // 2. Interception chirurgicale du doublon MySQL avant insertion
-        const [existingUser] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
+        const [existingUser] = await db.execute(
+            'SELECT id FROM users WHERE LOWER(email) = LOWER(?)',
+            [email]
+        );
         if (existingUser.length > 0) {
             return res.status(400).json({ message: "Cette adresse e-mail est déjà utilisée en Tunisie." });
         }
@@ -44,30 +38,21 @@ exports.register = async (req, res) => {
         );
 
         // 6. Envoi automatique de l'e-mail de confirmation
-        const confirmationUrl = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
-        const mailOptions = {
-            from: '"Tun-Job Portal" <no-reply@tunjob.com>',
-            to: email,
-            subject: 'Tun-Job - Activez votre compte candidat/recruteur',
-            html: `
-              <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; padding: 30px; border-radius: 12px; background-color: #ffffff;">
-                <div style="text-align: center; margin-bottom: 20px;">
-                  <h2 style="color: #0ea5e9; margin: 0; font-size: 24px; font-weight: 700;">Bienvenue sur Tun-Job !</h2>
-                </div>
-                <p style="font-size: 14px; color: #334155; line-height: 1.6;">Bonjour <strong>${name}</strong>,</p>
-                <p style="font-size: 14px; color: #334155; line-height: 1.6;">Merci de vous être inscrit sur Tun-Job Portal. Pour pouvoir vous connecter et utiliser la plateforme, veuillez confirmer votre adresse e-mail en cliquant sur le bouton ci-dessous :</p>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                  <a href="${confirmationUrl}" style="display: inline-block; background-color: #0ea5e9; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">Activer mon compte Tun-Job</a>
-                </div>
-                <p style="font-size: 12px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 15px;">Si le bouton ne fonctionne pas, copiez-collez ce lien : <br> ${confirmationUrl}</p>
-              </div>
-            `
-        };
-
-        transporter.sendMail(mailOptions, (mailErr) => {
-            if (mailErr) console.error("❌ Erreur d'envoi d'e-mail de confirmation:", mailErr);
+        const confirmationUrl = `${apiBaseUrl}/api/auth/verify-email?token=${verificationToken}`;
+        const html = emailLayout({
+            title: 'Bienvenue sur Tun-Job !',
+            bodyHtml: `
+              <p style="font-size:14px;color:#334155;line-height:1.6;">Bonjour <strong>${name}</strong>,</p>
+              <p style="font-size:14px;color:#334155;line-height:1.6;">Merci de vous être inscrit. Confirmez votre adresse e-mail pour activer votre compte.</p>`,
+            ctaUrl: confirmationUrl,
+            ctaLabel: 'Activer mon compte Tun-Job',
         });
+
+        emailService.sendMail({
+            to: email,
+            subject: 'Tun-Job — Activez votre compte',
+            html,
+        }).catch((mailErr) => console.error("❌ E-mail confirmation:", mailErr.message));
 
         // Succès : Déclenchera la Box Verte sur le Frontend Angular
         return res.status(201).json({ message: "Inscription réussie ! Un e-mail de validation vous a été envoyé." });
@@ -89,7 +74,10 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: "Veuillez fournir un email et un mot de passe." });
         }
 
-        const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+        const [users] = await db.execute(
+            'SELECT * FROM users WHERE LOWER(email) = LOWER(?)',
+            [email]
+        );
         if (users.length === 0) return res.status(400).json({ message: "Identifiants ou mot de passe incorrects." });
 
         const user = users[0];
@@ -102,7 +90,7 @@ exports.login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Identifiants ou mot de passe incorrects." });
 
-        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ id: user.id, role: user.role }, jwtConfig.secret, { expiresIn: jwtConfig.expiresIn });
         
         // 🚀 RETOUR LOGGED : Ajout de la valeur de certification d'entreprise pour Angular
         return res.status(200).json({ 
@@ -140,7 +128,7 @@ exports.verifyEmail = async (req, res) => {
         );
 
         // Redirection vers le formulaire Angular local avec paramètre de succès
-        return res.redirect('http://localhost:4200/login?verified=true');
+        return res.redirect(`${frontendUrl}/login?verified=true`);
 
     } catch (e) {
         console.error("❌ Erreur lors de la vérification de l'e-mail :", e);

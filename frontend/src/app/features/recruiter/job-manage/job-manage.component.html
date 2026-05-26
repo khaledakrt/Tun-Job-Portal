@@ -74,13 +74,14 @@
             <th>Localisation</th>
             <th>Candidatures Reçues</th>
             <th>Statut</th>
+            <th>Quiz</th>
             <th style="text-align: center;">Actions</th>
           </tr>
         </thead>
         <tbody>
           @if (isLoading) {
             <tr>
-              <td colspan="6" style="text-align: center; padding: 25px; color: #64748b; font-weight: 500;">
+              <td colspan="7" style="text-align: center; padding: 25px; color: #64748b; font-weight: 500;">
                 <i class="bi bi-arrow-clockwise" style="display: inline-block; animation: spin 1s linear infinite; margin-right: 8px;"></i>
                 Synchronisation avec la base de données...
               </td>
@@ -89,7 +90,7 @@
 
           @if (!isLoading && filteredJobs.length === 0) {
             <tr>
-              <td colspan="6" style="text-align: center; padding: 35px; color: #64748b;">
+              <td colspan="7" style="text-align: center; padding: 35px; color: #64748b;">
                 <i class="bi bi-folder-x" style="font-size: 26px; display: block; margin-bottom: 6px; color: #cbd5e1;"></i>
                 Aucune annonce ne correspond à votre recherche.
               </td>
@@ -112,7 +113,13 @@
                 </span>
               </td>
               <td>
+                <span class="status-badge" [ngClass]="job.has_quiz ? (job.quiz_is_active ? 'bg-green' : 'bg-gray') : 'bg-gray'">
+                  {{ getQuizBadge(job) }}
+                </span>
+              </td>
+              <td>
                 <div class="actions-cell">
+                  <button (click)="onManageQuiz(job)" class="btn-action btn-view" title="Gérer le quiz" style="color: #7c3aed;"><i class="bi bi-patch-question-fill"></i></button>
                   <button (click)="onViewJob(job)" class="btn-action btn-view" title="Consulter"><i class="bi bi-eye-fill"></i></button>
                   <button (click)="onToggleStatus(job)" class="btn-action btn-toggle" title="Masquer/Afficher"><i class="bi" [ngClass]="job.status === 'disponible' || job.status === 'Actif' ? 'bi-eye-slash-fill' : 'bi-check-circle-fill'"></i></button>
                   <button (click)="onDeleteJob(job.id)" class="btn-action btn-delete" title="Supprimer"><i class="bi bi-trash3-fill"></i></button>
@@ -227,6 +234,37 @@
 
         </div>
 
+      </div>
+    </div>
+  }
+
+  <!-- Modale gestion quiz -->
+  @if (quizManageJob) {
+    <div class="modal-overlay" (click)="onCloseQuizModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()" style="max-width: 720px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+          <h3><i class="bi bi-patch-question-fill" style="color: #7c3aed;"></i> Quiz — {{ quizManageJob.title }}</h3>
+          <button (click)="onCloseQuizModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body">
+          @if (quizMessage) {
+            <p style="font-size: 13px; color: #0369a1; background: #e0f2fe; padding: 10px; border-radius: 8px;">{{ quizMessage }}</p>
+          }
+          <app-quiz-builder
+            [enabled]="hasQuizEdit"
+            [hideActivationToggle]="true"
+            [quizTitle]="quizTitle"
+            [questions]="quizQuestions"
+            [isActive]="quizIsActive"
+            [showManageActions]="true"
+            [isSaving]="isSavingQuiz"
+            (enabledChange)="onQuizEnabledChange($event)"
+            (quizTitleChange)="quizTitle = $event"
+            (questionsChange)="quizQuestions = $event"
+            (save)="saveQuiz()"
+            (toggleVisibility)="toggleQuizVisibility($event)"
+          />
+        </div>
       </div>
     </div>
   }

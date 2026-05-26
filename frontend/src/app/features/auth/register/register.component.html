@@ -38,7 +38,8 @@
 
       <div class="form-group">
         <label for="password">Mot de passe</label>
-        <input type="password" id="password" name="password" [(ngModel)]="user.password" placeholder="••••••••" required>
+        <input type="password" id="password" name="password" [(ngModel)]="user.password" placeholder="••••••••" minlength="8" required>
+        <small style="font-size: 12px; color: #64748b;">Minimum 8 caractères</small>
       </div>
 
       <button type="submit" class="btn-submit">Créer mon compte</button>

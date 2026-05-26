@@ -11,7 +11,10 @@ const upload = require('../config/multer.config');
 const profileCtrl = require('../controllers/candidate/profile.controller');
 const cvCtrl = require('../controllers/candidate/cv.controller');
 const appCtrl = require('../controllers/candidate/application.controller');
-const candidateJobCtrl = require('../controllers/candidate/job.controller'); 
+const quizCtrl = require('../controllers/candidate/quiz.controller');
+const candidateJobCtrl = require('../controllers/candidate/job.controller');
+const { validate } = require('../middleware/validate.middleware');
+const appSchemas = require('../validators/application.validator');
 
 // ==========================================================================
 // 👤 MODULE PROFIL CANDIDAT (PROTÉGÉ PAR TOKEN JWT)
@@ -30,10 +33,12 @@ router.get('/jobs/list', candidateJobCtrl.getAllAvailableJobs);
 // 📄 GESTIONNAIRE DE CV & CANDIDATURES
 // ==========================================================================
 router.post('/cv/save', verifyToken, cvCtrl.saveCV);
-router.get('/cv/details', verifyToken, cvCtrl.getCVDetails); 
+router.get('/cv/details', verifyToken, cvCtrl.getCVDetails);
+router.post('/cv/upload-pdf', verifyToken, upload.single('cv'), cvCtrl.uploadCvPdf);
 
 // 🔒 ROUTE PRIVÉE : Reste protégée, l'utilisateur DOIT être connecté pour postuler
-router.post('/apply', verifyToken, appCtrl.apply);
+router.get('/jobs/:jobId/quiz', verifyToken, quizCtrl.getJobQuizForCandidate);
+router.post('/apply', verifyToken, validate(appSchemas.apply), appCtrl.apply);
 router.get('/history', verifyToken, appCtrl.getHistory);
 
 router.get('/profile/details-public/:id', verifyToken, profileCtrl.getPublicCompanyDetails);

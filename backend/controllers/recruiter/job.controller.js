@@ -1,179 +1,177 @@
 const db = require('../../config/db');
+const quizService = require('../../services/quiz.service');
+const { hasQuizSchema } = require('../../utils/dbSchema');
 
-// ==========================================================================
-// 🚀 1. CRÉATION D'UNE ANNONCE D'EMPLOI (CORRIGÉE AVEC COMPÉTENCES & LANGUES)
-// ==========================================================================
+async function fetchRecruiterJobs(recruiter_id) {
+    const quizReady = await hasQuizSchema();
+    if (quizReady) {
+        const [rows] = await db.execute(
+            `SELECT j.*, COUNT(a.id) AS application_count,
+                    COALESCE(j.has_quiz, 0) AS has_quiz,
+                    jq.is_active AS quiz_is_active,
+                    jq.title AS quiz_title
+             FROM jobs j
+             LEFT JOIN applications a ON j.id = a.job_id
+             LEFT JOIN job_quizzes jq ON j.id = jq.job_id
+             WHERE j.recruiter_id = ?
+             GROUP BY j.id, jq.id, jq.is_active, jq.title
+             ORDER BY j.id DESC`,
+            [recruiter_id]
+        );
+        return rows;
+    }
+    const [rows] = await db.execute(
+        `SELECT j.*, COUNT(a.id) AS application_count
+         FROM jobs j
+         LEFT JOIN applications a ON j.id = a.job_id
+         WHERE j.recruiter_id = ?
+         GROUP BY j.id
+         ORDER BY j.id DESC`,
+        [recruiter_id]
+    );
+    return rows.map((r) => ({ ...r, has_quiz: 0, quiz_is_active: null, quiz_title: null }));
+}
+
 exports.createJob = async (req, res) => {
-    const { 
-        title, 
-        contract_type, 
-        location, 
-        workplace_type, 
-        salary, 
-        experience_level, 
-        missions_desc, 
-        profile_desc, 
-        skills_desc,      
-        languages_desc,   
-        expires_at 
+    const {
+        title, contract_type, location, workplace_type, salary, experience_level,
+        missions_desc, profile_desc, skills_desc, languages_desc, expires_at,
+        has_quiz, quiz,
     } = req.body;
-    
-    const recruiter_id = req.user && req.user.id ? req.user.id : null;
-    
+
+    const recruiter_id = req.user?.id;
     if (!recruiter_id) {
         return res.status(401).json({ message: "Erreur d'authentification. Veuillez vous reconnecter." });
     }
 
     try {
-        const sqlQuery = `
-            INSERT INTO jobs 
-            (recruiter_id, title, contract_type, location, workplace_type, salary, experience_level, missions_desc, profile_desc, skills_desc, languages_desc, status, expires_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+        const formattedDate = expires_at && String(expires_at).trim() !== '' ? expires_at : null;
+        const quizReady = await hasQuizSchema();
 
-        const formattedDate = expires_at && expires_at.trim() !== '' ? expires_at : null;
-
-        await db.execute(sqlQuery, [
-            recruiter_id, 
-            title, 
-            contract_type, 
-            location, 
-            workplace_type, 
-            salary || null, 
-            experience_level, 
-            missions_desc, 
-            profile_desc, 
-            skills_desc || null,    
-            languages_desc || null, 
-            'disponible', 
-            formattedDate
-        ]);
-
-        return res.status(201).json({ message: "Annonce d'emploi publiée avec succès !" });
-
-    } catch (e) { 
-        return res.status(400).json({ message: "Impossible d'insérer l'offre en base de données.", error: e.message }); 
-    }
-};
-
-
-// ==========================================================================
-// 📥 2. RÉCUPÉRATION DES ANNONCES DU RECRUTEUR
-// ==========================================================================
-exports.getRecruiterJobs = async (req, res) => {
-    const recruiter_id = req.user && req.user.id ? req.user.id : null;
-    
-    if (!recruiter_id) {
-        return res.status(401).json({ message: "Utilisateur non authentifié." });
-    }
-
-    try {
-        const sqlQuery = `
-            SELECT j.*, COUNT(a.id) AS application_count
-            FROM jobs j
-            LEFT JOIN applications a ON j.id = a.job_id
-            WHERE j.recruiter_id = ?
-            GROUP BY j.id
-            ORDER BY j.id DESC
-        `;
-
-        const [rows] = await db.execute(sqlQuery, [recruiter_id]);
-        return res.json(rows);
-    } catch (e) { 
-        return res.status(500).json({ error: e.message }); 
-    }
-};
-
-// ==========================================================================
-// 🗑️ 3. SUPPRESSION DÉFINITIVE D'UNE OFFRE
-// ==========================================================================
-exports.deleteJob = async (req, res) => {
-    const jobId = req.params.id;
-
-    try {
-        await db.execute('DELETE FROM jobs WHERE id = ?', [jobId]);
-        return res.status(200).json({ 
-            success: true, 
-            message: "Annonce supprimée définitivement avec succès !" 
-        });
-    } catch (e) {
-        return res.status(500).json({ message: "Erreur serveur lors de la suppression." });
-    }
-};
-
-// ==========================================================================
-// 🔄 4. BASCULE DU STATUT DE L'OFFRE
-// ==========================================================================
-exports.toggleJobStatus = async (req, res) => {
-    const { jobId } = req.body;
-
-    try {
-        const [rows] = await db.execute('SELECT status FROM jobs WHERE id = ?', [jobId]);
-        
-        if (!rows || rows.length === 0) {
-            return res.status(404).json({ message: "Annonce introuvable dans la base MySQL." });
+        if (has_quiz && quiz?.questions?.length && !quizReady) {
+            return res.status(400).json({
+                message: 'Le module quiz n\'est pas activé en base. Exécutez database/migrations/001_quiz_module.sql',
+            });
         }
 
-        const currentStatus = rows[0].status; 
-        const newStatus = (currentStatus === 'disponible') ? 'fermé' : 'disponible';
+        let result;
+        if (quizReady) {
+            [result] = await db.execute(
+                `INSERT INTO jobs 
+                (recruiter_id, title, contract_type, location, workplace_type, salary, experience_level, 
+                 missions_desc, profile_desc, skills_desc, languages_desc, status, expires_at, has_quiz) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    recruiter_id, title, contract_type, location, workplace_type,
+                    salary || null, experience_level, missions_desc, profile_desc,
+                    skills_desc || null, languages_desc || null, 'disponible', formattedDate,
+                    has_quiz ? 1 : 0,
+                ]
+            );
+        } else {
+            [result] = await db.execute(
+                `INSERT INTO jobs 
+                (recruiter_id, title, contract_type, location, workplace_type, salary, experience_level, 
+                 missions_desc, profile_desc, skills_desc, languages_desc, status, expires_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    recruiter_id, title, contract_type, location, workplace_type,
+                    salary || null, experience_level, missions_desc, profile_desc,
+                    skills_desc || null, languages_desc || null, 'disponible', formattedDate,
+                ]
+            );
+        }
 
-        await db.execute('UPDATE jobs SET status = ? WHERE id = ?', [newStatus, jobId]);
+        const jobId = result.insertId;
 
-        return res.status(200).json({ 
-            message: "Statut mis à jour avec succès !", 
-            newStatus: newStatus 
+        if (quizReady && has_quiz && quiz?.questions?.length) {
+            await quizService.upsertQuizForJob(jobId, recruiter_id, quiz);
+        }
+
+        return res.status(201).json({
+            message: "Annonce d'emploi publiée avec succès !",
+            jobId,
         });
-
     } catch (e) {
-        return res.status(500).json({ message: "Erreur interne du serveur.", error: e.message });
+        return res.status(400).json({ message: "Impossible d'insérer l'offre.", error: e.message });
     }
 };
 
-// ==========================================================================
-// 📊 5. RÉCUPÉRATION DES STATISTIQUES DU DASHBOARD RECRUTEUR (CORRIGÉ)
-// ==========================================================================
-exports.getRecruiterStats = async (req, res) => {
-    const recruiter_id = req.user && req.user.id ? req.user.id : null;
-    
+exports.getRecruiterJobs = async (req, res) => {
+    const recruiter_id = req.user?.id;
     if (!recruiter_id) {
-        return res.status(401).json({ message: "Utilisateur non authentifié." });
+        return res.status(401).json({ message: 'Utilisateur non authentifié.' });
     }
 
     try {
-        // 1. Compter toutes les candidatures liées aux offres de ce recruteur
+        const rows = await fetchRecruiterJobs(recruiter_id);
+        return res.json(rows);
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+};
+
+exports.deleteJob = async (req, res) => {
+    try {
+        await db.execute('DELETE FROM jobs WHERE id = ? AND recruiter_id = ?', [
+            req.params.id,
+            req.user.id,
+        ]);
+        return res.status(200).json({ success: true, message: 'Annonce supprimée avec succès !' });
+    } catch (e) {
+        return res.status(500).json({ message: 'Erreur serveur lors de la suppression.' });
+    }
+};
+
+exports.toggleJobStatus = async (req, res) => {
+    const { jobId } = req.body;
+    try {
+        const [rows] = await db.execute(
+            'SELECT status FROM jobs WHERE id = ? AND recruiter_id = ?',
+            [jobId, req.user.id]
+        );
+        if (!rows.length) {
+            return res.status(404).json({ message: 'Annonce introuvable.' });
+        }
+        const newStatus = rows[0].status === 'disponible' ? 'fermé' : 'disponible';
+        await db.execute('UPDATE jobs SET status = ? WHERE id = ?', [newStatus, jobId]);
+        return res.status(200).json({ message: 'Statut mis à jour !', newStatus });
+    } catch (e) {
+        return res.status(500).json({ message: 'Erreur interne.', error: e.message });
+    }
+};
+
+exports.getRecruiterStats = async (req, res) => {
+    const recruiter_id = req.user?.id;
+    if (!recruiter_id) {
+        return res.status(401).json({ message: 'Utilisateur non authentifié.' });
+    }
+
+    try {
         const [appRows] = await db.execute(`
             SELECT COUNT(a.id) AS total_applications 
             FROM applications a
             JOIN jobs j ON a.job_id = j.id
-            WHERE j.recruiter_id = ?
-        `, [recruiter_id]);
+            WHERE j.recruiter_id = ?`, [recruiter_id]);
 
-        // 2. Compter les entretiens planifiés (Accepte les variantes de casse SQL)
         const [interviewRows] = await db.execute(`
             SELECT COUNT(a.id) AS total_interviews 
             FROM applications a
             JOIN jobs j ON a.job_id = j.id
-            WHERE j.recruiter_id = ? AND LOWER(a.status) = 'entretien'
-        `, [recruiter_id]);
+            WHERE j.recruiter_id = ? AND LOWER(a.status) LIKE '%entre%'`, [recruiter_id]);
 
-        // Correction fondamentale : Accéder à l'index [0] du tableau de lignes retourné
-        const totalApplications = appRows[0] ? appRows[0].total_applications : 0;
-        const totalInterviews = interviewRows[0] ? interviewRows[0].total_interviews : 0;
-
-        // 3. Calculer un taux de conversion réel
-        let conversionRate = 0;
-        if (totalApplications > 0) {
-            conversionRate = Math.round((totalInterviews / totalApplications) * 100);
-        }
+        const totalApplications = appRows[0]?.total_applications || 0;
+        const totalInterviews = interviewRows[0]?.total_interviews || 0;
+        const conversionRate = totalApplications > 0
+            ? Math.round((totalInterviews / totalApplications) * 100)
+            : 0;
 
         return res.json({
             applicationsCount: totalApplications,
             interviewsCount: totalInterviews,
-            conversionRate: conversionRate
+            conversionRate,
         });
-
     } catch (e) {
-        console.error("❌ ERREUR GET RECRUITER STATS :", e.message);
         return res.status(500).json({ error: e.message });
     }
 };

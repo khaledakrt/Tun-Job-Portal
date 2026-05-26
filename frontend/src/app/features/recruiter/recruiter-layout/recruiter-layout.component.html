@@ -149,6 +149,33 @@
               {{ selectedDirectCandidate.cv_summary || "Le candidat n'a pas encore rédigé de présentation de profil sur son espace TunJob." }}
             </p>
           </div>
+
+          @if (selectedDirectCandidate.has_quiz) {
+            <details class="notif-quiz-accordion" style="margin-top: 14px;" open>
+              <summary class="notif-quiz-summary">
+                <span><i class="bi bi-patch-question-fill"></i> Réponses au quiz</span>
+                <span class="quiz-title-inline">{{ selectedDirectCandidate.quiz_title || 'Quiz de présélection' }}</span>
+              </summary>
+
+              @if (selectedDirectCandidate.quiz_answers?.length) {
+                <div class="notif-quiz-list">
+                  @for (answer of selectedDirectCandidate.quiz_answers; track answer.question_id; let i = $index) {
+                    <div class="notif-quiz-item" [class.correct]="answer.is_correct" [class.incorrect]="!answer.is_correct">
+                      <div class="notif-quiz-question">
+                        <span class="notif-quiz-number">Q{{ i + 1 }}</span>
+                        {{ answer.question_text }}
+                      </div>
+                      <div class="notif-quiz-answer">
+                        {{ answer.selected_choice_text }}
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="notif-quiz-empty">Aucune réponse quiz disponible pour cette candidature.</p>
+              }
+            </details>
+          }
         </div>
 
         <!-- 🔘 PIED DE PAGE INTERACTIF DU KANBAN MODAL -->

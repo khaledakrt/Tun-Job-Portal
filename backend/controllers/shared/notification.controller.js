@@ -1,4 +1,5 @@
 const db = require('../../config/db');
+const quizService = require('../../services/quiz.service');
 
 // Stockage global en mémoire des flux HTTP ouverts (Clé: userId, Valeur: res)
 const activeClients = new Map();
@@ -213,6 +214,25 @@ exports.getCandidateByNotificationId = async (req, res) => {
     try {
         const notificationId = req.params.id;
         const currentUserId = req.user.id; // ID du recruteur connecté
+        const enrichWithQuizAnswers = async (candidateRow) => {
+            if (!candidateRow?.application_id) return candidateRow;
+            try {
+                const quizData = await quizService.getApplicationQuizAnswers(candidateRow.application_id, currentUserId);
+                return {
+                    ...candidateRow,
+                    has_quiz: !!quizData?.has_quiz,
+                    quiz_title: quizData?.quiz_title || null,
+                    quiz_answers: Array.isArray(quizData?.answers) ? quizData.answers : [],
+                };
+            } catch (err) {
+                return {
+                    ...candidateRow,
+                    has_quiz: false,
+                    quiz_title: null,
+                    quiz_answers: [],
+                };
+            }
+        };
 
         // 1. TENTATIVE ROBUSTE PAR IDENTIFIANT UNIQUE (Optionnelle si liée) ET COMPARAISON DU NOM PERMISSIF
         // On cherche le nom du candidat n'importe où dans le texte de la notification, sans être bloqué par les émojis
@@ -240,7 +260,7 @@ exports.getCandidateByNotificationId = async (req, res) => {
 
         if (rows && rows.length > 0) {
             console.log("🟢 [BACKEND] Candidat identifié avec succès par correspondance de nom.");
-            return res.json(rows[0]);
+            return res.json(await enrichWithQuizAnswers(rows[0]));
         }
 
         // 2. 🛡️ PLAN DE SECOURS DE DEUXIÈME CHANCE (Si l'émoji ou un pseudonyme bloque la jointure textuelle)
@@ -270,7 +290,7 @@ exports.getCandidateByNotificationId = async (req, res) => {
 
         if (permissiveRows && permissiveRows.length > 0) {
             console.log("ℹ️ [BACKEND - SECOURS 1] Candidat identifié via le titre de l'offre.");
-            return res.json(permissiveRows[0]);
+            return res.json(await enrichWithQuizAnswers(permissiveRows[0]));
         }
 
         // 3. 🛡️ PLAN DE SECOURS ULTRA-PERMISSIF DE DERNIÈRE CHANCE
@@ -299,7 +319,7 @@ exports.getCandidateByNotificationId = async (req, res) => {
 
         if (ultimateRows && ultimateRows.length > 0) {
             console.log("ℹ️ [BACKEND - SECOURS 2] Renvoi de la dernière candidature active pour ce recruteur.");
-            return res.json(ultimateRows[0]);
+            return res.json(await enrichWithQuizAnswers(ultimateRows[0]));
         }
 
         return res.status(404).json({ message: "Aucun candidat trouvé pour cette alerte." });

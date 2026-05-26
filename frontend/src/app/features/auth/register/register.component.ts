@@ -35,7 +35,8 @@ import { NgIf } from '@angular/common';
 })
 export class RegisterComponent {
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef); 
+  private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
 
   user = { name: '', email: '', role: 'candidate', password: '' };
   
@@ -49,45 +50,61 @@ export class RegisterComponent {
     this.errorMessage = '';
     this.showSuccessMessage = false;
 
-    if (!this.user.name || !this.user.email || !this.user.password) {
-      this.errorMessage = "Veuillez remplir tous les critères obligatoires.";
+    const name = this.user.name?.trim();
+    const email = this.user.email?.trim();
+    const password = this.user.password;
+
+    if (!name || !email || !password) {
+      this.errorMessage = 'Veuillez remplir tous les champs obligatoires.';
       this.cdr.detectChanges();
       return;
     }
 
-    const targetUrl = 'http://localhost:3000/api/auth/register';
-    console.log("🚀 Envoi de la requête d'inscription vers :", targetUrl);
+    if (name.length < 2) {
+      this.errorMessage = 'Le nom doit contenir au moins 2 caractères.';
+      this.cdr.detectChanges();
+      return;
+    }
 
-    fetch(targetUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(this.user)
-    })
-    .then(async res => {
-      const resData = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(resData.message || "Impossible de s'inscrire pour le moment.");
-      }
-      return resData;
-    })
-    .then(data => {
-      console.log("✅ Compte MySQL créé avec succès !", data);
-      this.showSuccessMessage = true;
-      this.cdr.detectChanges(); 
-      
-      const interval = setInterval(() => {
-        this.countdown--;
-        this.cdr.detectChanges(); 
-        if (this.countdown === 0) {
-          clearInterval(interval);
-          this.router.navigate(['/login']); // 🟢 CORRECTION : Redirection automatique vers /login après succès
-        }
-      }, 1000);
-    })
-    .catch((err: any) => {
-      console.error("❌ Échec de la requête d'inscription :", err);
-      this.errorMessage = err.message || "Impossible de joindre le serveur Tunisien.";
-      this.cdr.detectChanges(); 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.errorMessage = 'Adresse e-mail invalide.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (password.length < 8) {
+      this.errorMessage = 'Le mot de passe doit contenir au moins 8 caractères.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.authService
+      .register({
+        name,
+        email,
+        password,
+        role: this.user.role as 'candidate' | 'recruiter',
+      })
+      .subscribe({
+      next: () => {
+        this.showSuccessMessage = true;
+        this.cdr.detectChanges();
+        const interval = setInterval(() => {
+          this.countdown--;
+          this.cdr.detectChanges();
+          if (this.countdown === 0) {
+            clearInterval(interval);
+            this.router.navigate(['/login']);
+          }
+        }, 1000);
+      },
+      error: (err: any) => {
+        this.errorMessage = AuthService.formatHttpError(
+          err,
+          "Impossible de s'inscrire."
+        );
+        this.cdr.detectChanges();
+      },
     });
   }
 

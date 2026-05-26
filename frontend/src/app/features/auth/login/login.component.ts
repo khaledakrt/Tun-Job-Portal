@@ -2,7 +2,7 @@ import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
-import { from } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -40,8 +40,9 @@ import { from } from 'rxjs';
 })
 export class LoginComponent implements OnInit {
   private router = inject(Router);
-  private route = inject(ActivatedRoute); 
+  private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
 
   credentials = { email: '', password: '' };
   errorMessage = '';
@@ -61,50 +62,35 @@ export class LoginComponent implements OnInit {
     this.errorMessage = '';
     this.isEmailVerified = false; 
 
-    if (!this.credentials.email || !this.credentials.password) {
-      this.errorMessage = "Veuillez saisir vos identifiants.";
+    const email = this.credentials.email?.trim();
+    const password = this.credentials.password;
+
+    if (!email || !password) {
+      this.errorMessage = 'Veuillez saisir vos identifiants.';
       return;
     }
 
-    const cleanUrl = 'http://127.0.0.1:3000/api/auth/login';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.errorMessage = 'Adresse e-mail invalide.';
+      return;
+    }
 
-    const loginPromise = fetch(cleanUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(this.credentials)
-    }).then(async res => {
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => ({}));
-        
-        if (res.status === 403) {
-          throw { message: errorBody.message || "Votre compte n'est pas activé. Veuillez vérifier vos e-mails." };
-        }
-        
-        throw { message: errorBody.message || "Identifiants ou mot de passe incorrects." };
-      }
-      return res.json();
-    });
-
-    from(loginPromise).subscribe({
+    this.authService.login({ email, password }).subscribe({
       next: (res: any) => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('role', res.role);
-        localStorage.setItem('name', res.name);
-        
-        // 🏢 🔒 ENREGISTREMENT DE L'ÉTAT VÉRIFIÉ D'ENTREPRISE DANS LA SESSION FRONTEND
         if (res.is_verified_company !== undefined) {
           localStorage.setItem('is_verified_company', res.is_verified_company.toString());
         } else {
           localStorage.setItem('is_verified_company', '0');
         }
-        
-        // Redirection vers le layout
         this.router.navigate([`/${res.role}`]);
       },
       error: (err: any) => {
-        this.errorMessage = err.message || "Identifiants ou mot de passe incorrects.";
-        this.cdr.detectChanges(); 
-      }
+        this.errorMessage = AuthService.formatHttpError(
+          err,
+          'Identifiants ou mot de passe incorrects.'
+        );
+        this.cdr.detectChanges();
+      },
     });
   }
 

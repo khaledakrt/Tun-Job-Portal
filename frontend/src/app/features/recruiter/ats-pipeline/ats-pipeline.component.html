@@ -112,134 +112,167 @@
         <!-- Corps des détails avec intégration de l'avatar -->
     <div class="modal-body">
       
-      <!-- Conteneur Flex pour aligner la photo à gauche et les infos à droite -->
-      <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 20px;">
-        
-        <!-- Bloc Photo de Profil Ronde -->
-                <!-- 📸 Bloc Photo + Bouton Consulter le CV -->
-        <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 110px;">
-          
-          <!-- Photo ronde d'origine -->
-          <div style="width: 85px; height: 85px; border-radius: 50%; border: 1px solid #cbd5e1; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
-            <img [src]="selectedApplication.avatar_logo ? 'http://localhost:3000/logos/' + selectedApplication.avatar_logo : 'assets/images/default-avatar.png'" 
-                 (error)="$any($event.target).src='assets/images/default-avatar.png'"
-                 alt="Photo du candidat" 
-                 style="width: 100%; height: 100%; object-fit: cover;">
+      <details class="ats-section-card" open>
+        <summary class="ats-section-summary">
+          <span><i class="bi bi-person-vcard-fill"></i> Profil candidat</span>
+          <i class="bi bi-chevron-down"></i>
+        </summary>
+
+        <div class="ats-section-content">
+          <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 20px;">
+            <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 110px;">
+              <div style="width: 85px; height: 85px; border-radius: 50%; border: 1px solid #cbd5e1; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+                <img [src]="logoUrl(selectedApplication.avatar_logo)"
+                  (error)="$any($event.target).src='assets/images/default-avatar.png'"
+                  alt="Photo du candidat"
+                  style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+
+              <button (click)="openCandidateCV(selectedApplication.candidate_id)"
+                [disabled]="!selectedApplication.cv_summary || selectedApplication.cv_summary.trim() === ''"
+                [style.opacity]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? '1' : '0.5'"
+                [style.cursor]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'pointer' : 'not-allowed'"
+                [style.pointer-events]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'auto' : 'none'"
+                style="background: #ffffff; border: 1px solid #cbd5e1; color: #0284c7; padding: 6px 4px; border-radius: 4px; font-size: 11px; font-weight: 700; width: 100%; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                <svg xmlns="http://w3.org" width="11" height="11" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 1A1.5 1.5 0 0 1 11 2.5V4h3v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+                </svg>
+                {{ selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'Consulter le CV' : 'Aucun CV' }}
+              </button>
+            </div>
+
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
+              <div class="info-row" style="display: flex;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Poste ciblé :</span>
+                <strong class="info-value text-slate">{{ selectedApplication.job_title }}</strong>
+              </div>
+
+              <div class="info-row" style="display: flex;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Date candidature :</span>
+                <span class="info-value">{{ selectedApplication.applied_at ? (selectedApplication.applied_at | date:'dd/MM/yyyy à HH:mm') : '—' }}</span>
+              </div>
+
+              <div class="info-row" style="display: flex;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Adresse e-mail :</span>
+                <span class="info-value">{{ selectedApplication.email }}</span>
+              </div>
+
+              <div class="info-row" style="display: flex;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Téléphone :</span>
+                <span class="info-value">{{ selectedApplication.phone || 'Non renseigné' }}</span>
+              </div>
+
+              <div class="info-row" style="display: flex;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Ville / Région :</span>
+                <span class="info-value">{{ selectedApplication.address || 'Non spécifiée' }}</span>
+              </div>
+
+              <div class="info-row" style="display: flex; align-items: center;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Situation actuelle :</span>
+                <span class="info-value"><span class="badge-status-pro-ats">{{ selectedApplication.job_status || 'Non renseignée' }}</span></span>
+              </div>
+
+              <div class="info-row" style="display: flex;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Disponibilité :</span>
+                <span class="info-value">{{ selectedApplication.availability || 'Non renseignée' }}</span>
+              </div>
+
+              <div class="info-row" style="display: flex;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Contrat souhaité :</span>
+                <span class="info-value">{{ selectedApplication.job_type || 'Non renseigné' }}</span>
+              </div>
+
+              <div class="info-row" style="display: flex;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Date de naissance :</span>
+                <span class="info-value">{{ selectedApplication.birth_date ? (selectedApplication.birth_date | date:'dd/MM/yyyy') : 'Non renseignée' }}</span>
+              </div>
+
+              <div class="info-row" style="display: flex; align-items: center; margin-top: 4px;">
+                <span class="info-label" style="width: 150px; flex-shrink: 0;">Réseaux :</span>
+                <div style="display: flex; gap: 10px;">
+                  <a *ngIf="selectedApplication.linkedin && selectedApplication.linkedin.trim() !== ''"
+                    [href]="selectedApplication.linkedin"
+                    target="_blank"
+                    class="social-badge-btn linkedin-badge">
+                    <i class="bi bi-linkedin"></i> LinkedIn
+                  </a>
+
+                  <a *ngIf="selectedApplication.github && selectedApplication.github.trim() !== ''"
+                    [href]="selectedApplication.github"
+                    target="_blank"
+                    class="social-badge-btn github-badge">
+                    <i class="bi bi-github"></i> GitHub
+                  </a>
+
+                  <span *ngIf="(!selectedApplication.linkedin || selectedApplication.linkedin.trim() === '') && (!selectedApplication.github || selectedApplication.github.trim() === '')"
+                    style="color: #94a3b8; font-style: italic; font-size: 13px; font-weight: 500;">
+                    Non renseigné
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- 📄 BOUTON INTERACTIF : Ouvrir le document PDF -->
-         <button (click)="openCandidateCV(selectedApplication.candidate_id)" 
-        [disabled]="!selectedApplication.cv_summary || selectedApplication.cv_summary.trim() === ''"
-        [style.opacity]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? '1' : '0.5'"
-        [style.cursor]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'pointer' : 'not-allowed'"
-        [style.pointer-events]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'auto' : 'none'"
-        style="background: #ffffff; border: 1px solid #cbd5e1; color: #0284c7; padding: 6px 4px; border-radius: 4px; font-size: 11px; font-weight: 700; width: 100%; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-  
-  <!-- Icône SVG standardisée -->
-  <svg xmlns="http://w3.org" width="11" height="11" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 1A1.5 1.5 0 0 1 11 2.5V4h3v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
-  </svg>
-
-  <!-- Texte Dynamique basé sur la présence du résumé de CV -->
-  {{ selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'Consulter le CV' : 'Aucun CV' }}
-</button>
+          <div class="summary-box" style="margin-top: 15px; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+            <span class="summary-title" style="color: #0f172a; font-weight: 700; font-size: 13px; display: block; margin-bottom: 8px;">
+              Résumé du profil & Compétences clés
+            </span>
+            <p class="summary-text" style="margin: 0; color: #475569; font-size: 13px; line-height: 1.6; white-space: pre-line;">
+              {{ selectedApplication.cv_summary || selectedApplication.cv_Summary || selectedApplication.summary || "Le candidat n'a pas encore rédigé de présentation de profil sur son espace TunJob." }}
+            </p>
+          </div>
         </div>
-        <!-- Bloc des informations textuelles aligné au millimètre près -->
-<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
-  
-  <div class="info-row" style="display: flex;">
-    <span class="info-label" style="width: 150px; flex-shrink: 0;">Poste ciblé :</span> 
-    <strong class="info-value text-slate">{{ selectedApplication.job_title }}</strong>
-  </div>
-  
-  <div class="info-row" style="display: flex;">
-    <span class="info-label" style="width: 150px; flex-shrink: 0;">Adresse e-mail :</span> 
-    <span class="info-value">{{ selectedApplication.email }}</span>
-  </div>
-  
-  <div class="info-row" style="display: flex;">
-    <span class="info-label" style="width: 150px; flex-shrink: 0;">Téléphone :</span> 
-    <span class="info-value">{{ selectedApplication.phone || 'Non renseigné' }}</span>
-  </div>
-  
-  <div class="info-row" style="display: flex;">
-    <span class="info-label" style="width: 150px; flex-shrink: 0;">Ville / Région :</span> 
-    <span class="info-value">{{ selectedApplication.address || 'Non spécifiée' }}</span>
-  </div>
+      </details>
 
-  <!-- 🟢 Aligné : Situation actuelle -->
-  <div class="info-row" style="display: flex; align-items: center;">
-    <span class="info-label" style="width: 150px; flex-shrink: 0;">Situation actuelle :</span> 
-    <span class="info-value">
-      <span class="badge-status-pro-ats">{{ selectedApplication.job_status || 'Non renseignée' }}</span>
-    </span>
-  </div>
-  
-  <!-- 🟢 Aligné : Disponibilité -->
-  <div class="info-row" style="display: flex;">
-    <span class="info-label" style="width: 150px; flex-shrink: 0;">Disponibilité :</span> 
-    <span class="info-value">{{ selectedApplication.availability || 'Non renseignée' }}</span>
-  </div>
-  
-  <!-- 🟢 Aligné : Contrat souhaité -->
-  <div class="info-row" style="display: flex;">
-    <span class="info-label" style="width: 150px; flex-shrink: 0;">Contrat souhaité :</span> 
-    <span class="info-value">{{ selectedApplication.job_type || 'Non renseigné' }}</span>
-  </div>
-  
-  <!-- 🟢 Aligné : Date de naissance -->
-  <div class="info-row" style="display: flex;">
-    <span class="info-label" style="width: 150px; flex-shrink: 0;">Date de naissance :</span> 
-    <span class="info-value">
-      {{ selectedApplication.birth_date ? (selectedApplication.birth_date | date:'dd/MM/yyyy') : 'Non renseignée' }}
-    </span>
-  </div>
+      <details class="ats-section-card">
+        <summary class="ats-section-summary">
+          <span><i class="bi bi-patch-question-fill"></i> Réponses quiz</span>
+          <i class="bi bi-chevron-down"></i>
+        </summary>
 
-   <!-- 🟢 Aligné : Boutons réseaux ou message Non renseigné -->
-  <div class="info-row" style="display: flex; align-items: center; margin-top: 4px;">
-    <span class="info-label" style="width: 150px; flex-shrink: 0;">Réseaux :</span>
-    <div style="display: flex; gap: 10px;">
-      
-      <!-- S'affiche uniquement si le lien LinkedIn existe -->
-      <a *ngIf="selectedApplication.linkedin && selectedApplication.linkedin.trim() !== ''" 
-         [href]="selectedApplication.linkedin" 
-         target="_blank" 
-         class="social-badge-btn linkedin-badge">
-        <i class="bi bi-linkedin"></i> LinkedIn
-      </a>
-      
-      <!-- S'affiche uniquement si le lien GitHub existe -->
-      <a *ngIf="selectedApplication.github && selectedApplication.github.trim() !== ''" 
-         [href]="selectedApplication.github" 
-         target="_blank" 
-         class="social-badge-btn github-badge">
-        <i class="bi bi-github"></i> GitHub
-      </a>
-      
-      <!-- 🆕 S'affiche uniquement si les DEUX liens sont vides ou inexistants -->
-      <span *ngIf="(!selectedApplication.linkedin || selectedApplication.linkedin.trim() === '') && (!selectedApplication.github || selectedApplication.github.trim() === '')" 
-            style="color: #94a3b8; font-style: italic; font-size: 13px; font-weight: 500;">
-        Non renseigné
-      </span>
-
-    </div>
-  </div>
-
-
-</div>
-
-
-      </div>
-      
-      <!-- Boîte du Résumé (Inchangée et conservée à l'identique) -->
-      <div class="summary-box" style="margin-top: 15px; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #0ea5e9;">
-        <span class="summary-title" style="color: #0f172a; font-weight: 700; font-size: 13px; display: block; margin-bottom: 8px;">
-          Résumé du profil & Compétences clés
-        </span>
-        <p class="summary-text" style="margin: 0; color: #475569; font-size: 13px; line-height: 1.6; white-space: pre-line;">
-          {{ selectedApplication.cv_summary || selectedApplication.cv_Summary || selectedApplication.summary || "Le candidat n'a pas encore rédigé de présentation de profil sur son espace TunJob." }}
-        </p>
-      </div>
+        <div class="ats-section-content">
+          @if (isLoadingQuizAnswers) {
+            <div class="quiz-answers-section" style="margin-top: 6px;">
+              <p style="color: #64748b; font-size: 13px; margin: 0;"><i class="bi bi-arrow-clockwise"></i> Chargement des réponses au quiz…</p>
+            </div>
+          } @else if (quizAnswersData) {
+            @if (quizAnswersData.has_quiz && quizAnswersData.answers.length) {
+              <div class="quiz-answers-section">
+                <div class="quiz-answers-header">
+                  <h4><i class="bi bi-patch-question-fill"></i> Réponses au questionnaire</h4>
+                  <span class="quiz-answers-subtitle">{{ quizAnswersData.quiz_title }}</span>
+                </div>
+                <div class="quiz-answers-list">
+                  @for (answer of quizAnswersData.answers; track answer.question_id; let i = $index) {
+                    <div class="quiz-answer-item" [class.correct]="answer.is_correct" [class.incorrect]="!answer.is_correct">
+                      <div class="quiz-answer-q">
+                        <span class="quiz-answer-num">Q{{ i + 1 }}</span>
+                        {{ answer.question_text }}
+                      </div>
+                      <div class="quiz-answer-a">
+                        @if (answer.is_correct) {
+                          <i class="bi bi-check2-circle"></i>
+                        } @else {
+                          <i class="bi bi-x-circle"></i>
+                        }
+                        {{ answer.selected_choice_text }}
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @else if (quizAnswersData.has_quiz) {
+              <div class="quiz-answers-section quiz-answers-empty">
+                <p>Aucune réponse enregistrée pour ce quiz.</p>
+              </div>
+            } @else {
+              <div class="quiz-answers-section quiz-answers-empty">
+                <p>Cette offre ne contient pas de quiz.</p>
+              </div>
+            }
+          }
+        </div>
+      </details>
     </div>
 
 

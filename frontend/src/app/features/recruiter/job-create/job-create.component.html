@@ -133,13 +133,73 @@
         </div>
       </div>
 
-      <!-- 🔘 BOUTON PREMIUM INTÉGRÉ AU BAS DU PANNEAU DROIT -->
+      <div class="quiz-optional-card span-all">
+        <div class="quiz-optional-header">
+          <div>
+            <h4><i class="bi bi-patch-question-fill"></i> Quiz de présélection (optionnel)</h4>
+            <p>Ajoutez un questionnaire QCM pour filtrer les candidatures.</p>
+          </div>
+        </div>
+
+        @if (hasQuiz && quizSaved) {
+          <div class="quiz-saved-banner">
+            <div>
+              <strong><i class="bi bi-check-circle-fill"></i> Quiz enregistré</strong>
+              <p>{{ quizTitle }} · {{ quizQuestions.length }} question(s)</p>
+            </div>
+            <div class="quiz-saved-actions">
+              <button type="button" class="btn-quiz-secondary" (click)="onEditQuiz()">Modifier</button>
+              <button type="button" class="btn-quiz-danger" (click)="onDisableQuiz()">Retirer</button>
+            </div>
+          </div>
+        } @else if (hasQuiz && !quizSaved) {
+          <div class="quiz-draft-banner">
+            <p><i class="bi bi-exclamation-circle"></i> Quiz activé mais non enregistré.</p>
+            <button type="button" class="btn-quiz-primary" (click)="onOpenQuizModal()">Continuer la création</button>
+          </div>
+        } @else {
+          <button type="button" class="btn-activate-quiz" (click)="onOpenQuizModal()">
+            <i class="bi bi-plus-circle-fill"></i> Activer un quiz pour cette offre
+          </button>
+        }
+      </div>
+
       <div class="form-actions-compact" style="margin-top: 20px;">
-        <button type="submit" class="btn-publish-job-compact">
-          <i class="bi bi-rocket-takeoff-fill"></i> Diffuser l'annonce
+        <button type="submit" class="btn-publish-job-compact" [disabled]="!canPublishJob" [style.opacity]="canPublishJob ? '1' : '0.55'">
+          <i class="bi bi-rocket-takeoff-fill"></i>
+          @if (hasQuiz && !quizSaved) {
+            Enregistrez le quiz pour publier
+          } @else {
+            Diffuser l'annonce
+          }
         </button>
       </div>
     </div>
 
   </form>
+
+  @if (showQuizModal) {
+    <div class="quiz-modal-overlay" (click)="onCloseQuizModal()">
+      <div class="quiz-modal-card" (click)="$event.stopPropagation()">
+        <div class="quiz-modal-header">
+          <h3><i class="bi bi-patch-question-fill"></i> Créer le quiz de présélection</h3>
+          <button type="button" class="quiz-modal-close" (click)="onCloseQuizModal()" aria-label="Fermer">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="quiz-modal-body">
+          <app-quiz-builder
+            [enabled]="true"
+            [hideActivationToggle]="true"
+            [quizTitle]="quizTitle"
+            [questions]="quizQuestions"
+            [showSaveButton]="true"
+            (quizTitleChange)="onQuizTitleChange($event)"
+            (questionsChange)="onQuizQuestionsChange($event)"
+            (save)="onSaveQuizDraft()"
+          />
+        </div>
+      </div>
+    </div>
+  }
 </div>

@@ -234,6 +234,48 @@
   gap: 12px;
 }
 
+.ats-section-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.ats-section-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+}
+
+.ats-section-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ats-section-summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ats-section-card[open] .ats-section-summary .bi-chevron-down {
+  transform: rotate(180deg);
+}
+
+.ats-section-summary .bi-chevron-down {
+  transition: transform 0.2s ease;
+}
+
+.ats-section-content {
+  padding: 14px;
+}
+
 .info-row {
   display: flex;
   font-size: 13.5px;
@@ -361,4 +403,92 @@
   background: #0f172a; 
   color: #ffffff;
   border-color: #0f172a;
+}
+
+.quiz-answers-section {
+  margin-top: 18px;
+  padding: 16px;
+  background: #faf5ff;
+  border: 1px solid #e9d5ff;
+  border-radius: 10px;
+}
+
+.quiz-answers-header h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6b21a8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quiz-answers-subtitle {
+  font-size: 12px;
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.quiz-answers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.quiz-answer-item {
+  background: #fff;
+  border: 1px solid #e9d5ff;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.quiz-answer-item.correct {
+  border-left: 4px solid #10b981;
+}
+
+.quiz-answer-item.incorrect {
+  border-left: 4px solid #f59e0b;
+}
+
+.quiz-answer-q {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.quiz-answer-num {
+  display: inline-block;
+  background: #f3e8ff;
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.quiz-answer-a {
+  font-size: 13px;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quiz-answer-a .bi-check2-circle {
+  color: #10b981;
+}
+
+.quiz-answer-a .bi-x-circle {
+  color: #f59e0b;
+}
+
+.quiz-answers-empty p {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+  font-style: italic;
 }

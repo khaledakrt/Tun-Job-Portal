@@ -1,119 +1,200 @@
 import { Component, inject, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgClass } from '@angular/common'; // 🚀 Requis pour la gestion dynamique des classes CSS du Toast
-import { from } from 'rxjs';
+import { NgClass } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { QuizBuilderComponent, QuizQuestionDraft } from '../../../shared/components/quiz-builder/quiz-builder.component';
+import { createEmptyQuestion } from '../../../shared/constants/quiz.constants';
 
 @Component({
   selector: 'app-job-create',
   standalone: true,
-  imports: [FormsModule, NgClass], // 🚀 Intégration de NgClass pour le thème vert/rouge
+  imports: [FormsModule, NgClass, QuizBuilderComponent],
   templateUrl: './job-create.component.html',
   styleUrls: ['./job-create.component.css'],
-  encapsulation: ViewEncapsulation.None 
+  encapsulation: ViewEncapsulation.None,
 })
 export class JobCreateComponent {
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef); // 🚀 Force l'apparition immédiate de l'alerte verte sur l'écran
+  private cdr = inject(ChangeDetectorRef);
+  private http = inject(HttpClient);
 
-  // Structure réclamée par le HTML pour piloter le Toast Premium
   notification = {
     show: false,
     message: '',
-    type: 'success' as 'success' | 'error'
+    type: 'success' as 'success' | 'error',
   };
 
-  // Données de l'offre tunisienne synchronisées avec le HTML (Mises à jour avec les nouveaux champs)
-  job = { 
-    title: '', 
-    contract_type: 'CDI', 
-    location: '', 
-    workplace_type: 'Présentiel', 
-    salary: '', 
-    experience_level: 'Junior (0-2 ans)', 
-    missions_desc: '', 
-    profile_desc: '', 
-    skills_desc: '',     // 🚀 Nouvelle propriété pour les compétences
-    languages_desc: '',  // 🚀 Nouvelle propriété pour les langues
-    expires_at: '' 
+  job = {
+    title: '',
+    contract_type: 'CDI',
+    location: '',
+    workplace_type: 'Présentiel',
+    salary: '',
+    experience_level: 'Junior (0-2 ans)',
+    missions_desc: '',
+    profile_desc: '',
+    skills_desc: '',
+    languages_desc: '',
+    expires_at: '',
   };
 
-  // Fonction de déclenchement de l'alerte temporisée
+  hasQuiz = false;
+  quizSaved = false;
+  showQuizModal = false;
+  quizTitle = 'Quiz de présélection';
+  quizQuestions: QuizQuestionDraft[] = [];
+
   showFlashMessage(message: string, type: 'success' | 'error', callback?: () => void) {
     this.notification = { show: true, message, type };
-    this.cdr.detectChanges(); // 🚀 Force le rendu graphique vert/rouge à l'écran
-
-    // Disparition automatique et exécution de la redirection après 3 secondes (3000 ms)
+    this.cdr.detectChanges();
     setTimeout(() => {
       this.notification.show = false;
-      this.cdr.detectChanges(); // Force la disparition visuelle
-      if (callback) callback(); // Déclenche la redirection vers la table de gestion
+      this.cdr.detectChanges();
+      if (callback) callback();
     }, 3000);
   }
 
-  // 🌟 EXTRACTION EN TEMPS RÉEL DES COMPÉTENCES (Séparées par des virgules)
   getSkillsArray(): string[] {
     if (!this.job.skills_desc) return [];
-    return this.job.skills_desc
-      .split(',')
-      .map(skill => skill.trim())
-      .filter(skill => skill !== '');
+    return this.job.skills_desc.split(',').map((s) => s.trim()).filter(Boolean);
   }
 
-  // 🌟 EXTRACTION EN TEMPS RÉEL DES LANGUES (Séparées par des virgules)
   getLanguagesArray(): string[] {
     if (!this.job.languages_desc) return [];
-    return this.job.languages_desc
-      .split(',')
-      .map(lang => lang.trim())
-      .filter(lang => lang !== '');
+    return this.job.languages_desc.split(',').map((s) => s.trim()).filter(Boolean);
+  }
+
+  onOpenQuizModal() {
+    this.hasQuiz = true;
+    this.quizSaved = false;
+    if (!this.quizQuestions.length) {
+      this.quizQuestions = [createEmptyQuestion()];
+    }
+    this.showQuizModal = true;
+    this.cdr.detectChanges();
+  }
+
+  onCloseQuizModal() {
+    this.showQuizModal = false;
+    if (!this.quizSaved) {
+      this.hasQuiz = false;
+      this.quizQuestions = [];
+    }
+    this.cdr.detectChanges();
+  }
+
+  onEditQuiz() {
+    this.showQuizModal = true;
+    this.cdr.detectChanges();
+  }
+
+  onDisableQuiz() {
+    this.hasQuiz = false;
+    this.quizSaved = false;
+    this.quizQuestions = [];
+    this.showQuizModal = false;
+    this.cdr.detectChanges();
+  }
+
+  onQuizQuestionsChange(questions: QuizQuestionDraft[]) {
+    this.quizQuestions = questions;
+    this.quizSaved = false;
+    this.cdr.detectChanges();
+  }
+
+  onQuizTitleChange(title: string) {
+    this.quizTitle = title;
+    this.quizSaved = false;
+    this.cdr.detectChanges();
+  }
+
+  onSaveQuizDraft() {
+    const err = this.validateQuizLocal();
+    if (err) {
+      this.showFlashMessage(err, 'error');
+      return;
+    }
+    this.quizSaved = true;
+    this.showQuizModal = false;
+    this.showFlashMessage('Quiz enregistré. Vous pouvez maintenant diffuser l\'annonce.', 'success');
+    this.cdr.detectChanges();
+  }
+
+  get canPublishJob(): boolean {
+    if (!this.hasQuiz) return true;
+    return this.quizSaved;
   }
 
   onPublish(event: Event) {
-    event.preventDefault(); // Bloque le rechargement de page indésirable
+    event.preventDefault();
 
-    // Validation locale obligatoire incluant les nouvelles rubriques requis
-    if (!this.job.title || !this.job.location || !this.job.missions_desc || !this.job.profile_desc || !this.job.skills_desc || !this.job.languages_desc) {
-      this.showFlashMessage("Veuillez renseigner l'intégralité des champs obligatoires marqués d'un astérisque (*).", 'error');
+    if (
+      !this.job.title ||
+      !this.job.location ||
+      !this.job.missions_desc ||
+      !this.job.profile_desc ||
+      !this.job.skills_desc ||
+      !this.job.languages_desc
+    ) {
+      this.showFlashMessage("Veuillez renseigner tous les champs obligatoires (*).", 'error');
       return;
     }
 
-    console.log("Transmission directe au serveur :", this.job);
+    if (this.hasQuiz && !this.quizSaved) {
+      this.showFlashMessage('Enregistrez le quiz avant de diffuser l\'annonce.', 'error');
+      return;
+    }
 
-    const targetUrl = 'http://localhost:3000/api/recruiter/jobs/create'; 
-    const token = localStorage.getItem('token');
-
-    // Génération de la promesse fetch native
-    const promise = fetch(targetUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : '' // Transmet le Token JWT requis par votre sécurité backend
-      },
-      body: JSON.stringify(this.job)
-    }).then(async res => {
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => ({}));
-        throw new Error(errorBody.message || "Erreur serveur.");
+    if (this.hasQuiz) {
+      const err = this.validateQuizLocal();
+      if (err) {
+        this.showFlashMessage(err, 'error');
+        return;
       }
-      return res.json();
-    });
+    }
 
-    // Conversion en Observable pour conserver la structure de souscription
-    from(promise).subscribe({
+    const payload: any = { ...this.job, has_quiz: this.hasQuiz };
+    if (this.hasQuiz) {
+      payload.quiz = {
+        title: this.quizTitle.trim() || 'Quiz de présélection',
+        questions: this.quizQuestions.map((q) => ({
+          question_text: q.question_text.trim(),
+          question_type: 'single',
+          choices: q.choices.map((c) => ({
+            choice_text: c.choice_text.trim(),
+            is_correct: !!c.is_correct,
+          })),
+        })),
+      };
+    }
+
+    this.http.post(`${environment.apiUrl}/recruiter/jobs/create`, payload).subscribe({
       next: (res: any) => {
-        const successMsg = res.message || "Annonce d'emploi diffusée avec succès sur TunJob Portal !";
-        
-        // 🚀 DÉCLENCHEMENT DE L'ALERTE VERTE PREMIUM SUIVIE DE LA REDIRECTION
-        this.showFlashMessage(successMsg, 'success', () => {
-          this.router.navigate(['/recruiter/job-manage']); 
-        });
+        this.showFlashMessage(res.message || "Annonce diffusée avec succès !", 'success', () =>
+          this.router.navigate(['/recruiter/job-manage'])
+        );
       },
       error: (err) => {
-        console.error("Échec de l'insertion de l'annonce :", err);
-        // Déclenche l'alerte rouge en cas de panne de base de données
-        this.showFlashMessage("Impossible de diffuser l'offre. Vérifiez votre connexion ou contactez l'administrateur.", 'error');
-      }
+        const msg = err.error?.message || err.error?.errors?.join(' ') || "Impossible de diffuser l'offre.";
+        this.showFlashMessage(msg, 'error');
+      },
     });
+  }
+
+  private validateQuizLocal(): string | null {
+    if (!this.quizQuestions.length) return 'Ajoutez au moins une question.';
+    for (let i = 0; i < this.quizQuestions.length; i++) {
+      const q = this.quizQuestions[i];
+      if (!q.question_text.trim()) return `La question ${i + 1} est vide.`;
+      if (q.choices.filter((c) => c.choice_text.trim()).length < 3) {
+        return `La question ${i + 1} doit avoir 3 réponses.`;
+      }
+      if (!q.choices.some((c) => c.is_correct)) {
+        return `Indiquez la bonne réponse (question ${i + 1}).`;
+      }
+    }
+    return null;
   }
 }

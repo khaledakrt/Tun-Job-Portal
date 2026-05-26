@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `cvs` (
   `interests` text,
   `experience` text,
   `education` text,
+  `cv_pdf` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -71,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `jobs` (
   `profile_desc` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `benefits_desc` text COLLATE utf8mb4_unicode_ci,
   `status` enum('disponible','fermé') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'disponible',
+  `has_quiz` tinyint(1) NOT NULL DEFAULT '0',
   `expires_at` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -121,6 +123,55 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `idx_users_role` (`role`),
   KEY `idx_users_email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Listage de la structure de table tun_job_portal. job_quizzes
+CREATE TABLE IF NOT EXISTS `job_quizzes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `job_id` int NOT NULL,
+  `title` varchar(150) NOT NULL DEFAULT 'Quiz de présélection',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_job_quiz` (`job_id`),
+  CONSTRAINT `fk_quiz_job` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `quiz_questions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `quiz_id` int NOT NULL,
+  `question_text` text NOT NULL,
+  `question_type` enum('single','multiple') NOT NULL DEFAULT 'single',
+  `sort_order` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_quiz_questions_quiz` (`quiz_id`),
+  CONSTRAINT `fk_question_quiz` FOREIGN KEY (`quiz_id`) REFERENCES `job_quizzes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `quiz_choices` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `question_id` int NOT NULL,
+  `choice_text` varchar(500) NOT NULL,
+  `is_correct` tinyint(1) NOT NULL DEFAULT '0',
+  `sort_order` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_quiz_choices_question` (`question_id`),
+  CONSTRAINT `fk_choice_question` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `application_quiz_answers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `application_id` int NOT NULL,
+  `question_id` int NOT NULL,
+  `choice_id` int DEFAULT NULL,
+  `answer_text` text,
+  `answered_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_app_question` (`application_id`,`question_id`),
+  CONSTRAINT `fk_answer_application` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_answer_question` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_answer_choice` FOREIGN KEY (`choice_id`) REFERENCES `quiz_choices` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Listage de la structure de table tun_job_portal. candidate_profiles
 CREATE TABLE IF NOT EXISTS `candidate_profiles` (

@@ -1,48 +1,73 @@
-import { Injectable } from '@angular/core';
-import { from, Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+  role: 'candidate' | 'recruiter';
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  // 🟢 CORRECTION FINALE : Ajout du port 3000 ET du préfixe de routage d'Express
-  private apiUrl = 'http://127.0.0';
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/auth`;
 
-  register(user: any): Observable<any> {
-    // Appelle désormais : http://127.0.0/register
-    const promise = fetch(`${this.apiUrl}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(user)
-    }).then(async res => {
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => ({}));
-        throw { status: res.status, message: errorBody.message };
-      }
-      return res.json();
+  register(user: RegisterPayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/register`, {
+      name: user.name.trim(),
+      email: user.email.trim().toLowerCase(),
+      password: user.password,
+      role: user.role || 'candidate',
     });
-
-    return from(promise);
   }
 
-  login(credentials: any): Observable<any> {
-    // Appelle désormais : http://127.0.0/login
-    const promise = fetch(`${this.apiUrl}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(credentials)
-    }).then(async res => {
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => ({}));
-        throw { status: res.status, message: errorBody.message };
-      }
-      return res.json();
-    });
+  login(credentials: LoginPayload): Observable<any> {
+    return this.http
+      .post(`${this.apiUrl}/login`, {
+        email: credentials.email.trim().toLowerCase(),
+        password: credentials.password,
+      })
+      .pipe(
+        tap((res: any) => {
+          if (res.token) {
+            localStorage.setItem('token', res.token);
+            localStorage.setItem('role', res.role);
+            localStorage.setItem('name', res.name || '');
+          }
+        })
+      );
+  }
 
-    return from(promise);
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('name');
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+
+  /** Extrait le message d'erreur renvoyé par l'API (Joi ou controller) */
+  static formatHttpError(err: any, fallback: string): string {
+    const body = err?.error;
+    if (typeof body === 'string') return body;
+    if (body?.message) return body.message;
+    if (Array.isArray(body?.errors) && body.errors.length) {
+      return body.errors.join(' ');
+    }
+    return err?.message || fallback;
   }
 }
