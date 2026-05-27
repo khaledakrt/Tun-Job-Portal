@@ -56,7 +56,16 @@ exports.deleteUser = async (req, res) => {
 exports.getAllJobs = async (req, res) => {
     try {
         const query = `
-            SELECT jobs.*, users.company_name 
+            SELECT
+                jobs.*,
+                users.id AS recruiter_id,
+                users.name AS recruiter_name,
+                users.email AS recruiter_email,
+                users.phone AS recruiter_phone,
+                users.address AS recruiter_address,
+                users.company_logo AS recruiter_logo,
+                users.is_verified_company,
+                users.company_name
             FROM jobs 
             JOIN users ON jobs.recruiter_id = users.id 
             ORDER BY jobs.created_at DESC

@@ -1,13 +1,13 @@
  
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { CommonModule, NgIf, NgFor, DatePipe } from '@angular/common';
+import { CommonModule, NgIf, NgFor } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 
 @Component({
   selector: 'app-manage-users',
   standalone: true,
-  // 🚀 FIX : Retrait de DatePipe pour enlever le warning Webpack
-  imports: [CommonModule, NgIf, NgFor],
+  imports: [CommonModule, NgIf, NgFor, FormsModule],
   templateUrl: './manage-users.component.html',
   styleUrls: ['./manage-users.component.css']
 })
@@ -18,6 +18,21 @@ export class ManageUsersComponent implements OnInit {
 
   usersList: any[] = [];
   isLoading = false;
+  searchTerm = '';
+  selectedUser: any = null;
+  showUserCard = false;
+
+  get filteredUsers(): any[] {
+    if (!this.searchTerm || !this.searchTerm.trim()) {
+      return this.usersList;
+    }
+    const q = this.searchTerm.toLowerCase();
+    return this.usersList.filter(user =>
+      (user.name || '').toLowerCase().includes(q) ||
+      (user.email || '').toLowerCase().includes(q) ||
+      (user.role || '').toLowerCase().includes(q)
+    );
+  }
 
   ngOnInit(): void {
     this.isLoading = true;
@@ -42,6 +57,27 @@ export class ManageUsersComponent implements OnInit {
         }
       });
     }
+  }
+
+  openUserCard(user: any): void {
+    this.selectedUser = user;
+    this.showUserCard = true;
+  }
+
+  closeUserCard(): void {
+    this.showUserCard = false;
+    this.selectedUser = null;
+  }
+
+  getUserRoleLabel(user: any): string {
+    return user?.role === 'recruiter' ? 'Recruteur' : 'Candidat';
+  }
+
+  getVerificationLabel(user: any): string {
+    if (user?.role === 'recruiter') {
+      return user.is_verified_company ? 'Entreprise certifiée' : 'Certification en attente';
+    }
+    return user.is_verified ? 'Compte vérifié' : 'Compte non vérifié';
   }
 
   // 👑 COLLEZ LE CODE JUSTE ICI, AVANT LA DERNIÈRE ACCOLADE DE FERMETURE :

@@ -9,7 +9,12 @@
 
     <!-- 👤 BLOC PROFIL DYNAMIQUE UNIQUE : Connecté au statut de modération Admin -->
     <div class="recruiter-profile-summary">
-      <div class="avatar-circle"><i class="bi bi-building-fill"></i></div>
+      <div class="avatar-circle">
+        <img [src]="recruiterAvatar ? assetsUrl + '/logos/' + recruiterAvatar : 'assets/images/default-avatar.png'" 
+             (error)="$any($event.target).src='assets/images/default-avatar.png'"
+             alt="Logo Recruteur">
+      </div>
+
       <div class="profile-info">
         <h4 class="company-name">{{ recruiterName }}</h4>
         
@@ -84,7 +89,7 @@
 
   <!-- 🎛️ MODAL COPIÉE DE L'ATS KANBAN - EN SURIMPRESSION AU PREMIER PLAN -->
   <div *ngIf="selectedDirectCandidate" class="modal-overlay" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()" style="width: 720px; height: 500px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
+    <div class="modal-content recruiter-modal-content" (click)="$event.stopPropagation()">
         
         <!-- En-tête -->
         <div class="modal-header">
@@ -94,52 +99,87 @@
 
         <!-- Corps des détails avec intégration de l'avatar -->
         <div class="modal-body">
-          <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 20px;">
-            
-            <!-- 📸 Bloc Photo + Bouton Consulter le CV -->
-            <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 110px;">
-              <div style="width: 85px; height: 85px; border-radius: 50%; border: 1px solid #cbd5e1; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
-                <img [src]="selectedDirectCandidate.avatar_logo ? 'http://localhost:3000/logos/' + selectedDirectCandidate.avatar_logo : 'assets/images/default-avatar.png'" 
+          <div class="candidate-top-row">
+            <div class="candidate-photo-block">
+              <div class="candidate-avatar">
+                <img [src]="selectedDirectCandidate.avatar_logo ? assetsUrl + '/logos/' + selectedDirectCandidate.avatar_logo : 'assets/images/default-avatar.png'" 
                      (error)="$any($event.target).src='assets/images/default-avatar.png'"
-                     alt="Photo du candidat" 
-                     style="width: 100%; height: 100%; object-fit: cover;">
+                     alt="Photo du candidat">
               </div>
-
-              <!-- 📄 BOUTON INTERACTIF : Ouvrir le document PDF lié au CV -->
-              <button (click)="openCandidateCV(selectedDirectCandidate.candidate_id)" 
+              <button (click)="openCandidateCV(selectedDirectCandidate.candidate_id)"
                       [disabled]="!selectedDirectCandidate.cv_summary || selectedDirectCandidate.cv_summary.trim() === ''"
-                      [style.opacity]="selectedDirectCandidate.cv_summary && selectedDirectCandidate.cv_summary.trim() !== '' ? '1' : '0.5'"
-                      [style.cursor]="selectedDirectCandidate.cv_summary && selectedDirectCandidate.cv_summary.trim() !== '' ? 'pointer' : 'not-allowed'"
-                      [style.pointer-events]="selectedDirectCandidate.cv_summary && selectedDirectCandidate.cv_summary.trim() !== '' ? 'auto' : 'none'"
-                      style="background: #ffffff; border: 1px solid #cbd5e1; color: #0284c7; padding: 6px 4px; border-radius: 4px; font-size: 11px; font-weight: 700; width: 100%; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                <svg xmlns="http://w3.org" width="11" height="11" fill="currentColor" viewBox="0 0 16 16">
+                      [class.disabled-button]="!selectedDirectCandidate.cv_summary || selectedDirectCandidate.cv_summary.trim() === ''"
+                      class="btn-cv-view"
+                      style="cursor: pointer;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 1A1.5 1.5 0 0 1 11 2.5V4h3v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
                 </svg>
                 {{ selectedDirectCandidate.cv_summary && selectedDirectCandidate.cv_summary.trim() !== '' ? 'Consulter le CV' : 'Aucun CV' }}
               </button>
             </div>
 
-            <!-- Bloc des informations textuelles -->
-            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Poste ciblé :</span> 
-                <strong class="info-value text-slate">{{ selectedDirectCandidate.job_title }}</strong>
+            <div class="candidate-summary-grid">
+              <div class="candidate-detail-item">
+                <span class="detail-label">Poste ciblé:</span>
+                <span class="detail-value">{{ selectedDirectCandidate.job_title }}</span>
               </div>
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Adresse e-mail :</span> 
-                <span class="info-value">{{ selectedDirectCandidate.email }}</span>
+              <div class="candidate-detail-item">
+                <span class="detail-label">Date candidature:</span>
+<span class="detail-value">
+  {{ selectedDirectCandidate?.created_at 
+                        ? (selectedDirectCandidate.created_at | date:'dd/MM/yyyy à HH:mm') 
+                        : (selectedDirectCandidate?.applied_at 
+                            ? (selectedDirectCandidate.applied_at | date:'dd/MM/yyyy à HH:mm') 
+                            : '—') }}
+</span> 
+             </div>
+              <div class="candidate-detail-item">
+                <span class="detail-label">Adresse e-mail:</span>
+                <span class="detail-value">{{ selectedDirectCandidate.email }}</span>
               </div>
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Numéro de téléphone :</span> 
-                <span class="info-value">{{ selectedDirectCandidate.phone || 'Non renseigné' }}</span>
-              </div>
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Ville / Région :</span> 
-                <span class="info-value">{{ selectedDirectCandidate.address || 'Non spécifiée' }}</span>
+              <div class="candidate-detail-item">
+                <span class="detail-label">Téléphone:</span>
+                <span class="detail-value">{{ selectedDirectCandidate.phone || 'Non renseigné' }}</span>
               </div>
             </div>
           </div>
-          
+
+          <div class="candidate-detail-grid">
+            <div class="candidate-detail-item">
+              <span class="detail-label">Ville / Région :</span>
+              <span class="detail-value">{{ selectedDirectCandidate.address || 'Non spécifiée' }}</span>
+            </div>
+            <div class="candidate-detail-item">
+              <span class="detail-label">Contrat souhaité :</span>
+              <span class="detail-value">{{ selectedDirectCandidate.job_type || 'Non renseigné' }}</span>
+            </div>
+            <div class="candidate-detail-item">
+              <span class="detail-label">Situation actuelle :</span>
+              <span class="detail-value">{{ selectedDirectCandidate.job_status || 'Non renseignée' }}</span>
+            </div>
+            <div class="candidate-detail-item">
+              <span class="detail-label">Date de naissance :</span>
+              <span class="detail-value">{{ selectedDirectCandidate.birth_date ? (selectedDirectCandidate.birth_date | date:'dd/MM/yyyy') : 'Non renseignée' }}</span>
+            </div>
+            <div class="candidate-detail-item">
+              <span class="detail-label">Disponibilité :</span>
+              <span class="detail-value">{{ selectedDirectCandidate.availability || 'Non renseignée' }}</span>
+            </div>
+            <div class="candidate-detail-item">
+              <span class="detail-label">Réseaux :</span>
+              <span class="detail-value">
+                <ng-container *ngIf="selectedDirectCandidate.linkedin && selectedDirectCandidate.linkedin.trim() !== ''">
+                  <a [href]="selectedDirectCandidate.linkedin" target="_blank">LinkedIn</a>
+                </ng-container>
+                <ng-container *ngIf="selectedDirectCandidate.github && selectedDirectCandidate.github.trim() !== ''">
+                  <span class="network-separator">|</span>
+                  <a [href]="selectedDirectCandidate.github" target="_blank">GitHub</a>
+                </ng-container>
+                <span *ngIf="(!selectedDirectCandidate.linkedin || selectedDirectCandidate.linkedin.trim() === '') && (!selectedDirectCandidate.github || selectedDirectCandidate.github.trim() === '')" class="detail-empty">Non renseigné</span>
+              </span>
+            </div>
+          </div>
+
           <!-- Boîte du Résumé -->
           <div class="summary-box" style="margin-top: 15px; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #0ea5e9;">
             <span class="summary-title" style="color: #0f172a; font-weight: 700; font-size: 13px; display: block; margin-bottom: 8px;">
@@ -151,7 +191,7 @@
           </div>
 
           @if (selectedDirectCandidate.has_quiz) {
-            <details class="notif-quiz-accordion" style="margin-top: 14px;" open>
+            <details class="notif-quiz-accordion" style="margin-top: 14px;">
               <summary class="notif-quiz-summary">
                 <span><i class="bi bi-patch-question-fill"></i> Réponses au quiz</span>
                 <span class="quiz-title-inline">{{ selectedDirectCandidate.quiz_title || 'Quiz de présélection' }}</span>

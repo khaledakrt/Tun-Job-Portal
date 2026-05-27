@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-cv-builder',
@@ -55,7 +56,7 @@ showSaveConfirmationModal: boolean = false;
 
   fetchProfileDetails() {
     const token = localStorage.getItem('token');
-    fetch('http://localhost:3000/api/candidate/profile/details', {
+    fetch(`${environment.apiUrl}/candidate/profile/details`, {
       method: 'GET',
       headers: { 'Authorization': token ? `Bearer ${token}` : '' }
     })
@@ -65,11 +66,11 @@ showSaveConfirmationModal: boolean = false;
         if (!this.candidateName) {
           this.candidateName = (data.firstname && data.lastname) ? `${data.firstname} ${data.lastname}` : 'Candidat';
         }
-        this.candidateContact.email = data.email || '';
+            this.candidateContact.email = data.email || '';
         this.candidateContact.phone = data.phone || '';
         this.candidateContact.address = data.address || '';
         if (data.avatar_logo) {
-          this.avatarUrl = `http://localhost:3000/logos/${data.avatar_logo}`;
+          this.avatarUrl = `${environment.assetsUrl}/logos/${data.avatar_logo}`;
         }
         this.cdr.detectChanges();
       }
@@ -78,7 +79,7 @@ showSaveConfirmationModal: boolean = false;
 
   fetchCurrentCV() {
     const token = localStorage.getItem('token');
-    fetch('http://localhost:3000/api/candidate/cv/details', {
+    fetch(`${environment.apiUrl}/candidate/cv/details`, {
       method: 'GET',
       headers: { 'Authorization': token ? `Bearer ${token}` : '' }
     })
@@ -248,7 +249,7 @@ confirmAndSaveCV() {
     address: this.candidateContact.address
   };
 
-  fetch('http://localhost:3000/api/candidate/cv/save', {
+  fetch(`${environment.apiUrl}/candidate/cv/save`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
     body: JSON.stringify(payload)

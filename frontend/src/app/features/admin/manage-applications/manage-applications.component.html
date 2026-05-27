@@ -1,0 +1,83 @@
+<div class="manage-container">
+  <div class="card-header-flex">
+    <div class="card-header-left">
+      <h3><i class="bi bi-clipboard-data"></i> Gestion des Candidatures</h3>
+      <p>Contrôlez les candidatures soumises et supprimez les entrées non conformes.</p>
+    </div>
+  </div>
+
+  <div class="manage-card-premium">
+    <div class="admin-search-bar">
+      <input type="text" placeholder="Rechercher candidature, candidat, offre ou recruteur..." [(ngModel)]="searchTerm" />
+    </div>
+    <div class="table-wrapper-premium">
+      <div *ngIf="isLoading" class="loading-box">
+        <i class="bi bi-arrow-clockwise spinning"></i> Chargement des candidatures...
+      </div>
+
+      <table *ngIf="!isLoading" class="jobs-table-premium">
+        <thead>
+          <tr>
+            <th class="th-left-padding">Candidat / Offre</th>
+            <th>Recruteur</th>
+            <th>Statut</th>
+            <th class="th-center-align">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let app of filteredApplications" class="table-row-premium">
+            <td class="job-company-cell">
+              <span class="clickable-job-title">{{ app.candidate_name || app.name || 'Candidat inconnu' }}</span>
+              <span class="company-sub-badge clickable-user-name" (click)="openApplicationCard(app)"><i class="bi bi-briefcase"></i> {{ app.job_title || 'Offre inconnue' }}</span>
+            </td>
+            <td class="date-text-cell-premium">
+              <div class="date-container-premium">
+                <i class="bi bi-building"></i>
+                <span>{{ app.recruiter_name || app.company_name || 'Recruteur inconnu' }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge-fixed" [ngClass]="{
+                'bg-emerald': app.status === 'Proposition' || app.status === 'Entretien',
+                'bg-amber': app.status !== 'Proposition' && app.status !== 'Entretien'
+              }">
+                <span class="dot-status"></span>
+                <span class="badge-text-span">{{ app.status || 'Nouveau' }}</span>
+              </span>
+            </td>
+            <td class="status-cell-premium">
+              <button class="btn-action-delete" (click)="onDeleteApplication(app.id)">
+                <i class="bi bi-trash3-fill"></i> Supprimer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="showApplicationCard && selectedApplication" class="admin-user-card-overlay" (click)="closeApplicationCard()">
+    <div class="admin-user-card" (click)="$event.stopPropagation()">
+      <button class="admin-user-card-close" (click)="closeApplicationCard()">×</button>
+      <div class="admin-user-card-header">
+        <div>
+          <h4>{{ selectedApplication.candidate_name || 'Candidat' }} a postulé à</h4>
+          <p class="admin-user-role">{{ selectedApplication.job_title || 'Offre' }}</p>
+        </div>
+        <span class="admin-badge" [ngClass]="selectedApplication.status === 'Proposition' || selectedApplication.status === 'Entretien' ? 'badge-success' : 'badge-warning'">
+          {{ selectedApplication.status || 'Nouveau' }}
+        </span>
+      </div>
+      <div class="admin-user-card-body">
+        <div class="admin-user-field"><span>Candidat</span><strong>{{ selectedApplication.candidate_name || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Email</span><strong>{{ selectedApplication.candidate_email || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Téléphone</span><strong>{{ selectedApplication.candidate_phone || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Adresse</span><strong>{{ selectedApplication.candidate_address || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Statut candidature</span><strong>{{ selectedApplication.status || 'Nouveau' }}</strong></div>
+        <div class="admin-user-field"><span>Date postulation</span><strong>{{ selectedApplication.applied_at | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+        <div class="admin-user-field"><span>Recruteur</span><strong>{{ selectedApplication.recruiter_name || selectedApplication.company_name || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Offre</span><strong>{{ selectedApplication.job_title || '—' }}</strong></div>
+      </div>
+    </div>
+  </div>
+</div>

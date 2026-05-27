@@ -95,7 +95,7 @@
           <div class="recruiter-meta-header">
             <div class="large-avatar-placeholder">
               @if (selectedRecruiter.company_logo) {
-                <img [src]="'http://localhost:3000/logos/' + selectedRecruiter.company_logo" alt="Logo">
+                <img [src]="assetsUrl + '/logos/' + selectedRecruiter.company_logo" alt="Logo">
               } @else {
                 <i class="bi bi-building" style="font-size: 32px; color: #cbd5e1;"></i>
               }
@@ -134,7 +134,7 @@
         <div class="modal-body">
           <div class="job-hero-section">
             <div class="job-logo-wrapper">
-              <img [src]="selectedJob.company_logo ? 'http://localhost:3000/logos/' + selectedJob.company_logo : 'https://placehold.co'" 
+              <img [src]="selectedJob.company_logo ? assetsUrl + '/logos/' + selectedJob.company_logo : 'https://placehold.co'" 
                    (error)="$any($event.target).src='https://placehold.co'"
                    alt="Logo entreprise">
             </div>

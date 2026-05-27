@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { from, Observable, BehaviorSubject } from 'rxjs'; 
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
-  private apiUrl = 'http://localhost:3000/api/notifications';
+  private apiUrl = `${environment.apiUrl}/notifications`;
 
   // 📡 1. Canal pour l'ouverture classique (avec changement de page vers le Kanban)
   private openApplicationSubject = new BehaviorSubject<number | null>(null);
@@ -33,7 +34,7 @@ export class NotificationService {
     const token = localStorage.getItem('token');
     
     // On interroge l'API de profil recruteur existante pour avoir le détail complet de la candidature
-    fetch(`http://localhost:3000/api/recruiter/candidate-profile/${applicationId}`, {
+    fetch(`${environment.apiUrl}/recruiter/candidate-profile/${applicationId}`, {
       method: 'GET',
       headers: this.getHeaders()
     })

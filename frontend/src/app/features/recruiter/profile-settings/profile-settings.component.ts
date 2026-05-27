@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-profile-settings',
@@ -64,6 +65,8 @@ export class ProfileSettingsComponent implements OnInit {
   passwordSuccessMessage = '';
   passwordErrorMessage = '';
 
+  assetsUrl = environment.assetsUrl;
+
   ngOnInit() {
     this.loadCurrentProfile();
   }
@@ -89,7 +92,7 @@ export class ProfileSettingsComponent implements OnInit {
   }
 
     loadCurrentProfile() {
-    const targetUrl = 'http://localhost:3000/api/recruiter/profile/details';
+    const targetUrl = `${environment.apiUrl}/recruiter/profile/details`;
     const token = localStorage.getItem('token');
 
     fetch(targetUrl, {
@@ -114,7 +117,7 @@ export class ProfileSettingsComponent implements OnInit {
           const cleanFilename = data.company_logo.replace('/logos/', '');
           
           // 🌟 Recomposition propre vers le dossier exposé par votre serveur Express
-          this.logoPreviewUrl = `http://localhost:3000/logos/${cleanFilename}`;
+          this.logoPreviewUrl = `${this.assetsUrl}/logos/${cleanFilename}`;
         }
         this.cdr.detectChanges();
       }
@@ -142,7 +145,7 @@ export class ProfileSettingsComponent implements OnInit {
   onSaveProfile(event: Event) {
     event.preventDefault();
 
-    const targetUrl = 'http://localhost:3000/api/recruiter/profile/update';
+    const targetUrl = `${environment.apiUrl}/recruiter/profile/update`;
     const token = localStorage.getItem('token');
 
     const formData = new FormData();
@@ -194,7 +197,7 @@ export class ProfileSettingsComponent implements OnInit {
       return;
     }
 
-    const targetUrl = 'http://localhost:3000/api/recruiter/profile/change-password';
+    const targetUrl = `${environment.apiUrl}/recruiter/profile/change-password`;
     const token = localStorage.getItem('token');
 
     fetch(targetUrl, {

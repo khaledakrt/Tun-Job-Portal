@@ -221,6 +221,13 @@ export class JobSearchComponent implements OnInit {
   }
 
   onRequestApplyConfirmation() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.showAuthRequiredPopup = true;
+      this.cdr.detectChanges();
+      return;
+    }
+
     const job = this.selectedJob || this.jobToApply;
     if (!job) return;
 

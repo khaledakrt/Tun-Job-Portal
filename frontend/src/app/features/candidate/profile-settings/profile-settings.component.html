@@ -65,6 +65,15 @@
           </div>
 
           <div class="form-group-compact">
+            <label>Adresse e-mail *</label>
+            @if (isEditMode) {
+              <input type="email" [(ngModel)]="profile.email" name="email" required>
+            } @else {
+              <div class="static-text-compact">{{ profile.email || 'Non renseigné' }}</div>
+            }
+          </div>
+
+          <div class="form-group-compact">
             <label>Téléphone *</label>
             @if (isEditMode) {
               <input [(ngModel)]="profile.phone" name="phone">

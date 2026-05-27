@@ -2,9 +2,7 @@ const express = require('express');
 const router = express.Router();
 // 🚀 Pointage exact vers votre fichier partagé
 const notificationCtrl = require('../controllers/shared/notification.controller');
-const authMiddleware = require('../middleware/auth.middleware');
-
-const verifyToken = typeof authMiddleware === 'function' ? authMiddleware : (authMiddleware.verifyToken || authMiddleware.authMiddleware);
+const { verifyToken } = require('../middleware/auth.middleware');
 router.use(verifyToken);
 
 router.get('/stream', notificationCtrl.notificationStream);

@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-applications-list',
@@ -15,13 +16,14 @@ export class ApplicationsListComponent implements OnInit {
   isLoading: boolean = true;
   selectedRecruiter: any = null; // 🚀 Gère le recruteur sélectionné pour la pop-up
   selectedJob: any = null;       // 🚀 Gère l'offre sélectionnée pour la pop-up de détails
+  assetsUrl = environment.assetsUrl;
 
   ngOnInit() {
     this.fetchCandidateHistory();
   }
 
   fetchCandidateHistory() {
-    const targetUrl = 'http://localhost:3000/api/candidate/history';
+    const targetUrl = `${environment.apiUrl}/candidate/history`;
     const token = localStorage.getItem('token');
 
     fetch(targetUrl, {
@@ -48,7 +50,7 @@ export class ApplicationsListComponent implements OnInit {
   onViewRecruiterProfile(recruiterId: number) {
     if (!recruiterId) return;
     const token = localStorage.getItem('token');
-    const targetUrl = `http://localhost:3000/api/candidate/profile/details-public/${recruiterId}`;
+    const targetUrl = `${environment.apiUrl}/candidate/profile/details-public/${recruiterId}`;
     
     fetch(targetUrl, {
       method: 'GET',

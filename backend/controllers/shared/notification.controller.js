@@ -38,11 +38,14 @@ exports.triggerNotification = async (userId, messageText) => {
         console.log(`💾 [BDD] Notif sauvegardée pour l'utilisateur ${userId}`);
 
         // B. Récupération instantanée des vraies données du profil pour le push SSE en direct
-        const [enrichedRows] = await db.execute(`
+        let enrichedPayload = null;
+
+        // Tentative pour les notifications destinées au recruteur
+        const [recruiterRows] = await db.execute(`
             SELECT 
                 n.id, n.message, n.is_read, n.created_at,
                 u.id AS candidate_id, u.name, u.email, u.phone, u.address, u.company_logo AS avatar_logo,
-                j.title AS job_title, c.summary AS cv_summary, a.id AS application_id
+                j.title AS job_title, c.summary AS cv_summary, a.id AS application_id, a.applied_at AS applied_at
             FROM notifications n
             INNER JOIN users u ON n.message LIKE CONCAT(u.name, ' %')
             INNER JOIN applications a ON u.id = a.candidate_id
@@ -52,10 +55,41 @@ exports.triggerNotification = async (userId, messageText) => {
             [result.insertId]
         );
 
+        if (recruiterRows.length > 0) {
+            enrichedPayload = recruiterRows[0];
+        } else {
+            // Repli pour les notifications destinées au candidat
+            const [candidateRows] = await db.execute(`
+                SELECT
+                    n.id, n.message, n.is_read, n.created_at,
+                    recruiter.id AS recruiter_id, recruiter.name AS company_name,
+                    recruiter.email, recruiter.phone, recruiter.address,
+                    recruiter.company_logo AS avatar_logo,
+                    j.title AS job_title, c.summary AS cv_summary, a.id AS application_id, a.applied_at AS applied_at
+                FROM notifications n
+                INNER JOIN applications a ON a.candidate_id = n.user_id
+                INNER JOIN jobs j ON a.job_id = j.id
+                INNER JOIN users recruiter ON j.recruiter_id = recruiter.id
+                LEFT JOIN cvs c ON a.candidate_id = c.candidate_id
+                WHERE n.id = ? LIMIT 1`,
+                [result.insertId]
+            );
+
+            if (candidateRows.length > 0) {
+                enrichedPayload = candidateRows[0];
+            }
+        }
+
         // B. Pousse le message enrichi instantanément si l'utilisateur est en ligne
         const clientRes = activeClients.get(Number(userId));
-        if (clientRes && enrichedRows.length > 0) {
-            clientRes.write(`data: ${JSON.stringify(enrichedRows[0])}\n\n`);
+        if (clientRes) {
+            const payloadToSend = enrichedPayload || {
+                id: result.insertId,
+                message: messageText,
+                is_read: 0,
+                created_at: new Date().toISOString(),
+            };
+            clientRes.write(`data: ${JSON.stringify(payloadToSend)}\n\n`);
             console.log(`⚡ [SSE-SHARED] Notification dynamique poussée en direct.`);
         }
     } catch (err) {
@@ -68,38 +102,118 @@ exports.triggerNotification = async (userId, messageText) => {
 // ==========================================================================
 exports.getNotificationHistory = async (req, res) => {
     try {
-        // 🚀 AJOUT DE FILTRAGE : Ajout de AND n.is_read = 0 pour masquer les notifications lues
+        const loggedUserId = req.user.id;
+        const userRole = req.user.role ? req.user.role.toLowerCase().trim() : '';
+
         const [rows] = await db.execute(`
             SELECT 
                 n.id, 
                 n.message, 
                 n.is_read, 
                 n.created_at,
-                a.id AS application_id,
-                u.id AS candidate_id,
-                u.name AS name,
-                u.email AS email,
-                u.phone AS phone,
-                u.address AS address,
-                u.company_logo AS avatar_logo,
-                j.title AS job_title,
-                c.summary AS cv_summary
+                n.user_id AS user_id
             FROM notifications n
-            LEFT JOIN users u ON LOWER(n.message) LIKE CONCAT(LOWER(u.name), ' %')
-            LEFT JOIN applications a ON u.id = a.candidate_id
-            LEFT JOIN jobs j ON a.job_id = j.id AND j.recruiter_id = ?
-            LEFT JOIN cvs c ON u.id = c.candidate_id
-            WHERE n.user_id = ? AND n.is_read = 0 
-            ORDER BY n.created_at DESC 
+            WHERE n.user_id = ? AND n.is_read = 0
+            ORDER BY n.created_at DESC
             LIMIT 20`,
-            [req.user.id, req.user.id]
+            [loggedUserId]
         );
-        return res.json({ notifications: rows });
+
+        const processedRows = [];
+
+        for (const row of rows) {
+            if (userRole === 'recruiter') {
+                const [candidateData] = await db.execute(`
+                    SELECT 
+                        u.id AS candidate_id,
+                        u.name AS name,
+                        u.address AS address,
+                        u.company_logo AS avatar_logo,
+                        j.title AS job_title,
+                        a.status AS status
+                    FROM notifications n
+                    JOIN jobs j ON j.recruiter_id = ?
+                    JOIN applications a ON a.job_id = j.id
+                    JOIN users u ON u.id = a.candidate_id
+                    WHERE n.id = ?
+                      AND LOWER(n.message) LIKE CONCAT('%', LOWER(u.name), '%')
+                      AND LOWER(n.message) LIKE CONCAT('%', LOWER(j.title), '%')
+                    ORDER BY a.id DESC
+                    LIMIT 1`,
+                    [loggedUserId, row.id]
+                );
+
+                if (candidateData.length > 0) {
+                    const cand = candidateData[0];
+                    processedRows.push({
+                        id: row.id,
+                        message: row.message,
+                        is_read: row.is_read,
+                        created_at: row.created_at,
+                        name: cand.name,
+                        address: cand.address || '—',
+                        avatar_logo: cand.avatar_logo,
+                        job_title: cand.job_title,
+                        status: cand.status || 'Nouveau'
+                    });
+                } else {
+                    processedRows.push(row);
+                }
+            } else {
+                const [recruiterData] = await db.execute(`
+                    SELECT 
+                        r.id AS recruiter_id,
+                        r.name AS name,
+                        r.address AS address,
+                        r.company_logo AS avatar_logo,
+                        j.title AS job_title,
+                        a.status AS status
+                    FROM notifications n
+                    JOIN jobs j ON LOWER(n.message) LIKE CONCAT('%', LOWER(j.title), '%')
+                    JOIN applications a ON a.job_id = j.id AND a.candidate_id = ?
+                    JOIN users r ON j.recruiter_id = r.id
+                    WHERE n.id = ?
+                    ORDER BY a.id DESC
+                    LIMIT 1`,
+                    [loggedUserId, row.id]
+                );
+
+                if (recruiterData.length > 0) {
+                    const rec = recruiterData[0];
+                    processedRows.push({
+                        id: row.id,
+                        message: row.message,
+                        is_read: row.is_read,
+                        created_at: row.created_at,
+                        name: rec.name,
+                        address: rec.address || '—',
+                        avatar_logo: rec.avatar_logo,
+                        job_title: rec.job_title,
+                        status: rec.status || 'Mis à jour'
+                    });
+                } else {
+                    processedRows.push(row);
+                }
+            }
+        }
+
+        return res.json({ notifications: processedRows });
     } catch (e) {
         console.error("❌ ERREUR HISTORIQUE NOTIFICATIONS :", e.message);
         return res.status(500).json({ error: e.message });
     }
 };
+
+
+
+
+
+
+
+
+
+
+
 
 
 // ==========================================================================
@@ -239,6 +353,7 @@ exports.getCandidateByNotificationId = async (req, res) => {
         const [rows] = await db.execute(`
             SELECT 
                 a.id AS application_id,
+                a.applied_at AS applied_at,
                 u.id AS candidate_id,
                 u.name AS name,
                 u.email AS email,
@@ -268,6 +383,7 @@ exports.getCandidateByNotificationId = async (req, res) => {
         const [permissiveRows] = await db.execute(`
             SELECT 
                 a.id AS application_id,
+                a.applied_at AS applied_at,
                 u.id AS candidate_id,
                 u.name AS name,
                 u.email AS email,
@@ -298,6 +414,7 @@ exports.getCandidateByNotificationId = async (req, res) => {
         const [ultimateRows] = await db.execute(`
             SELECT 
                 a.id AS application_id,
+                a.applied_at AS applied_at,
                 u.id AS candidate_id,
                 u.name AS name,
                 u.email AS email,

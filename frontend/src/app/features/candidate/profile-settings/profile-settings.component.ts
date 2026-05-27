@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-profile-settings',
@@ -71,7 +72,7 @@ export class ProfileSettingsComponent implements OnInit {
   }
 
   loadCurrentProfile() {
-    const targetUrl = 'http://localhost:3000/api/candidate/profile/details'; 
+    const targetUrl = `${environment.apiUrl}/candidate/profile/details`;
     const token = localStorage.getItem('token');
 
     fetch(targetUrl, {
@@ -85,8 +86,8 @@ export class ProfileSettingsComponent implements OnInit {
     .then(data => {
       if (data) {
         this.profile.name = data.name || localStorage.getItem('name') || '';
-        this.profile.phone = data.phone || '';
         this.profile.email = data.email || '';
+        this.profile.phone = data.phone || '';
         this.profile.address = data.address || '';
         
         // Formate correctement la date pour l'input HTML type="date"
@@ -100,7 +101,7 @@ export class ProfileSettingsComponent implements OnInit {
         
         if (data.avatar_logo) {
           const cleanFilename = data.avatar_logo.replace('/logos/', '').replace('uploads/logos/', '');
-          this.logoPreviewUrl = `http://localhost:3000/logos/${cleanFilename}`;
+          this.logoPreviewUrl = `${environment.assetsUrl}/logos/${cleanFilename}`;
         }
         this.cdr.detectChanges();
       }
@@ -123,7 +124,7 @@ export class ProfileSettingsComponent implements OnInit {
       };
       reader.readAsDataURL(file);
 
-      const targetUrl = 'http://localhost:3000/api/candidate/profile/update-avatar';
+      const targetUrl = `${environment.apiUrl}/candidate/profile/update-avatar`;
       const token = localStorage.getItem('token');
       
       const formData = new FormData();
@@ -145,7 +146,7 @@ export class ProfileSettingsComponent implements OnInit {
         this.successMessage = "Votre photo de profil a été mise à jour !";
         
         if (data && data.filename) {
-          this.logoPreviewUrl = `http://localhost:3000/logos/${data.filename}`;
+          this.logoPreviewUrl = `${environment.assetsUrl}/logos/${data.filename}`;
         }
 
         this.cdr.detectChanges();
@@ -161,7 +162,7 @@ export class ProfileSettingsComponent implements OnInit {
   onSaveProfile(event: Event) {
     if (event) event.preventDefault();
 
-    const targetUrl = 'http://localhost:3000/api/candidate/profile/update';
+    const targetUrl = `${environment.apiUrl}/candidate/profile/update`;
     const token = localStorage.getItem('token');
 
     fetch(targetUrl, {
@@ -172,6 +173,7 @@ export class ProfileSettingsComponent implements OnInit {
       },
       body: JSON.stringify({
         name: this.profile.name,
+        email: this.profile.email,
         phone: this.profile.phone,
         address: this.profile.address,
         birth_date: this.profile.birth_date,
@@ -213,9 +215,8 @@ export class ProfileSettingsComponent implements OnInit {
       return;
     }
 
-    const targetUrl = 'http://localhost:3000/api/candidate/profile/change-password';
+    const targetUrl = `${environment.apiUrl}/candidate/profile/change-password`;
     const token = localStorage.getItem('token');
-
     fetch(targetUrl, {
       method: 'POST',
       headers: {

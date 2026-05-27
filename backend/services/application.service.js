@@ -77,7 +77,7 @@ async function updateApplicationStatus({ applicationId, status, recruiterId }) {
         `SELECT a.id, a.candidate_id, a.job_id, a.status AS old_status,
                 j.title AS job_title, j.recruiter_id,
                 c.email AS candidate_email, c.name AS candidate_name,
-                r.company_name
+                r.company_name, r.name AS r_name, r.address AS r_address, r.company_logo AS r_logo
          FROM applications a
          JOIN jobs j ON a.job_id = j.id
          JOIN users c ON a.candidate_id = c.id
@@ -94,9 +94,11 @@ async function updateApplicationStatus({ applicationId, status, recruiterId }) {
 
     await db.execute('UPDATE applications SET status = ? WHERE id = ?', [status, applicationId]);
 
+    // Inclure le nom du recruteur dans le message pour faciliter la récupération côté frontend
+    const notificationMessage = `📧 ${app.r_name || app.company_name} a changé le statut de votre candidature pour "${app.job_title}" en ${status}`;
     await notificationCtrl.triggerNotification(
         app.candidate_id,
-        `Votre candidature pour "${app.job_title}" a changé de statut : ${status}`
+        notificationMessage
     );
 
     if (app.candidate_email) {

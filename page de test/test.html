@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TunJob Pro - Dashboard Éclatant</title>
+    
+    <!-- Polices & Icônes -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    
+    <!-- Fichier CSS externe -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Barre latérale -->
+    <nav class="sidebar">
+        <div>
+            <div class="logo-container">
+                <div class="logo-icon"><i class="fa-solid fa-briefcase"></i></div>
+                <span class="logo-text">TunJob Pro</span>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-title">Recrutement</div>
+                <a href="#" class="nav-item"><i class="fa-solid fa-chart-pie"></i>Vue d'ensemble</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-circle-plus"></i>Publier une offre</a>
+                <a href="#" class="nav-item active"><i class="fa-solid fa-folder-open"></i>Gérer mes annonces</a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-users-gear"></i>Suivi Candidats (ATS)</a>
+            </div>
+        </div>
+        <div>
+            <a href="#" class="nav-item logout-btn"><i class="fa-solid fa-right-from-bracket"></i>Quitter la session</a>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+        <header class="header">
+            <div class="welcome">
+                <h1>Bienvenue, rec 👋</h1>
+                <p>Voici l'état actuel de vos campagnes de recrutement en Tunisie.</p>
+            </div>
+            <button class="btn-primary"><i class="fa-solid fa-plus"></i> Nouvelle Annonce</button>
+        </header>
+
+        <!-- Statistiques -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Offres Actives</span>
+                    <div class="stat-icon-wrapper"><i class="fa-solid fa-file-invoice"></i></div>
+                </div>
+                <div class="stat-value">10</div>
+                <div class="stat-badge"><i class="fa-solid fa-arrow-up"></i> +1 cette semaine</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Candidatures</span>
+                    <div class="stat-icon-wrapper"><i class="fa-solid fa-user-graduate"></i></div>
+                </div>
+                <div class="stat-value">10</div>
+                <div class="stat-badge"><i class="fa-solid fa-arrow-up"></i> +8 aujourd'hui</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Entretiens</span>
+                    <div class="stat-icon-wrapper"><i class="fa-solid fa-calendar-days"></i></div>
+                </div>
+                <div class="stat-value">2</div>
+                <div class="stat-meta">Planifiés ce mois</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Taux de conversion</span>
+                    <div class="stat-icon-wrapper"><i class="fa-solid fa-percent"></i></div>
+                </div>
+                <div class="stat-value">20%</div>
+                <div class="stat-badge"><i class="fa-solid fa-arrow-up"></i> +2.4% vs mois max</div>
+            </div>
+        </section>
+
+        <!-- Tableau Principal -->
+        <section class="table-container">
+            <div class="table-title-bar">
+                <span>Vos Annonces en Ligne</span>
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="search-input" placeholder="Rechercher...">
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Intitulé du poste</th>
+                        <th>Type de Contrat</th>
+                        <th>Localisation</th>
+                        <th>Candidatures Reçues</th>
+                        <th>Statut</th>
+                        <th>Quiz</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#" class="job-title">grhjjulom</a></td>
+                        <td>CDI</td>
+                        <td><span class="text-muted-color">arhtjkti</span></td>
+                        <td><strong class="profile-count"><i class="fa-solid fa-user"></i> 1 profil</strong></td>
+                        <td><span class="badge-status">Actif</span></td>
+                        <td><span class="badge-quiz">Aucun</span></td>
+                        <td class="action-icons">
+                            <button class="icon-btn" title="Voir"><i class="fa-solid fa-eye"></i></button>
+                            <button class="icon-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+                            <button class="icon-btn delete" title="Supprimer"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="#" class="job-title">fjvdufhva</a></td>
+                        <td>CDI</td>
+                        <td><span class="text-muted-color">fjvdufhva</span></td>
+                        <td><strong class="profile-count"><i class="fa-solid fa-user"></i> 1 profil</strong></td>
+                        <td><span class="badge-status">Actif</span></td>
+                        <td><span class="badge-quiz">Aucun</span></td>
+                        <td class="action-icons">
+                            <button class="icon-btn" title="Voir"><i class="fa-solid fa-eye"></i></button>
+                            <button class="icon-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+                            <button class="icon-btn delete" title="Supprimer"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="#" class="job-title">rtrshyuyituyooyuujfnh</a></td>
+                        <td>CDI</td>
+                        <td><span class="text-muted-color">rtrshyuyituyooyuujfnh</span></td>
+                        <td><strong class="profile-count"><i class="fa-solid fa-user"></i> 1 profil</strong></td>
+                        <td><span class="badge-status">Actif</span></td>
+                        <td><span class="badge-quiz active">Actif</span></td>
+                        <td class="action-icons">
+                            <button class="icon-btn" title="Voir"><i class="fa-solid fa-eye"></i></button>
+                            <button class="icon-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+                            <button class="icon-btn delete" title="Supprimer"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+</body>
+</html>

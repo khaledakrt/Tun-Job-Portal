@@ -8,6 +8,9 @@
   </div>
 
   <div class="manage-card-premium">
+    <div class="admin-search-bar">
+      <input type="text" placeholder="Rechercher utilisateur par nom, email ou rôle..." [(ngModel)]="searchTerm" />
+    </div>
     <div class="table-wrapper-premium">
       
       <div *ngIf="isLoading" class="loading-box">
@@ -24,9 +27,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of usersList" class="table-row-premium">
+          <tr *ngFor="let user of filteredUsers" class="table-row-premium">
             <td class="job-company-cell">
-              <span class="clickable-job-title" style="font-size: 14px !important; font-weight: 700;">{{ user.name }}</span>
+              <span class="clickable-job-title" style="font-size: 14px !important; font-weight: 700;" (click)="openUserCard(user)">{{ user.name }}</span>
               <span class="company-sub-badge">
                 <i class="bi" [ngClass]="user.role === 'recruiter' ? 'bi-building' : 'bi-person'"></i> 
                 {{ user.role === 'recruiter' ? 'Recruteur' : 'Candidat' }}
@@ -62,6 +65,28 @@
         </tbody>
       </table>
 
+    </div>
+  </div>
+
+  <div *ngIf="showUserCard && selectedUser" class="admin-user-card-overlay" (click)="closeUserCard()">
+    <div class="admin-user-card" (click)="$event.stopPropagation()">
+      <button class="admin-user-card-close" (click)="closeUserCard()">×</button>
+      <div class="admin-user-card-header">
+        <div>
+          <h4>{{ selectedUser.name }}</h4>
+          <p class="admin-user-role">{{ getUserRoleLabel(selectedUser) }}</p>
+        </div>
+        <span class="admin-badge" [ngClass]="selectedUser.role === 'recruiter' ? (selectedUser.is_verified_company ? 'badge-success' : 'badge-warning') : (selectedUser.is_verified ? 'badge-success' : 'badge-warning')">
+          {{ getVerificationLabel(selectedUser) }}
+        </span>
+      </div>
+      <div class="admin-user-card-body">
+        <div class="admin-user-field"><span>Adresse e-mail</span><strong>{{ selectedUser.email }}</strong></div>
+        <div class="admin-user-field"><span>Rôle</span><strong>{{ getUserRoleLabel(selectedUser) }}</strong></div>
+        <div class="admin-user-field"><span>Date d'inscription</span><strong>{{ selectedUser.created_at | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+        <div class="admin-user-field" *ngIf="selectedUser.role === 'recruiter'"><span>Statut entreprise</span><strong>{{ selectedUser.is_verified_company ? 'Certifiée' : 'Non certifiée' }}</strong></div>
+        <div class="admin-user-field" *ngIf="selectedUser.role !== 'recruiter'"><span>Compte vérifié</span><strong>{{ selectedUser.is_verified ? 'Oui' : 'Non' }}</strong></div>
+      </div>
     </div>
   </div>
 </div>

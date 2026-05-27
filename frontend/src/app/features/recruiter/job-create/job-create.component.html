@@ -20,66 +20,98 @@
 
   <!-- 📊 DISPOSITION DOUBLE PANNEAU SANS SCROLL -->
   <form (ngSubmit)="onPublish($event)" class="job-split-layout">
-    
-    <!-- ================= PANNEAU GAUCHE : CRITÈRES ET OPTIONS ================= -->
-    <div class="job-panel-card">
-      <div class="panel-inner-title"><i class="bi bi-sliders"></i> Critères de l'offre</div>
+
+    <!-- 🧱 COLONNE GAUCHE : GROUPEMENT POUR GARDER LE QUIZ SOUS LES CRITÈRES -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
       
-      <div class="compact-form-grid">
-        <!-- Intitulé du poste -->
-        <div class="form-group-compact span-all">
-          <label for="title">Intitulé du poste *</label>
-          <input type="text" id="title" name="title" [(ngModel)]="job.title" placeholder="Ex: Développeur Angular Senior" required>
-        </div>
+      <!-- 1. CARTE DES CRITÈRES -->
+      <div class="job-panel-card">
+        <div class="panel-inner-title"><i class="bi bi-sliders"></i> Critères de l'offre</div>
         
-        <!-- Localisation -->
-        <div class="form-group-compact span-all">
-          <label for="location">Localisation *</label>
-          <input type="text" id="location" name="location" [(ngModel)]="job.location" placeholder="Ex: Les Berges du Lac, Tunis" required>
-        </div>
+        <div class="compact-form-grid">
+          <div class="form-group-compact span-all">
+            <label for="title">Intitulé du poste *</label>
+            <input type="text" id="title" name="title" [(ngModel)]="job.title" placeholder="Ex: Développeur Angular Senior" required>
+          </div>
+          
+          <div class="form-group-compact span-all">
+            <label for="location-autocomplete">Localisation *</label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="location-autocomplete" name="location" [(ngModel)]="job.location"
+                     (input)="onLocationInput($event)"
+                     (blur)="onLocationBlur()"
+                     placeholder="Ex: Tunis, La Marsa" required>
+              <ul *ngIf="showLocationSuggestions && filteredLocations.length > 0" class="autocomplete-dropdown">
+                <li *ngFor="let loc of filteredLocations" (mousedown)="selectLocation(loc)">
+                  {{ loc.ville }}, {{ loc.cite }}
+                </li>
+              </ul>
+            </div>
+          </div>
 
-        <!-- Type de contrat -->
-        <div class="form-group-compact">
-          <label for="contract_type">Type de contrat</label>
-          <select id="contract_type" name="contract_type" [(ngModel)]="job.contract_type" class="form-select-compact">
-            <option value="CDI">CDI</option>
-            <option value="CDD">CDD</option>
-            <option value="SIVP">SIVP / Stage</option>
-            <option value="Freelance">Freelance</option>
-          </select>
-        </div>
+          <div class="form-group-compact">
+            <label for="contract_type">Type de contrat</label>
+            <select id="contract_type" name="contract_type" [(ngModel)]="job.contract_type" class="form-select-compact">
+              <option value="CDI">CDI</option>
+              <option value="CDD">CDD</option>
+              <option value="SIVP">SIVP / Stage</option>
+              <option value="Freelance">Freelance</option>
+            </select>
+          </div>
 
-        <!-- Mode de travail -->
-        <div class="form-group-compact">
-          <label for="workplace_type">Mode de travail</label>
-          <select id="workplace_type" name="workplace_type" [(ngModel)]="job.workplace_type" class="form-select-compact">
-            <option value="Présentiel">Présentiel</option>
-            <option value="Hybride">Hybride</option>
-            <option value="Télétravail">Télétravail à 100%</option>
-          </select>
-        </div>
+          <div class="form-group-compact">
+            <label for="workplace_type">Mode de travail</label>
+            <select id="workplace_type" name="workplace_type" [(ngModel)]="job.workplace_type" class="form-select-compact">
+              <option value="Présentiel">Présentiel</option>
+              <option value="Hybride">Hybride</option>
+              <option value="Télétravail">Télétravail à 100%</option>
+            </select>
+          </div>
 
-        <!-- Salaire indicatif -->
-        <div class="form-group-compact">
-          <label for="salary">Salaire indicatif (Optionnel)</label>
-          <input type="text" id="salary" name="salary" [(ngModel)]="job.salary" placeholder="Ex: 1500 - 2200 DT">
-        </div>
+          <div class="form-group-compact">
+            <label for="salary">Salaire indicatif (Optionnel)</label>
+            <input type="text" id="salary" name="salary" [(ngModel)]="job.salary" placeholder="Ex: 1500 - 2200 DT">
+          </div>
 
-        <!-- Niveau d'expérience -->
-        <div class="form-group-compact">
-          <label for="experience_level">Expérience requise</label>
-          <select id="experience_level" name="experience_level" [(ngModel)]="job.experience_level" class="form-select-compact">
-            <option value="Junior (0-2 ans)">Junior (0-2 ans)</option>
-            <option value="Intermédiaire (2-5 ans)">Intermédiaire (2-5 ans)</option>
-            <option value="Senior (5+ ans)">Senior (5+ ans)</option>
-          </select>
-        </div>
+          <div class="form-group-compact">
+            <label for="experience_level">Expérience requise</label>
+            <select id="experience_level" name="experience_level" [(ngModel)]="job.experience_level" class="form-select-compact">
+              <option value="Junior (0-2 ans)">Junior (0-2 ans)</option>
+              <option value="Intermédiaire (2-5 ans)">Intermédiaire (2-5 ans)</option>
+              <option value="Senior (5+ ans)">Senior (5+ ans)</option>
+            </select>
+          </div>
 
-        <!-- Expire le -->
-        <div class="form-group-compact span-all">
-          <label for="expires_at">Date limite de candidature</label>
-          <input type="date" id="expires_at" name="expires_at" [(ngModel)]="job.expires_at">
+          <div class="form-group-compact span-all">
+            <label for="expires_at">Date limite de candidature</label>
+            <input type="date" id="expires_at" name="expires_at" [(ngModel)]="job.expires_at">
+          </div>
         </div>
+      </div>
+
+      <!-- 2. CARTE DU QUIZ (SÉPARÉE ET SOUS LES CRITÈRES) -->
+      <div class="job-panel-card">
+        <div class="panel-inner-title">
+          <h4><i class="bi bi-patch-question-fill" style="color: #8b5cf6;"></i> Quiz de présélection (optionnel)</h4>
+        </div>
+        <p style="margin-top: -10px; margin-bottom: 15px; color: #64748b; font-size: 13px;">Ajoutez un questionnaire QCM pour filtrer les candidatures.</p>
+
+        @if (hasQuiz && quizSaved) {
+          <div class="quiz-saved-banner">
+            <div>
+              <strong><i class="bi bi-check-circle-fill"></i> Quiz enregistré</strong>
+              <p>{{ quizTitle }} · {{ quizQuestions.length }} question(s)</p>
+            </div>
+            <div class="quiz-saved-actions">
+              <button type="button" class="btn-quiz-secondary" (click)="onEditQuiz()">Modifier</button>
+              <button type="button" class="btn-quiz-danger" (click)="onDisableQuiz()">Retirer</button>
+            </div>
+          </div>
+        } @else {
+          <button type="button" class="btn-activate-quiz" (click)="onOpenQuizModal()">
+            <i class="bi bi-plus-circle-fill"></i> Activer un quiz pour cette offre
+          </button>
+        }
       </div>
     </div>
 
@@ -108,9 +140,10 @@
           @if (getSkillsArray().length > 0) {
             <div class="skills-badge-preview-grid" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
               @for (skill of getSkillsArray(); track $index) {
-                <span class="live-skill-tag" style="background-color: #f0f9ff; color: #0369a1; border: 1px solid #e0f2fe; padding: 5px 12px; border-radius: 6px; font-size: 12.5px; font-weight: 600;">
-                  {{ skill }}
-                </span>
+                <span class="live-skill-tag" style="background-color: #E0F2FE; color: #0369A1; border: 1px solid rgba(3, 105, 161, 0.2); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; letter-spacing: -0.1px; display: inline-flex; align-items: center;">
+    {{ skill }}
+</span>
+
               }
             </div>
           }
@@ -124,44 +157,14 @@
           @if (getLanguagesArray().length > 0) {
             <div class="skills-badge-preview-grid" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
               @for (lang of getLanguagesArray(); track $index) {
-                <span class="live-skill-tag" style="background-color: #f0f9ff; color: #0369a1; border: 1px solid #e0f2fe; padding: 5px 12px; border-radius: 6px; font-size: 12.5px; font-weight: 600;">
-                  {{ lang }}
-                </span>
+                <span class="live-skill-tag" style="background-color: #f0f9ff; color: #0369a1; border: 1px solid rgba(3, 105, 161, 0.15); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; letter-spacing: -0.1px; display: inline-flex; align-items: center; gap: 6px;">
+    {{ lang }}
+</span>
+
               }
             </div>
           }
         </div>
-      </div>
-
-      <div class="quiz-optional-card span-all">
-        <div class="quiz-optional-header">
-          <div>
-            <h4><i class="bi bi-patch-question-fill"></i> Quiz de présélection (optionnel)</h4>
-            <p>Ajoutez un questionnaire QCM pour filtrer les candidatures.</p>
-          </div>
-        </div>
-
-        @if (hasQuiz && quizSaved) {
-          <div class="quiz-saved-banner">
-            <div>
-              <strong><i class="bi bi-check-circle-fill"></i> Quiz enregistré</strong>
-              <p>{{ quizTitle }} · {{ quizQuestions.length }} question(s)</p>
-            </div>
-            <div class="quiz-saved-actions">
-              <button type="button" class="btn-quiz-secondary" (click)="onEditQuiz()">Modifier</button>
-              <button type="button" class="btn-quiz-danger" (click)="onDisableQuiz()">Retirer</button>
-            </div>
-          </div>
-        } @else if (hasQuiz && !quizSaved) {
-          <div class="quiz-draft-banner">
-            <p><i class="bi bi-exclamation-circle"></i> Quiz activé mais non enregistré.</p>
-            <button type="button" class="btn-quiz-primary" (click)="onOpenQuizModal()">Continuer la création</button>
-          </div>
-        } @else {
-          <button type="button" class="btn-activate-quiz" (click)="onOpenQuizModal()">
-            <i class="bi bi-plus-circle-fill"></i> Activer un quiz pour cette offre
-          </button>
-        }
       </div>
 
       <div class="form-actions-compact" style="margin-top: 20px;">
@@ -175,7 +178,6 @@
         </button>
       </div>
     </div>
-
   </form>
 
   @if (showQuizModal) {

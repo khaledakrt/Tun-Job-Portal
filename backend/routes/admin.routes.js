@@ -3,6 +3,7 @@ const router = express.Router();
 
 // 📂 Chargement du contrôleur Admin
 const adminCtrl = require('../controllers/admin/admin.controller'); 
+const adminAppCtrl = require('../controllers/admin/application.controller');
 
 /* ==========================================================================
    🔒 LOGIQUE DES ENDPOINTS DE L'API ADMINISTRATEUR
@@ -21,10 +22,16 @@ router.delete('/users/:id', adminCtrl.deleteUser);
 // 💼 Route 4 : Récupérer toutes les offres d'emploi déposées en Tunisie
 router.get('/jobs', adminCtrl.getAllJobs);
 
-// 🗑️ Route 5 : Supprimer ou modérer une offre d'emploi par son ID
+// �️ Route 5 : Récupérer toutes les candidatures à modérer
+router.get('/applications', adminAppCtrl.getAllApplications);
+
+// 🗑️ Route 6 : Supprimer ou modérer une offre d'emploi par son ID
 router.delete('/jobs/:id', adminCtrl.deleteJob);
 
-// 🔑 Route 6 : Valider ou suspendre la certification d'un recruteur
+// 🗑️ Route 7 : Supprimer une candidature non conforme par son ID
+router.delete('/applications/:id', adminAppCtrl.deleteApplication);
+
+// 🔑 Route 8 : Valider ou suspendre la certification d'un recruteur
 router.put('/users/:id/verify-company', adminCtrl.toggleCompanyVerification);
 
 module.exports = router;

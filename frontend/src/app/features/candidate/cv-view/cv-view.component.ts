@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router'; // 🚀 AJOUT : Pour lire l'ID dans l'URL
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-cv-view',
@@ -37,12 +38,12 @@ export class CvViewComponent implements OnInit {
     
     // 🚀 DÉFINITION DYNAMIQUE DES ENDPOINTS
     // Si candidateId existe, on interroge les nouvelles routes d'accès recruteur/public en passant l'ID
-    let profileUrl = 'http://localhost:3000/api/candidate/profile/details';
-    let cvUrl = 'http://localhost:3000/api/candidate/cv/details';
+    let profileUrl = `${environment.apiUrl}/candidate/profile/details`;
+    let cvUrl = `${environment.apiUrl}/candidate/cv/details`;
 
     if (this.candidateId) {
-      profileUrl = `http://localhost:3000/api/recruiter/candidate-profile/${this.candidateId}`;
-      cvUrl = `http://localhost:3000/api/recruiter/candidate-cv/${this.candidateId}`;
+      profileUrl = `${environment.apiUrl}/recruiter/candidate-profile/${this.candidateId}`;
+      cvUrl = `${environment.apiUrl}/recruiter/candidate-cv/${this.candidateId}`;
     }
     
     const profilePromise = fetch(profileUrl, {
@@ -65,7 +66,7 @@ export class CvViewComponent implements OnInit {
             this.candidateContact.address = user.address || '';
             this.candidateName = user.name || this.candidateName;
             if (user.avatar_logo) {
-              this.avatarUrl = `http://localhost:3000/logos/${user.avatar_logo}`;
+              this.avatarUrl = `${environment.assetsUrl}/logos/${user.avatar_logo}`;
             }
           }
         }

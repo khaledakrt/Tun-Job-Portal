@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+
 export interface JobQuizPayload {
   title: string;
   questions: { question_text: string; question_type: string; choices: { choice_text: string; is_correct: boolean }[] }[];

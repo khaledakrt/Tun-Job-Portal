@@ -40,7 +40,7 @@
 .job-panel-card { 
   background: #ffffff; 
   border-radius: 12px; 
-  border: 1px solid #e2e8f0; 
+  border: 1px solid #4e77ad; 
   padding: 26px; 
   box-shadow: 0 1px 3px rgba(0,0,0,0.02); 
   box-sizing: border-box;
@@ -49,14 +49,14 @@
 .panel-inner-title { 
   font-size: 14px; 
   font-weight: 700; 
-  color: #0f172a; 
+  color: #010204; 
   text-align: left; 
   margin-bottom: 18px; 
   display: flex; 
   align-items: center; 
   gap: 8px; 
 }
-.panel-inner-title i { color: #0ea5e9; }
+.panel-inner-title i { color: #03496a; }
 
 /* Grilles de formulaires condensées */
 .compact-form-grid { 
@@ -93,11 +93,11 @@
 .form-group-compact textarea { 
   width: 100% !important; 
   padding: 10px 14px !important; 
-  border: 1px solid #cbd5e1 !important; 
+  border: 1px solid #6385b0 !important; 
   border-radius: 6px !important; 
   font-size: 13.5px !important; 
   box-sizing: border-box !important; 
-  color: #1e293b !important; 
+  color: #233758 !important; 
   background-color: #ffffff !important; 
   font-family: inherit !important;
   margin: 0 !important;
@@ -404,4 +404,47 @@
 .quiz-modal-body .quiz-builder-card {
   margin-top: 0;
   box-shadow: none;
+}
+
+/* ==========================================================================
+   🚀 AUTOCOMPLÉTION LOCALISATION (PROFESSIONNEL)
+   ========================================================================== */
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%; /* Juste en dessous de l'input */
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Assure que la liste est au-dessus des autres éléments */
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  list-style: none;
+  padding: 8px 0;
+  margin: 4px 0 0 0;
+  max-height: 200px; /* Limite la hauteur et ajoute un scroll */
+  overflow-y: auto;
+}
+
+.autocomplete-dropdown li {
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #334155;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.autocomplete-dropdown li:hover {
+  background-color: #f0f9ff; /* Bleu très clair au survol */
+  color: #0ea5e9; /* Texte bleu */
+}
+
+/* Style pour l'input d'autocomplétion (reprend le style existant) */
+.autocomplete-wrapper input {
+  width: 100%; /* Assure que l'input prend toute la largeur */
 }

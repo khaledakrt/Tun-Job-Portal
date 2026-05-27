@@ -13,11 +13,7 @@ const appSchemas = require('../validators/application.validator');
 const quizSchemas = require('../validators/quiz.validator');
 
 // 2. Middleware d'authentification
-const authMiddleware = require('../middleware/auth.middleware');
-const verifyToken = typeof authMiddleware === 'function' 
-    ? authMiddleware 
-    : (authMiddleware.verifyToken || authMiddleware.authMiddleware || authMiddleware.protect);
-
+const { verifyToken } = require('../middleware/auth.middleware');
 if (!verifyToken) {
     throw new Error("❌ Impossible de charger le middleware d'authentification.");
 }

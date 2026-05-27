@@ -4,24 +4,31 @@
       <h3><i class="bi bi-people-fill"></i> Suivi des Candidats (Pipeline ATS)</h3>
       <p>Suivez pas à pas la progression de vos candidats dans le tunnel de recrutement.</p>
     </div>
-<!-- 🔍 FILTRE PAR OFFRE D'EMPLOI -->
-<div class="job-filter-container" style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
-  <label style="font-size: 13px; font-weight: 700; color: #475569; text-transform: uppercase;">Filtrer par offre :</label>
-  
-  
-  <select (change)="onJobFilterChange($event)" style="padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #1e293b; background: #fff; width: 300px;">
-  
-  <!-- 🟢 Compteur global parfaitement synchronisé (Affiche 14) -->
-  <option value="all">Tous les candidats ({{ getFilteredCandidatesCount('all') }})</option>
-  
-  <!-- 🟢 Compteurs par offre mis à jour en temps réel -->
-  <option *ngFor="let title of getUniqueJobTitles()" [value]="title">
-    {{ title }} ({{ getFilteredCandidatesCount(title) }})
-  </option>
+    
+    <!-- 🔍 BARRE DE FILTRES PRO (Job Selector + Recherche Instantanée) -->
+    <div class="filters-bar">
+      <div class="filter-item">
+        <label><i class="bi bi-funnel-fill"></i> Filtrer par offre</label>
+        <select [(ngModel)]="selectedJobTitle" (change)="onJobFilterChange($event)" class="pro-filter-select">
+          <option value="all">Toutes les offres ({{ getFilteredCandidatesCount('all') }})</option>
+          <option *ngFor="let title of getUniqueJobTitles()" [value]="title">
+            {{ title }} ({{ getFilteredCandidatesCount(title) }})
+          </option>
+        </select>
+      </div>
 
-</select>
-
-</div>
+      <div class="filter-item search-item">
+        <label><i class="bi bi-person-search"></i> Recherche candidat</label>
+        <div class="search-input-wrapper">
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" [(ngModel)]="searchTerm" (input)="onSearchTermChange($event)" 
+                 placeholder="Rechercher par nom, poste, ville..." class="pro-filter-input">
+          <button *ngIf="searchTerm || selectedJobTitle !== 'all'" (click)="resetFilters()" class="btn-clear-filters" title="Réinitialiser les filtres">
+            <i class="bi bi-x-circle-fill"></i>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Les colonnes Kanban du logiciel de recrutement -->
     <div class="pipeline-grid">
@@ -29,8 +36,8 @@
       <!-- 1. Colonne : Nouveaux CV -->
       <div class="pipeline-column">
         <div class="column-header">
-          Nouveaux CV 
-          <span class="count">{{ getCandidatesByStatus('Nouveau').length }}</span>
+          Nouveaux CV
+          <span class="count">{{ getTotalCandidatesForStatus('Nouveau') }}</span>
         </div>
         
         <div *ngFor="let app of getCandidatesByStatus('Nouveau')" 
@@ -42,17 +49,20 @@
         </div>
 
         <!-- Espace visuel si la colonne est vide -->
-        <div *ngIf="getCandidatesByStatus('Nouveau').length === 0" class="empty-placeholder">
-          <svg xmlns="http://w3.org" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M4.5 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM3 2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H8a.5.5 0 0 1-.5-.5M8 9a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H8A.5.5 0 0 1 8 9m.5 2.5a.5.5 0 0 1 0-1h2a.5.5 0 0 1 0 1z"/></svg>
+        <div *ngIf="getCandidatesByStatus('Nouveau').length === 0 && getTotalCandidatesForStatus('Nouveau') === 0" class="empty-placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M4.5 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM3 2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H8a.5.5 0 0 1-.5-.5M8 9a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H8A.5.5 0 0 1 8 9m.5 2.5a.5.5 0 0 1 0-1h2a.5.5 0 0 1 0 1z"/></svg>
           <p>Aucun nouveau CV</p>
         </div>
+        <button *ngIf="hasMoreCandidates('Nouveau')" (click)="loadMoreCandidates('Nouveau')" class="btn-load-more">
+          Charger plus ({{ getTotalCandidatesForStatus('Nouveau') - getCandidatesByStatus('Nouveau').length }})
+        </button>
       </div>
 
       <!-- 2. Colonne : Entretien Tech -->
       <div class="pipeline-column">
         <div class="column-header">
           Entretien Tech 
-          <span class="count">{{ getCandidatesByStatus('Entretien').length }}</span>
+          <span class="count">{{ getTotalCandidatesForStatus('Entretien') }}</span>
         </div>
         
         <div *ngFor="let app of getCandidatesByStatus('Entretien')" 
@@ -64,17 +74,20 @@
         </div>
 
         <!-- Espace visuel si la colonne est vide -->
-        <div *ngIf="getCandidatesByStatus('Entretien').length === 0" class="empty-placeholder">
-          <svg xmlns="http://w3.org" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0"/><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/></svg>
+        <div *ngIf="getCandidatesByStatus('Entretien').length === 0 && getTotalCandidatesForStatus('Entretien') === 0" class="empty-placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0"/><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/></svg>
           <p>Aucun entretien planifié</p>
         </div>
+        <button *ngIf="hasMoreCandidates('Entretien')" (click)="loadMoreCandidates('Entretien')" class="btn-load-more">
+          Charger plus ({{ getTotalCandidatesForStatus('Entretien') - getCandidatesByStatus('Entretien').length }})
+        </button>
       </div>
 
       <!-- 3. Colonne : Proposition -->
       <div class="pipeline-column">
         <div class="column-header">
           Proposition 
-          <span class="count">{{ getCandidatesByStatus('Proposition').length }}</span>
+          <span class="count">{{ getTotalCandidatesForStatus('Proposition') }}</span>
         </div>
         
         <div *ngFor="let app of getCandidatesByStatus('Proposition')" 
@@ -86,10 +99,13 @@
         </div>
 
         <!-- Espace visuel si la colonne est vide -->
-        <div *ngIf="getCandidatesByStatus('Proposition').length === 0" class="empty-placeholder">
-          <svg xmlns="http://w3.org" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
+        <div *ngIf="getCandidatesByStatus('Proposition').length === 0 && getTotalCandidatesForStatus('Proposition') === 0" class="empty-placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
           <p>Aucune proposition émise</p>
         </div>
+        <button *ngIf="hasMoreCandidates('Proposition')" (click)="loadMoreCandidates('Proposition')" class="btn-load-more">
+          Charger plus ({{ getTotalCandidatesForStatus('Proposition') - getCandidatesByStatus('Proposition').length }})
+        </button>
       </div>
 
     </div>
@@ -100,7 +116,7 @@
 <!-- 🚀 FENÊTRE MODALE DE CONSULTATION DE LA CANDIDATURE                        -->
 <!-- ========================================================================== -->
 <div *ngIf="selectedApplication" class="modal-overlay" (click)="onCloseDetails()">
-<div class="modal-content" (click)="$event.stopPropagation()" style="width: 640px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column; gap: 16px;">
+<div class="modal-content" (click)="$event.stopPropagation()" style="display: flex; flex-direction: column; gap: 16px;">
     
     <!-- En-tête -->
     <div class="modal-header">
@@ -119,8 +135,8 @@
         </summary>
 
         <div class="ats-section-content">
-          <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 20px;">
-            <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 110px;">
+          <div class="candidate-top-row">
+            <div class="candidate-photo-block">
               <div style="width: 85px; height: 85px; border-radius: 50%; border: 1px solid #cbd5e1; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
                 <img [src]="logoUrl(selectedApplication.avatar_logo)"
                   (error)="$any($event.target).src='assets/images/default-avatar.png'"
@@ -130,85 +146,65 @@
 
               <button (click)="openCandidateCV(selectedApplication.candidate_id)"
                 [disabled]="!selectedApplication.cv_summary || selectedApplication.cv_summary.trim() === ''"
-                [style.opacity]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? '1' : '0.5'"
-                [style.cursor]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'pointer' : 'not-allowed'"
-                [style.pointer-events]="selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'auto' : 'none'"
-                style="background: #ffffff; border: 1px solid #cbd5e1; color: #0284c7; padding: 6px 4px; border-radius: 4px; font-size: 11px; font-weight: 700; width: 100%; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                <svg xmlns="http://w3.org" width="11" height="11" fill="currentColor" viewBox="0 0 16 16">
+                [class.disabled-button]="!selectedApplication.cv_summary || selectedApplication.cv_summary.trim() === ''"
+                class="btn-cv-view"
+                style="cursor: pointer;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 1A1.5 1.5 0 0 1 11 2.5V4h3v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
                 </svg>
                 {{ selectedApplication.cv_summary && selectedApplication.cv_summary.trim() !== '' ? 'Consulter le CV' : 'Aucun CV' }}
               </button>
             </div>
 
-            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Poste ciblé :</span>
-                <strong class="info-value text-slate">{{ selectedApplication.job_title }}</strong>
+            <div class="candidate-summary-grid">
+              <div class="candidate-summary-item">
+                <span class="info-label">Poste ciblé:</span>
+                <span class="info-value">{{ selectedApplication.job_title }}</span>
               </div>
-
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Date candidature :</span>
+              <div class="candidate-summary-item">
+                <span class="info-label">Date candidature:</span>
                 <span class="info-value">{{ selectedApplication.applied_at ? (selectedApplication.applied_at | date:'dd/MM/yyyy à HH:mm') : '—' }}</span>
               </div>
-
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Adresse e-mail :</span>
+              <div class="candidate-summary-item">
+                <span class="info-label">Adresse e-mail:</span>
                 <span class="info-value">{{ selectedApplication.email }}</span>
               </div>
-
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Téléphone :</span>
+              <div class="candidate-summary-item">
+                <span class="info-label">Téléphone:</span>
                 <span class="info-value">{{ selectedApplication.phone || 'Non renseigné' }}</span>
               </div>
-
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Ville / Région :</span>
+              <div class="candidate-summary-item">
+                <span class="info-label">Ville / Région:</span>
                 <span class="info-value">{{ selectedApplication.address || 'Non spécifiée' }}</span>
               </div>
-
-              <div class="info-row" style="display: flex; align-items: center;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Situation actuelle :</span>
-                <span class="info-value"><span class="badge-status-pro-ats">{{ selectedApplication.job_status || 'Non renseignée' }}</span></span>
-              </div>
-
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Disponibilité :</span>
-                <span class="info-value">{{ selectedApplication.availability || 'Non renseignée' }}</span>
-              </div>
-
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Contrat souhaité :</span>
+              <div class="candidate-summary-item">
+                <span class="info-label">Contrat souhaité:</span>
                 <span class="info-value">{{ selectedApplication.job_type || 'Non renseigné' }}</span>
               </div>
-
-              <div class="info-row" style="display: flex;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Date de naissance :</span>
+              <div class="candidate-summary-item">
+                <span class="info-label">Situation actuelle:</span>
+                <span class="info-value">{{ selectedApplication.job_status || 'Non renseignée' }}</span>
+              </div>
+              <div class="candidate-summary-item">
+                <span class="info-label">Date de naissance:</span>
                 <span class="info-value">{{ selectedApplication.birth_date ? (selectedApplication.birth_date | date:'dd/MM/yyyy') : 'Non renseignée' }}</span>
               </div>
-
-              <div class="info-row" style="display: flex; align-items: center; margin-top: 4px;">
-                <span class="info-label" style="width: 150px; flex-shrink: 0;">Réseaux :</span>
-                <div style="display: flex; gap: 10px;">
-                  <a *ngIf="selectedApplication.linkedin && selectedApplication.linkedin.trim() !== ''"
-                    [href]="selectedApplication.linkedin"
-                    target="_blank"
-                    class="social-badge-btn linkedin-badge">
-                    <i class="bi bi-linkedin"></i> LinkedIn
-                  </a>
-
-                  <a *ngIf="selectedApplication.github && selectedApplication.github.trim() !== ''"
-                    [href]="selectedApplication.github"
-                    target="_blank"
-                    class="social-badge-btn github-badge">
-                    <i class="bi bi-github"></i> GitHub
-                  </a>
-
-                  <span *ngIf="(!selectedApplication.linkedin || selectedApplication.linkedin.trim() === '') && (!selectedApplication.github || selectedApplication.github.trim() === '')"
-                    style="color: #94a3b8; font-style: italic; font-size: 13px; font-weight: 500;">
-                    Non renseigné
-                  </span>
-                </div>
+              <div class="candidate-summary-item">
+                <span class="info-label">Disponibilité:</span>
+                <span class="info-value">{{ selectedApplication.availability || 'Non renseignée' }}</span>
+              </div>
+              <div class="candidate-summary-item">
+                <span class="info-label">Réseaux:</span>
+                <span class="info-value">
+                  <ng-container *ngIf="selectedApplication.linkedin && selectedApplication.linkedin.trim() !== ''">
+                    <a [href]="selectedApplication.linkedin" target="_blank">LinkedIn</a>
+                  </ng-container>
+                  <ng-container *ngIf="selectedApplication.github && selectedApplication.github.trim() !== ''">
+                    <span class="network-separator">|</span>
+                    <a [href]="selectedApplication.github" target="_blank">GitHub</a>
+                  </ng-container>
+                  <span *ngIf="(!selectedApplication.linkedin || selectedApplication.linkedin.trim() === '') && (!selectedApplication.github || selectedApplication.github.trim() === '')" class="detail-empty">Non renseigné</span>
+                </span>
               </div>
             </div>
           </div>
@@ -224,7 +220,7 @@
         </div>
       </details>
 
-      <details class="ats-section-card">
+      <details class="ats-section-card" [open]="isQuizAccordionOpen">
         <summary class="ats-section-summary">
           <span><i class="bi bi-patch-question-fill"></i> Réponses quiz</span>
           <i class="bi bi-chevron-down"></i>
@@ -285,7 +281,7 @@
   <button type="button" 
           (click)="changeCandidateStatus(selectedApplication.id, 'Proposition')" 
           style="background: #10b981; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">
-    <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
     Accepter
   </button>
 
@@ -293,7 +289,7 @@
   <button type="button" 
           (click)="changeCandidateStatus(selectedApplication.id, 'Nouveau')" 
           style="background: #64748b; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">
-    <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 0 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M5 6.25a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0zm4 0a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 0 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M5 6.25a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0zm4 0a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0z"/></svg>
     En attente
   </button>
   
@@ -301,7 +297,7 @@
   <button type="button" 
           (click)="changeCandidateStatus(selectedApplication.id, 'Entretien')" 
           style="background: #f97316; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">
-    <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0m-8.5-4.5A.5.5 0 0 1 7 4v3.5h2.5a.5.5 0 0 1 0 1H6.5a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0m-8.5-4.5A.5.5 0 0 1 7 4v3.5h2.5a.5.5 0 0 1 0 1H6.5a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5"/></svg>
     Entretien
   </button>
 
@@ -309,7 +305,7 @@
   <button type="button" 
           (click)="changeCandidateStatus(selectedApplication.id, 'Rejete')" 
           style="background: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">
-    <svg xmlns="http://w3.org" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/></svg>
     Rejeter
   </button>
 

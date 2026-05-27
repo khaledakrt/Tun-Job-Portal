@@ -1,13 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/admin';
+  private apiUrl = `${environment.apiUrl}/admin`;
 
   // 🛡️ MÉTHODE PRIVÉE : Récupère le jeton JWT et génère les Headers de sécurité
   private getAuthHeaders(): { headers: HttpHeaders } {
@@ -40,12 +41,22 @@ export class AdminService {
     return this.http.get<any[]>(`${this.apiUrl}/jobs`, this.getAuthHeaders());
   }
 
+  // �️ Récupérer toutes les candidatures pour modération admin
+  getAllApplications(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/applications`, this.getAuthHeaders());
+  }
+
   // 🗑️ Supprimer une offre d'emploi non conforme (Corrigé avec Headers)
   deleteJob(jobId: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/jobs/${jobId}`, this.getAuthHeaders());
   }
 
-    // 🏢 Valider ou révoquer la certification d'une entreprise recruteur
+  // 🗑️ Supprimer une candidature non conforme
+  deleteApplication(applicationId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/applications/${applicationId}`, this.getAuthHeaders());
+  }
+
+  // 🏢 Valider ou révoquer la certification d'une entreprise recruteur
   toggleCompanyVerification(userId: number, status: number): Observable<any> {
     return this.http.put<any>(
       `${this.apiUrl}/users/${userId}/verify-company`, 

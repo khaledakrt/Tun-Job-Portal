@@ -26,8 +26,7 @@ router.get('/profile/details', verifyToken, profileCtrl.getProfileDetails);
 // ==========================================================================
 // 💼 MOTEUR DE RECHERCHE D'OFFRES
 // ==========================================================================
-// 🔓 ROUTE PUBLIQUE : 'verifyToken' a été supprimé pour permettre l'accès à tout le monde
-router.get('/jobs/list', candidateJobCtrl.getAllAvailableJobs); 
+// Note : la route publique de recherche d'offres est déclarée dans app.js
 
 // ==========================================================================
 // 📄 GESTIONNAIRE DE CV & CANDIDATURES
@@ -41,6 +40,6 @@ router.get('/jobs/:jobId/quiz', verifyToken, quizCtrl.getJobQuizForCandidate);
 router.post('/apply', verifyToken, validate(appSchemas.apply), appCtrl.apply);
 router.get('/history', verifyToken, appCtrl.getHistory);
 
-router.get('/profile/details-public/:id', verifyToken, profileCtrl.getPublicCompanyDetails);
+// La route publique pour récupérer les détails d'une entreprise est maintenant exposée dans app.js
 
 module.exports = router;

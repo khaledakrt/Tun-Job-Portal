@@ -7,6 +7,9 @@
   </div>
 
   <div class="manage-card-premium">
+    <div class="admin-search-bar">
+      <input type="text" placeholder="Rechercher offre ou recruteur..." [(ngModel)]="searchTerm" />
+    </div>
     <div class="table-wrapper-premium">
       
       <div *ngIf="isLoading" class="loading-box">
@@ -23,10 +26,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let job of jobsList" class="table-row-premium">
+          <tr *ngFor="let job of filteredJobs" class="table-row-premium">
             <td class="job-company-cell">
-              <span class="clickable-job-title" style="font-size: 14px !important; font-weight: 700;">{{ job.title }}</span>
-              <span class="company-sub-badge"><i class="bi bi-building"></i> {{ job.company_name || 'Recruteur' }}</span>
+              <span class="clickable-job-title" style="font-size: 14px !important; font-weight: 700;" (click)="openJobCard(job)">{{ job.title }}</span>
+              <span class="company-sub-badge clickable-user-name" (click)="openRecruiterCard(job)"><i class="bi bi-building"></i> {{ job.company_name || job.recruiter_name || 'Recruteur' }}</span>
             </td>
             <td class="date-text-cell-premium">
               <div class="date-container-premium">
@@ -49,6 +52,75 @@
         </tbody>
       </table>
 
+    </div>
+  </div>
+
+  <div *ngIf="showJobCard && selectedJob" class="admin-user-card-overlay" (click)="closeJobCard()">
+    <div class="admin-user-card" (click)="$event.stopPropagation()">
+      <button class="admin-user-card-close" (click)="closeJobCard()">×</button>
+      <div class="admin-user-card-header">
+        <div>
+          <h4>{{ selectedJob.title }}</h4>
+          <p class="admin-user-role">Détails du poste</p>
+        </div>
+        <span class="admin-badge" [ngClass]="selectedJob.is_verified_company ? 'badge-success' : 'badge-warning'">
+          {{ selectedJob.is_verified_company ? 'Entreprise certifiée' : 'Entreprise non certifiée' }}
+        </span>
+      </div>
+      <div class="admin-user-card-body">
+        <div class="admin-user-field"><span>Recruteur</span><strong>{{ selectedJob.company_name || selectedJob.recruiter_name || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Localisation</span><strong>{{ selectedJob.location || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Type de contrat</span><strong>{{ selectedJob.contract_type || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Mode de travail</span><strong>{{ selectedJob.workplace_type || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Expérience</span><strong>{{ selectedJob.experience_level || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Salaire</span><strong>{{ selectedJob.salary || 'Non spécifié' }}</strong></div>
+        <div class="admin-user-field"><span>Date limite</span><strong>{{ selectedJob.expires_at ? (selectedJob.expires_at | date:'dd/MM/yyyy') : '—' }}</strong></div>
+        <div class="admin-user-field"><span>Email recruteur</span><strong>{{ selectedJob.recruiter_email || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Téléphone recruteur</span><strong>{{ selectedJob.recruiter_phone || '—' }}</strong></div>
+        <div class="admin-user-field"><span>Adresse recruteur</span><strong>{{ selectedJob.recruiter_address || '—' }}</strong></div>
+      </div>
+
+      <div class="admin-job-section">
+        <h5>Contenu de l'offre</h5>
+        <div class="admin-job-field"><span>Poste</span><p style="white-space: pre-line; margin: 0;">{{ selectedJob.title }}</p></div>
+        <div class="admin-job-field"><span>Missions</span><p style="white-space: pre-line; margin: 0;">{{ selectedJob.missions_desc || 'Aucune description des missions disponible.' }}</p></div>
+        <div class="admin-job-field"><span>Profil recherché</span><p style="white-space: pre-line; margin: 0;">{{ selectedJob.profile_desc || 'Aucun profil recherché renseigné.' }}</p></div>
+        <div *ngIf="getJobSkills(selectedJob.skills_desc).length > 0" class="admin-job-field">
+          <span>Compétences / Technologies</span>
+          <div class="job-skills-list">
+            <span *ngFor="let skill of getJobSkills(selectedJob.skills_desc)" class="skill-tag">{{ skill }}</span>
+          </div>
+        </div>
+        <div *ngIf="getJobLanguages(selectedJob.languages_desc).length > 0" class="admin-job-field">
+          <span>Langues</span>
+          <div class="job-languages-list">
+            <span *ngFor="let language of getJobLanguages(selectedJob.languages_desc)" class="language-tag">{{ language }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showRecruiterCard && selectedRecruiter" class="admin-user-card-overlay" (click)="closeRecruiterCard()">
+    <div class="admin-user-card" (click)="$event.stopPropagation()">
+      <button class="admin-user-card-close" (click)="closeRecruiterCard()">×</button>
+      <div class="admin-user-card-header">
+        <div>
+          <h4>{{ selectedRecruiter.name }}</h4>
+          <p class="admin-user-role">Recruteur</p>
+        </div>
+        <span class="admin-badge" [ngClass]="selectedRecruiter.is_verified_company ? 'badge-success' : 'badge-warning'">
+          {{ selectedRecruiter.is_verified_company ? 'Entreprise certifiée' : 'Certification en attente' }}
+        </span>
+      </div>
+      <div class="admin-user-card-body">
+        <div class="admin-user-field"><span>Email</span><strong>{{ selectedRecruiter.email }}</strong></div>
+        <div class="admin-user-field"><span>Téléphone</span><strong>{{ selectedRecruiter.phone }}</strong></div>
+        <div class="admin-user-field"><span>Adresse</span><strong>{{ selectedRecruiter.address }}</strong></div>
+        <div class="admin-user-field"><span>Entreprise</span><strong>{{ selectedRecruiter.company_name }}</strong></div>
+        <div class="admin-user-field"><span>Poste lié</span><strong>{{ selectedRecruiter.job_title }}</strong></div>
+        <div class="admin-user-field"><span>Localisation</span><strong>{{ selectedRecruiter.location }}</strong></div>
+      </div>
     </div>
   </div>
 </div>

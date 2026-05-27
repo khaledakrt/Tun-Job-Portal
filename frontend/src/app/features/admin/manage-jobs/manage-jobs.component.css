@@ -129,3 +129,126 @@
 .loading-box { text-align: center; padding: 40px; color: #64748b; font-weight: 500; }
 .spinning { display: inline-block; animation: spin 1s linear infinite; margin-right: 6px; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.admin-search-bar {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-search-bar input {
+  width: 100%;
+  max-width: 380px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  color: #0f172a;
+  background: #ffffff;
+}
+
+.admin-search-bar input:focus {
+  outline: none;
+  border-color: #7dd3fc;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+}
+
+.admin-user-card-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.22);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 150;
+}
+
+.admin-user-card {
+  width: min(440px, 100%);
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.18);
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  position: relative;
+}
+
+.admin-user-card-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  color: #475569;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.admin-user-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-user-card-header h4 {
+  margin: 0;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.admin-user-role {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.admin-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.badge-success {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #d1fae5;
+}
+
+.badge-warning {
+  background: #fefce8;
+  color: #a16207;
+  border: 1px solid #fef3c7;
+}
+
+.admin-user-card-body {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-user-field {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-user-field span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.admin-user-field strong {
+  color: #0f172a;
+  font-weight: 700;
+  text-align: right;
+}

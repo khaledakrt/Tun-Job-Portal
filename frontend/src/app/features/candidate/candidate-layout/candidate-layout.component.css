@@ -17,21 +17,55 @@
   width: 260px;
   background: #0f172a; /* Bleu nuit pro */
   color: #ffffff;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   padding: 24px 16px;
   box-sizing: border-box;
 }
 
 .sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: flex !important;
+  flex-direction: column !important; /* Force l'empilement vertical */
+  align-items: flex-start !important;
+  gap: 20px !important; /* Espace entre le titre et le profil */
   margin-bottom: 30px;
+  padding-left: 4px;
 }
-.logo-icon i { color: #0ea5e9; font-size: 22px; }
+
+/* 📸 Style pour l'avatar rond dans la sidebar */
+.sidebar-user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #0ea5e9; /* Cercle bleu ciel */
+  overflow: hidden;
+  background: #1e293b;
+  flex-shrink: 0;
+}
+.sidebar-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-profile-section {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100%;
+}
+
 .logo-text { font-size: 18px; font-weight: 700; }
 .logo-text span { color: #0ea5e9; }
+
+.user-sidebar-name {
+  font-size: 14px;
+  color: #f1f5f9; /* Couleur beaucoup plus claire et lisible */
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
 
@@ -95,36 +129,19 @@
 /* ==========================================================================
    🎛️ COUCHE SUPPLÉMENTAIRE : STRUCTURE DE LA VERITABLE MODAL POPUP CENTRÉE
    ========================================================================== */
-
-/* Arrière-plan sombre translucide couvrant la totalité du navigateur */
-.global-popup-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(15, 23, 42, 0.6); /* Superposition foncée */
-  backdrop-filter: blur(4px); /* Effet de flou esthétique */
+.modal-overlay {
+  position: fixed !important;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(4px) !important;
+  z-index: 99999 !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99999; /* Force l'affichage au premier plan absolu */
+  animation: fadeIn 0.2s ease-out;
 }
-
-/* Carte modale blanche parfaitement centrée */
-.global-popup-card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 650px; /* Largeur idéale d'une carte d'informations */
-  max-height: 85vh; /* Empêche le débordement vertical */
-  border-radius: 12px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* En-tête de la carte */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -132,7 +149,6 @@
   padding: 18px 24px;
   border-bottom: 1px solid #f1f5f9;
 }
-
 .modal-header h3 {
   margin: 0;
   font-size: 16px;
@@ -140,7 +156,116 @@
   color: #1e293b;
 }
 
-/* Bouton Fermer d'en-tête (X) */
+.modal-content {
+  background: #ffffff !important;
+  width: 100% !important;
+  max-width: 650px;
+  border-radius: 16px !important;
+  padding: 0 !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 📸 NOUVEAUX STYLES ALIGNÉS SUR LE RECRUTEUR */
+.candidate-top-row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.candidate-photo-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100px;
+}
+
+.candidate-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.candidate-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge-status-pro-ats {
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.candidate-main-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13.5px;
+}
+
+.info-label {
+  color: #64748b;
+  min-width: 120px;
+}
+
+.summary-box {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  margin-top: 10px;
+}
+
+.summary-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #0f172a;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.summary-text {
+  margin: 0;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* 🎨 BADGES DE STATUT (COPIÉS DE L'ATS RECRUTEUR) */
+.status-badge-fixed {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bg-blue { background: #e0f2fe; color: #0369a1; }
+.bg-emerald { background: #dcfce7; color: #15803d; }
+.bg-amber { background: #fef3c7; color: #92400e; }
+.bg-red { background: #fee2e2; color: #b91c1c; }
+
 .close-btn {
   background: none;
   border: none;
@@ -186,3 +311,5 @@
   border-color: #94a3b8;
   color: #0f172a;
 }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

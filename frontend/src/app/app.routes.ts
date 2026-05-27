@@ -4,20 +4,18 @@ import { candidateGuard } from './core/guards/candidate.guard';
 import { recruiterGuard } from './core/guards/recruiter.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'job-search', pathMatch: 'full' }, 
-  { path: 'login', loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
-  { path: 'register', loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
-  
-  // ==========================================================================
-  // 🌍 ENTRÉE PUBLIQUE (Pour les visiteurs anonymes / plein écran)
-  // ==========================================================================
-  { 
-    path: 'candidate/cv-view/:id', 
-    loadComponent: () => import('./features/candidate/cv-view/cv-view.component').then(m => m.CvViewComponent) 
-  },
   {
-    path: 'job-search',
-    loadComponent: () => import('./features/candidate/job-search/job-search.component').then(m => m.JobSearchComponent)
+    path: '',
+    loadComponent: () => import('./features/public/public-layout.component').then(m => m.PublicLayoutComponent),
+    children: [
+      { path: '', redirectTo: 'job-search', pathMatch: 'full' },
+      { path: 'job-search', loadComponent: () => import('./features/candidate/job-search/job-search.component').then(m => m.JobSearchComponent) },
+      { path: 'login', loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
+      { path: 'register', loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
+      { path: 'about', loadComponent: () => import('./features/public/about.component').then(m => m.AboutComponent) },
+      { path: 'contact', loadComponent: () => import('./features/public/contact.component').then(m => m.ContactComponent) },
+      { path: 'candidate/cv-view/:id', loadComponent: () => import('./features/candidate/cv-view/cv-view.component').then(m => m.CvViewComponent) }
+    ]
   },
 
   // ==========================================================================
@@ -112,6 +110,10 @@ export const routes: Routes = [
       {
         path: 'manage-jobs',
         loadComponent: () => import('./features/admin/manage-jobs/manage-jobs.component').then(m => m.ManageJobsComponent)
+      },
+      {
+        path: 'manage-applications',
+        loadComponent: () => import('./features/admin/manage-applications/manage-applications.component').then(m => m.ManageApplicationsComponent)
       }
     ]
   },

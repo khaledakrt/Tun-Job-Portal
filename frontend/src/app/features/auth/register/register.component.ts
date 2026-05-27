@@ -10,7 +10,7 @@ import { NgIf } from '@angular/common';
   imports: [FormsModule, NgIf, RouterLink], // 🚀 2. AJOUT DE RouterLink DANS LES IMPORTS
   templateUrl: './register.component.html',
   styles: [`
-    .register-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; width: 100vw; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; position: absolute; top: 0; left: 0; }
+    .register-container { display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 80px); width: 100%; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0 auto; position: relative; }
     .register-card { background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 20px 48px rgba(0, 0, 0, 0.05); width: 100%; max-width: 440px; box-sizing: border-box; }
     .register-header { text-align: center; margin-bottom: 28px; }
     .brand-title { font-size: 28px; font-weight: 800; color: #1e293b; margin: 0 0 8px 0; letter-spacing: -0.5px; }

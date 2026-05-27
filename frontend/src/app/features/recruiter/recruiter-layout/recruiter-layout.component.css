@@ -3,7 +3,7 @@
   display: flex;
   min-height: 100vh;
   width: 100vw;
-  background-color: #f8fafc;
+  background-color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   margin: 0; position: absolute; top: 0; left: 0;
   overflow: hidden;
@@ -54,13 +54,19 @@
 .avatar-circle {
   width: 42px;
   height: 42px;
-  background-color: #334155;
-  color: #94a3b8;
   border-radius: 50%;
+  border: 2px solid #0ea5e9; /* Bordure bleue pour la cohérence */
+  overflow: hidden;
+  background: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 20px;
+  flex-shrink: 0;
+}
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .company-name { margin: 0; font-size: 14px; font-weight: 600; color: #f8fafc; }
 .badge-status { font-size: 11px; color: #38bdf8; display: flex; align-items: center; gap: 6px; margin-top: 2px; }
@@ -139,7 +145,7 @@
 
 .header-actions { display: flex; align-items: center; gap: 20px; }
 .btn-quick-add {
-  background-color: #0f172a; color: white; border: none; border-radius: 6px;
+  background-color: #2d65e6; color: white; border: none; border-radius: 6px;
   padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer;
   display: flex; align-items: center; gap: 4px; transition: background 0.15s;
 }
@@ -298,6 +304,166 @@
   padding: 0;
   overflow: hidden;
   border: 1px solid #e2e8f0;
+  width: 840px !important;
+  max-width: 95%;
+  max-height: 90vh;
+}
+
+.modal-content.recruiter-modal-content {
+  width: 840px !important;
+}
+
+.candidate-top-row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.candidate-photo-block {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 120px;
+}
+
+.candidate-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.candidate-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-cv-view {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0284c7;
+  padding: 8px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-cv-view:hover:not(.disabled-button) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.disabled-button {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+}
+
+.candidate-main-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.candidate-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.candidate-summary-item,
+.candidate-main-line,
+.candidate-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.info-label, .detail-label {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 120px;
+  white-space: nowrap;
+  text-align: left;
+  margin-right: 6px;
+}
+
+.info-value, .detail-value {
+  color: #0f172a;
+  font-size: 13px;
+  text-align: left;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-label,
+.detail-label {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 130px;
+}
+
+.info-value,
+.detail-value {
+  color: #0f172a;
+  font-size: 13px;
+  text-align: right;
+  display: block;
+  flex: 1;
+}
+
+.candidate-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.candidate-detail-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.network-separator {
+  color: #cbd5e1;
+  margin: 0 8px;
+}
+
+.detail-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.summary-box {
+  margin-top: 15px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #0ea5e9;
 }
 
 .modal-header {

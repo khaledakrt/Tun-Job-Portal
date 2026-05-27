@@ -1,9 +1,10 @@
 import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
-import { RouterModule } from '@angular/router'; 
+import { RouterModule, Router } from '@angular/router'; 
 import { CommonModule } from '@angular/common';
 import { NotificationCenterComponent } from '../../../shared/components/notification-center/notification-center.component';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Subscription } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-candidate-layout',
@@ -13,11 +14,14 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./candidate-layout.component.css']
 })
 export class CandidateLayoutComponent implements OnInit, OnDestroy {
+  private router = inject(Router);
   private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
 
   candidateName = 'Candidat';
+  candidateAvatar: string | null = null;
+  assetsUrl = environment.assetsUrl;
   
   // 🚀 Variable réactive liée au *ngIf du HTML pour afficher la popup
   selectedNotifData: any = null; 
@@ -28,17 +32,15 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
     if (storedName) {
       this.candidateName = storedName;
     }
+    
+    // Charge les informations de profil (incluant l'avatar)
+    this.loadProfileSidebar();
 
-    // 🚀 INTERCEPTION DU SIGNAL UNIFIÉ DU SERVICE DE NOTIFICATIONS
-    // Utilisation d'une vérification dynamique sur le flux disponible pour éviter les erreurs de typage
-    const modalObservable$ = (this.notificationService as any).candidateModal$ || 
-                             (this.notificationService as any).candidatePopup$ || 
-                             this.notificationService.openApplication$;
-
-    this.notifSub = modalObservable$.subscribe((data: any) => {
+    this.notifSub = this.notificationService.openApplication$.subscribe((data: any) => {
       if (!data) {
         this.zone.run(() => {
           this.selectedNotifData = null;
+          this.cdr.markForCheck();
           this.cdr.detectChanges();
         });
         return;
@@ -58,9 +60,29 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
           status: data.status || "En cours d'étude",
           message: data.message || ''
         };
+        this.cdr.markForCheck();
         this.cdr.detectChanges(); // Réveille l'interface pour faire jaillir la popup !
       });
     });
+  }
+
+  // 📡 Récupère l'avatar actuel pour la sidebar
+  loadProfileSidebar() {
+    const token = localStorage.getItem('token');
+    fetch(`${environment.apiUrl}/candidate/profile/details`, {
+      method: 'GET',
+      headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+    })
+    .then(res => res.ok ? res.json() : null)
+    .then(data => {
+      if (data && data.avatar_logo) {
+        // Nettoyage du chemin si nécessaire (similaire à profile-settings)
+        const cleanFilename = data.avatar_logo.replace('/logos/', '').replace('uploads/logos/', '');
+        this.candidateAvatar = cleanFilename;
+        this.cdr.detectChanges();
+      }
+    })
+    .catch(() => {});
   }
 
   // ❌ Méthode de fermeture liée au bouton "Fermer" et à la croix (X)
@@ -82,6 +104,6 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
 
   onLogout() {
     localStorage.clear();
-    window.location.href = '/login';
+    this.router.navigate(['/login']);
   }
 }

@@ -126,7 +126,7 @@
 
 .candidate-item .location { 
   font-size: 11px; 
-  color: #94a3b8; 
+  color: #374f71; 
   display: flex; 
   align-items: center; 
   gap: 4px; 
@@ -162,6 +162,104 @@
   font-style: italic;
 }
 
+/* 🔍 BARRE DE FILTRES PRO (STYLE SAAS) */
+.filters-bar {
+  display: flex;
+  gap: 20px;
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 25px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-item label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-item label i { color: #0ea5e9; }
+
+.pro-filter-select, .pro-filter-input {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #0f172a;
+  background: #ffffff;
+  min-width: 280px;
+  transition: all 0.2s;
+}
+
+.search-item { flex: 1; min-width: 300px; }
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  font-size: 15px;
+}
+
+.pro-filter-input { padding-left: 40px; width: 100%; }
+
+.btn-clear-filters {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-clear-filters:hover { color: #ef4444; }
+
+.pro-filter-select:focus, .pro-filter-input:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  outline: none;
+}
+
+.btn-load-more {
+  background: #0ea5e9;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-load-more:hover {
+  background: #0284c7;
+  transform: translateY(-1px);
+}
+
 /* ========================================================================== */
 /* 🌟 INTERFACE MODALE PREMIUM                                               */
 /* ========================================================================== --> */
@@ -184,12 +282,163 @@
   background: #ffffff;
   padding: 28px;
   border-radius: 12px;
-  width: 640px !important;    /* Laisse de la place pour les 5 boutons côte à côte */
+  width: 760px !important;
   max-width: 95%;
-  height: auto !important;    /* 🆕 AJOUT : La boîte grandit selon le texte */
-  max-height: 90vh;           /* Sécurité pour ne pas dépasser l'écran */
+  height: auto !important;
+  max-height: 90vh;
   box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-  overflow-y: auto;           /* Ajoute un défilement propre si le résumé IA est très long */
+  overflow-y: auto;
+}
+
+.candidate-top-row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.candidate-photo-block {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 120px;
+}
+
+.candidate-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.candidate-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-cv-view {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0284c7;
+  padding: 8px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-cv-view:hover:not(.disabled-button) {
+  background: #f8fafc;
+  border-color: #5597f3;
+}
+
+.disabled-button {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+}
+
+.candidate-main-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.candidate-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.candidate-summary-item,
+.candidate-main-line,
+.candidate-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+/* Style "pill" pour les éléments de résumé (comme sur le screenshot) */
+.candidate-summary-item {
+  background: #fdfdfd;
+  border: 1px solid #003d8c;
+  border-radius: 12px;
+  padding: 10px 14px;
+  align-items: center;
+}
+
+.info-label, .detail-label {
+  color: #0d0c0c;
+  font-size: 13px;
+  font-weight: 700;
+  width: auto !important;       /* 🚀 Supprime l'espace minimal forcé */
+  min-width: 0 !important;      /* 🚀 Annule les 120px de vide */
+  white-space: nowrap;
+  text-align: left;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+
+.info-value, .detail-value {
+  color: #000000;
+  font-size: 13px;
+  text-align: left !important;  /* 🚀 Aligne le texte noir immédiatement à gauche */
+  display: block;
+  flex: none !important;        /* 🚀 Empêche la valeur d'occuper tout l'espace disponible */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 0 !important;
+}
+
+
+.candidate-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.candidate-detail-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.network-separator {
+  color: #cbd5e1;
+  margin: 0 8px;
+}
+
+.detail-empty {
+  color: #396db5;
+  font-style: italic;
+}
+
+.summary-box {
+  margin-top: 15px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #06618c;
 }
 
 .modal-header {
@@ -277,16 +526,33 @@
 }
 
 .info-row {
-  display: flex;
+  display: flex !important;
   font-size: 13.5px;
+  align-items: center !important;
+  justify-content: flex-start !important; /* Forcer l'alignement à gauche */
+  gap: 8px !important;                    /* Espace serré fixe de 8px après les deux-points */
 }
 
-.info-label {
-  color: #64748b;
-  font-weight: 500;
-  width: 150px;
-  flex-shrink: 0;
+/* 🚀 LA RÈGLE MAGIQUE : Annule l'alignement à droite de tous les éléments à l'intérieur */
+.info-row > * {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
 }
+
+/* Sécurise le libellé gris pour qu'il reste sur une seule ligne */
+.info-row .info-label,
+.info-row .detail-label {
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+
+
 
 .info-value {
   color: #334155;

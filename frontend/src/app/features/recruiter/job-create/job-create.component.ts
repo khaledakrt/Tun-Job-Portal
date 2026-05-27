@@ -1,8 +1,9 @@
 import { Component, inject, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgClass } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { tunisianCities } from '../../candidate/candidate-layout/tunisian-cities'; // Point vers le fichier peuplé
 import { environment } from '../../../../environments/environment';
 import { QuizBuilderComponent, QuizQuestionDraft } from '../../../shared/components/quiz-builder/quiz-builder.component';
 import { createEmptyQuestion } from '../../../shared/constants/quiz.constants';
@@ -10,7 +11,7 @@ import { createEmptyQuestion } from '../../../shared/constants/quiz.constants';
 @Component({
   selector: 'app-job-create',
   standalone: true,
-  imports: [FormsModule, NgClass, QuizBuilderComponent],
+  imports: [FormsModule, CommonModule, NgClass, QuizBuilderComponent],
   templateUrl: './job-create.component.html',
   styleUrls: ['./job-create.component.css'],
   encapsulation: ViewEncapsulation.None,
@@ -45,6 +46,10 @@ export class JobCreateComponent {
   showQuizModal = false;
   quizTitle = 'Quiz de présélection';
   quizQuestions: QuizQuestionDraft[] = [];
+
+  // Autocomplétion Localisation
+  filteredLocations: { ville: string; cite: string }[] = [];
+  showLocationSuggestions: boolean = false;
 
   showFlashMessage(message: string, type: 'success' | 'error', callback?: () => void) {
     this.notification = { show: true, message, type };
@@ -196,5 +201,32 @@ export class JobCreateComponent {
       }
     }
     return null;
+  }
+
+  // ============================================================================
+  // 🚀 AUTOCOMPLÉTION LOCALISATION
+  // ============================================================================
+
+  onLocationInput(event: Event) {
+    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
+    if (searchTerm.length > 0) {
+      this.filteredLocations = (tunisianCities as { ville: string; cite: string }[]).filter(
+        (loc: { ville: string; cite: string }) => loc.ville.toLowerCase().startsWith(searchTerm) || loc.cite.toLowerCase().startsWith(searchTerm)
+      );
+      this.showLocationSuggestions = this.filteredLocations.length > 0;
+    } else {
+      this.filteredLocations = [];
+      this.showLocationSuggestions = false;
+    }
+  }
+
+  selectLocation(location: { ville: string; cite: string }) {
+    this.job.location = `${location.ville}, ${location.cite}`;
+    this.showLocationSuggestions = false;
+  }
+
+  onLocationBlur() {
+    // Utiliser un petit délai pour permettre le clic sur une suggestion avant de cacher
+    setTimeout(() => { this.showLocationSuggestions = false; }, 150);
   }
 }

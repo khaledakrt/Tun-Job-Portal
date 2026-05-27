@@ -41,7 +41,7 @@ exports.updateProfile = async (req, res) => {
     }
 
     const { 
-        name, phone, address, 
+        name, email, phone, address, 
         birth_date, linkedin, github, job_status, availability, job_type, location_pref 
     } = req.body;
     
@@ -51,13 +51,13 @@ exports.updateProfile = async (req, res) => {
         // --- ÉTAPE 1 : Sauvegarde dans la table générale 'users' ---
         if (avatarFilename) {
             await db.execute(
-                'UPDATE users SET name = ?, phone = ?, address = ?, company_logo = ? WHERE id = ?', 
-                [name, phone, address, avatarFilename, userId]
+                'UPDATE users SET name = ?, email = ?, phone = ?, address = ?, company_logo = ? WHERE id = ?', 
+                [name, email, phone, address, avatarFilename, userId]
             );
         } else {
             await db.execute(
-                'UPDATE users SET name = ?, phone = ?, address = ? WHERE id = ?', 
-                [name, phone, address, userId]
+                'UPDATE users SET name = ?, email = ?, phone = ?, address = ? WHERE id = ?', 
+                [name, email, phone, address, userId]
             );
         }
 

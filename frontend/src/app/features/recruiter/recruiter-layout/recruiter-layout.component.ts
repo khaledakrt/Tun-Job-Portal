@@ -4,6 +4,8 @@ import { CommonModule, NgIf } from '@angular/common';
 import { NotificationCenterComponent } from '../../../shared/components/notification-center/notification-center.component';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Subscription } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+
 
 @Component({
   selector: 'app-recruiter-layout',
@@ -19,6 +21,8 @@ export class RecruiterLayoutComponent implements OnInit, OnDestroy {
   private zone = inject(NgZone); 
   
   recruiterName = 'Recruteur';
+  recruiterAvatar: string | null = null;
+  assetsUrl = environment.assetsUrl;
   selectedDirectCandidate: any = null;
   
   // 🏢 L'état du badge passe par cette variable mise à jour par l'API
@@ -37,6 +41,10 @@ export class RecruiterLayoutComponent implements OnInit, OnDestroy {
 
     // 🚀 LIAISON SÉCURISÉE AVEC RÉINITIALISATION DYNAMIQUE DU CANDIDAT
     this.notifSubscription = this.notificationService.openApplication$.subscribe(candidateObject => {
+      // Si on est sur la page ATS elle-même, on laisse la page ATS gérer l'ouverture (évite les doublons)
+      const currentUrl = this.router.url || '';
+      if (currentUrl.includes('/recruiter/ats-pipeline')) return;
+
       if (!candidateObject) {
         this.zone.run(() => {
           this.selectedDirectCandidate = null;
@@ -62,7 +70,7 @@ export class RecruiterLayoutComponent implements OnInit, OnDestroy {
   // 📡 SYNCHRONISATION EN DIRECT PAR API : Cherche la valeur fraîche dans votre table users
   checkRealtimeVerification() {
     const token = localStorage.getItem('token');
-    fetch('http://localhost:3000/api/auth/profile', {
+    fetch(`${environment.apiUrl}/auth/profile`, {
       method: 'GET',
       headers: { 
         'Authorization': token ? `Bearer ${token}` : '' 
@@ -72,6 +80,14 @@ export class RecruiterLayoutComponent implements OnInit, OnDestroy {
     .then(user => {
       // Met à jour la variable avec le vrai état de votre table MySQL (0 ou 1)
       this.isVerifiedCompany = user.is_verified_company === 1;
+      
+      if (user.company_logo) {
+        // On nettoie le chemin si nécessaire pour correspondre à la structure des assets
+        this.recruiterAvatar = user.company_logo.replace('/logos/', '').replace('uploads/logos/', '');
+      } else {
+        this.recruiterAvatar = null;
+      }
+
       this.cdr.detectChanges(); // Force le rafraîchissement visuel du menu
     })
     .catch(err => console.error("❌ Erreur de synchronisation du statut recruteur :", err));
@@ -80,7 +96,7 @@ export class RecruiterLayoutComponent implements OnInit, OnDestroy {
   changeCandidateStatus(applicationId: number, newStatus: string) {
     if (!applicationId) return;
     
-    const targetUrl = 'http://localhost:3000/api/recruiter/ats/update-status';
+    const targetUrl = `${environment.apiUrl}/recruiter/ats/update-status`;
     const token = localStorage.getItem('token');
 
     fetch(targetUrl, {
