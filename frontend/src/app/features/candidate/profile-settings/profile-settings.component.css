@@ -294,3 +294,42 @@ form > .profile-split-layout {
     grid-column: span 1;
   }
 }
+
+/* ==========================================================================
+   🚀 AUTOCOMPLÉTION ADRESSE (STYLE SAAS)
+   ========================================================================== */
+.autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  list-style: none;
+  padding: 8px 0;
+  margin: 4px 0 0 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.autocomplete-dropdown li {
+  padding: 10px 15px;
+  font-size: 13.5px;
+  color: #334155;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: left;
+}
+
+.autocomplete-dropdown li:hover {
+  background-color: #f0f9ff;
+  color: #0ea5e9;
+}

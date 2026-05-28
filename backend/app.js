@@ -31,6 +31,8 @@ const candidateRoutes = require('./routes/candidate.routes');
 const recruiterRoutes = require('./routes/recruiter.routes');
 const adminRoutes = require('./routes/admin.routes'); // 🔑 Chargement des routes d'administration
 const notificationRoutes = require('./routes/notification.routes');
+const publicRoutes = require('./routes/public.routes');
+const publicSharedRoutes = require('./routes/public.routes');
 
 // Importation des middlewares de protection d'accès
 const { verifyToken, checkRole } = require('./middleware/auth.middleware');
@@ -51,6 +53,9 @@ app.get('/api/public/jobs/:jobId/quiz', candidateQuizCtrl.getJobQuizForCandidate
 // Public contact endpoint for the website contact form
 // Expose contact endpoint under /api to match frontend `environment.apiUrl`
 app.post('/api/contact', contactCtrl.postContact);
+
+// 🔓 Routes publiques partagées (Entreprises, Centres de formation)
+app.use('/api/public', publicRoutes);
 
 // 🔒 2. RESTE DE L'ESPACE CANDIDAT : Protégé globalement (verifyToken + checkRole)
 app.use('/api/candidate', verifyToken, checkRole(['candidate']), candidateRoutes);

@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { tunisianCities } from '../../../shared/data/tunisian-cities';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -27,6 +28,10 @@ export class ProfileSettingsComponent implements OnInit {
   logoPreviewUrl: string | null = null;
   selectedFile: File | null = null;
   successMessage = '';
+
+  // Autocomplétion Localisation
+  filteredLocations: { ville: string; cite: string }[] = [];
+  showLocationSuggestions: boolean = false;
   
   // 🎛️ États de contrôle des formulaires indépendants
   isEditMode = false;         // Pour "Mon Profil Candidat"
@@ -245,5 +250,34 @@ export class ProfileSettingsComponent implements OnInit {
       this.passwordErrorMessage = err.message;
       this.cdr.detectChanges();
     });
+  }
+
+  // ============================================================================
+  // 🚀 AUTOCOMPLÉTION ADRESSE
+  // ============================================================================
+
+  onLocationInput(event: Event) {
+    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
+    if (searchTerm.length > 0) {
+      this.filteredLocations = (tunisianCities as { ville: string; cite: string }[]).filter(
+        (loc: { ville: string; cite: string }) => 
+          loc.ville.toLowerCase().startsWith(searchTerm) || 
+          loc.cite.toLowerCase().startsWith(searchTerm)
+      );
+      this.showLocationSuggestions = this.filteredLocations.length > 0;
+    } else {
+      this.filteredLocations = [];
+      this.showLocationSuggestions = false;
+    }
+  }
+
+  selectLocation(location: { ville: string; cite: string }) {
+    this.profile.address = `${location.ville}, ${location.cite}`;
+    this.showLocationSuggestions = false;
+  }
+
+  onLocationBlur() {
+    // Délai pour permettre le clic sur une suggestion avant de cacher la liste
+    setTimeout(() => { this.showLocationSuggestions = false; }, 150);
   }
 }

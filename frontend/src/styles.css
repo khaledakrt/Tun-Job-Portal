@@ -7,3 +7,40 @@ body {
   font-family: Arial, sans-serif;
   background-color: #fbfbfb;
 }
+
+/* 🕋 Layout 3 colonnes pour toutes les pages publiques (Visiteur uniquement) */
+.public-page-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr 350px; /* Augmenté pour plus de focus au centre */
+  min-height: 100vh;
+  background-color: #f8fafc;
+  width: 100%;
+}
+
+.side-spacer {
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.right-spacer {
+  border-right: none;
+  border-left: 1px solid #e2e8f0;
+}
+
+.public-main-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 📱 Responsive : On cache les barres latérales sur mobile */
+@media (max-width: 1200px) {
+  .public-page-layout {
+    grid-template-columns: 1fr;
+  }
+  .side-spacer {
+    display: none;
+  }
+}

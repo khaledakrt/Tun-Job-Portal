@@ -6,14 +6,17 @@ import { recruiterGuard } from './core/guards/recruiter.guard';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./features/public/public-layout.component').then(m => m.PublicLayoutComponent),
+    loadComponent: () => import('./features/public/public-layout/public-layout.component').then(m => m.PublicLayoutComponent), // Chemin corrigé
     children: [
       { path: '', redirectTo: 'job-search', pathMatch: 'full' },
       { path: 'job-search', loadComponent: () => import('./features/candidate/job-search/job-search.component').then(m => m.JobSearchComponent) },
       { path: 'login', loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
       { path: 'register', loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
-      { path: 'about', loadComponent: () => import('./features/public/about.component').then(m => m.AboutComponent) },
-      { path: 'contact', loadComponent: () => import('./features/public/contact.component').then(m => m.ContactComponent) },
+      { path: 'about', loadComponent: () => import('./features/public/about/about.component').then(m => m.AboutComponent) }, // Chemin corrigé
+      { path: 'contact', loadComponent: () => import('./features/public/contact/contact.component').then(m => m.ContactComponent) }, // Chemin corrigé
+      { path: 'companies', loadComponent: () => import('./features/public/companies/companies-list.component').then(m => m.CompaniesListComponent) }, // Chemin corrigé
+      { path: 'training-centers', loadComponent: () => import('./features/public/training-centers-list/training-centers-list.component').then(m => m.TrainingCentersListComponent) }, // Chemin corrigé
+      { path: 'terms', loadComponent: () => import('./features/public/terms/terms.component').then(m => m.TermsComponent) }, // Chemin corrigé
       { path: 'candidate/cv-view/:id', loadComponent: () => import('./features/candidate/cv-view/cv-view.component').then(m => m.CvViewComponent) }
     ]
   },

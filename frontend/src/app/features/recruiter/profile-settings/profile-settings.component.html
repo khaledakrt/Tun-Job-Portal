@@ -71,7 +71,19 @@
           <div class="form-group-compact span-all">
             <label>Adresse du siège *</label>
             @if (isEditMode) {
-              <input type="text" name="address" [(ngModel)]="profile.address" required>
+              <div class="autocomplete-wrapper">
+                <input type="text" name="address" [(ngModel)]="profile.address" 
+                       (input)="onLocationInput($event)"
+                       (blur)="onLocationBlur()"
+                       placeholder="Ex: Tunis, La Marsa" required>
+                @if (showLocationSuggestions && filteredLocations.length > 0) {
+                  <ul class="autocomplete-dropdown">
+                    @for (loc of filteredLocations; track loc.cite) {
+                      <li (mousedown)="selectLocation(loc)">{{ loc.ville }}, {{ loc.cite }}</li>
+                    }
+                  </ul>
+                }
+              </div>
             } @else {
               <div class="static-text-compact">{{ profile.address || 'Non renseigné' }}</div>
             }

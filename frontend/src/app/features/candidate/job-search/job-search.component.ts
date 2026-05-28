@@ -40,8 +40,10 @@ export class JobSearchComponent implements OnInit {
   isSubmitting = false;
 
   searchFilters = { title: '', location: '', experience: '', contract: '' };
+  isLoggedIn = false;
 
   ngOnInit() {
+    this.isLoggedIn = !!localStorage.getItem('token');
     this.fetchAvailableJobs();
   }
 

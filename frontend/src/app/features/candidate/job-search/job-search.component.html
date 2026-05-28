@@ -42,7 +42,7 @@
 
   <!-- 🚀 GRILLE DES CARTES (3 PAR LIGNE) -->
   @if (!isLoading && filteredJobs.length > 0) {
-    <div class="jobs-cards-grid-3">
+    <div class="jobs-cards-grid-3" [class.logged-in-grid]="isLoggedIn">
       @for (job of filteredJobs; track job.id) {
         <div class="job-feed-card">
           <div class="card-top-info">
@@ -264,6 +264,7 @@
   }
 
 </div>
+
   <!-- 🎛️ UNIQUE POP-UP DE CONFIRMATION DE CANDIDATURE EN SURIMPRESSION -->
   @if (showConfirmApplyPopup) {
     <div class="modal-overlay" style="z-index: 100005;" (click)="onCancelApplyConfirmation()">

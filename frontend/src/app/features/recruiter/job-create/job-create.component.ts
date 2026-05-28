@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgClass } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { tunisianCities } from '../../candidate/candidate-layout/tunisian-cities'; // Point vers le fichier peuplé
+import { tunisianCities } from '../../../shared/data/tunisian-cities'; // Point vers le fichier peuplé
 import { environment } from '../../../../environments/environment';
 import { QuizBuilderComponent, QuizQuestionDraft } from '../../../shared/components/quiz-builder/quiz-builder.component';
 import { createEmptyQuestion } from '../../../shared/constants/quiz.constants';

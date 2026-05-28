@@ -309,6 +309,104 @@
   max-height: 90vh;
 }
 
+.ats-section-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.ats-section-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+}
+
+.ats-section-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ats-section-summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ats-section-card[open] .ats-section-summary .bi-chevron-down {
+  transform: rotate(180deg);
+}
+
+.ats-section-summary .bi-chevron-down {
+  transition: transform 0.2s ease;
+}
+
+.ats-section-content {
+  padding: 20px;
+}
+
+.candidate-summary-item {
+  background: #fdfdfd;
+  border: 1px solid #003d8c;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-label {
+  color: #0d0c0c;
+  font-size: 13px;
+  font-weight: 700;
+  width: auto !important;
+  min-width: 0 !important;
+  white-space: nowrap;
+  text-align: left;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.info-value {
+  color: #000000;
+  font-size: 13px;
+  text-align: left !important;
+  display: block;
+  flex: none !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 0 !important;
+}
+
+.network-separator {
+  color: #cbd5e1;
+  margin: 0 8px;
+}
+
+.detail-empty {
+  color: #396db5;
+  font-style: italic;
+}
+
+.badge-status-pro-ats {
+  background-color: #f0fdf4; 
+  color: #166534; 
+  padding: 3px 10px; 
+  border-radius: 6px; 
+  font-size: 12.5px; 
+  font-weight: 600;
+  display: inline-block;
+  border: 1px solid #dcfce7;
+}
+
 .modal-content.recruiter-modal-content {
   width: 840px !important;
 }

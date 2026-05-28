@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common'; 
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -23,9 +23,21 @@ import { RouterModule } from '@angular/router';
       </nav>
     </header>
 
-    <main class="public-main">
-      <router-outlet></router-outlet>
-    </main>
+    <!-- 🕋 Structure 3 colonnes centralisée (wider spacers) -->
+    <div [class.public-page-layout]="!isLoggedIn">
+      
+      @if (!isLoggedIn) {
+        <aside class="side-spacer left-spacer"></aside>
+      }
+
+      <main class="public-main" [class.public-main-content]="!isLoggedIn">
+        <router-outlet></router-outlet>
+      </main>
+
+      @if (!isLoggedIn) {
+        <aside class="side-spacer right-spacer"></aside>
+      }
+    </div>
   `,
   styles: [
     `
@@ -38,4 +50,11 @@ import { RouterModule } from '@angular/router';
     `,
   ],
 })
-export class PublicLayoutComponent {}
+export class PublicLayoutComponent implements OnInit {
+  isLoggedIn = false;
+
+  ngOnInit() {
+    // Vérifie si l'utilisateur est connecté pour masquer les sidebars d'espacement
+    this.isLoggedIn = !!localStorage.getItem('token');
+  }
+}

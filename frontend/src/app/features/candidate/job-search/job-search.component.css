@@ -1,8 +1,39 @@
+/* 🕋 Mise en page globale en 3 colonnes pour la recherche publique */
+.job-search-page-layout {
+  display: grid;
+  /* 280px correspondent à la largeur de votre sidebar Recruteur/Candidat pour la cohérence */
+  grid-template-columns: 280px 1fr 280px;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  width: 100%;
+}
+
+/* 🧭 Style des colonnes vides servant d'espacement */
+.side-spacer {
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.right-spacer {
+  border-right: none;
+  border-left: 1px solid #e2e8f0;
+}
+
+/* 🎯 Zone centrale pour les jobs */
+.job-main-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
 .job-search-container {
   animation: fadeIn 0.2s ease-out;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding: 30px 40px;
 }
 
 /* 🔍 CONTENEUR RECHERCHE AVANCÉE EN GRILLE COMPACTE */
@@ -97,31 +128,40 @@
 /* 🚀 GRILLE À 3 COLONNES SANS SCROLL */
 .jobs-cards-grid-3 {
   display: grid;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 16px;
   width: 100%;
 }
 
-.job-feed-card {
-  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; display: flex; flex-direction: column; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.01); box-sizing: border-box;
+/* 🌟 TAILLE ÉLARGIE POUR L'UTILISATEUR CONNECTÉ (Candidat) */
+/* En augmentant le minmax à 360px, on obtient environ 4 colonnes sur un écran large 
+   tout en rendant les cartes plus lisibles et spacieuses. */
+.jobs-cards-grid-3.logged-in-grid {
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)) !important;
+  gap: 24px; /* Un peu plus d'espace entre les grandes cartes */
 }
 
-.card-top-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.company-logo-placeholder { width: 44px; height: 44px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+
+.job-feed-card {
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.01); box-sizing: border-box;
+}
+
+.card-top-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.company-logo-placeholder { width: 38px; height: 38px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 .company-logo-placeholder img { width: 100%; height: 100%; object-fit: cover; }
 
 .job-title-block { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.feed-job-title { margin: 0; color: #0f172a; font-size: 14.5px; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-.feed-company-name { font-size: 12.5px; color: #64748b; margin-top: 1px; }
+.feed-job-title { margin: 0; color: #0f172a; font-size: 14px; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.feed-company-name { font-size: 12px; color: #64748b; margin-top: 1px; }
 .contract-badge-feed { background: #f0f9ff; color: #0ea5e9; font-size: 11px; font-weight: 700; padding: 3px 6px; border-radius: 4px; }
 
-.card-mid-meta { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 12px; }
+.card-mid-meta { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 10px; }
 .meta-item { font-size: 12px; color: #64748b; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
 .salary-tag { color: #10b981; font-weight: 600; }
 
-.job-short-desc { margin: 0 0 14px 0; font-size: 13px; color: #475569; line-height: 1.5; flex: 1; }
+.job-short-desc { margin: 0 0 10px 0; font-size: 12.5px; color: #475569; line-height: 1.4; flex: 1; }
 
-.card-bottom-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px; gap: 8px; }
+.card-bottom-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 10px; gap: 8px; }
 .btn-consult-job { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
 .btn-apply-now { background: #0ea5e9; color: #ffffff; border: none; border-radius: 6px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
 .badge-already-applied { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; padding: 7px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; }

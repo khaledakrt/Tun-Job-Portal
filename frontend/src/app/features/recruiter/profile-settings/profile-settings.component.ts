@@ -1,53 +1,15 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { tunisianCities } from '../../../shared/data/tunisian-cities';
 import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-profile-settings',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './profile-settings.component.html',
-  styles: [`
-    .profile-container-compact { max-width: 100% !important; margin: 0 auto; padding: 0 20px !important; font-family: inherit; box-sizing: border-box; }
-    .card-header-flex-compact { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .card-header-left h3 { margin: 0; color: #0f172a; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-
-    .profile-split-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; align-items: start; width: 100%; }
-    .profile-panel-card { background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 26px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box; }
-    
-    .panel-inner-title { font-size: 14px; font-weight: 700; color: #0f172a; text-align: left; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
-    .panel-inner-title i { color: #0ea5e9; }
-
-    .logo-section-compact { display: flex; align-items: center; gap: 16px; background: #f8fafc; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #f1f5f9; }
-    .logo-preview-compact { width: 52px; height: 52px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-    .logo-preview-compact img { width: 100%; height: 100%; object-fit: cover; }
-    .btn-secondary-upload-compact { background: #ffffff; border: 1px solid #cbd5e1; color: #334155; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .btn-secondary-upload-compact:disabled { opacity: 0.5; cursor: not-allowed; background: #f1f5f9; }
-
-    .compact-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .compact-form-grid.vertical-stack { grid-template-columns: 1fr; gap: 16px; }
-    
-    .form-group-compact { display: flex; flex-direction: column; gap: 6px; }
-    .form-group-compact.span-all { grid-column: span 2; }
-    .form-group-compact label { font-size: 11px; font-weight: 700; color: #64748b; text-align: left; text-transform: uppercase; letter-spacing: 0.3px; }
-    
-    .form-group-compact input, .form-group-compact textarea { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13.5px; box-sizing: border-box; color: #1e293b; background: #ffffff; }
-
-    .static-text-compact { background: #f8fafc; padding: 10px 14px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 13.5px; font-weight: 500; color: #0f172a; text-align: left; min-height: 41px; box-sizing: border-box; display: flex; align-items: center; }
-    .static-text-compact.textarea-view-compact { min-height: 85px; max-height: 85px; overflow-y: auto; line-height: 1.5; display: block; white-space: pre-line; }
-    .text-muted-dots { color: #94a3b8 !important; letter-spacing: 3px; font-weight: bold; background-color: #fafbfc; }
-
-    .form-actions-compact { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
-    .btn-cancel-compact { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; }
-    
-    .btn-save-compact { background: #0ea5e9; color: white; border: none; padding: 8px 20px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-    .btn-save-compact.btn-dark-theme { background: #0f172a !important; color: #ffffff !important; }
-    .btn-save-compact.btn-dark-theme:hover { background: #1e293b !important; }
-
-    .alert-box-compact { padding: 10px; border-radius: 6px; margin-bottom: 14px; font-size: 13px; text-align: center; font-weight: 600; }
-    .alert-success { background-color: #e6f4ea; color: #137333; border: 1px solid #ceead6; }
-    .alert-danger { background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
-  `]
+  styleUrl: './profile-settings.component.css'
 })
 export class ProfileSettingsComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
@@ -58,6 +20,10 @@ export class ProfileSettingsComponent implements OnInit {
   selectedFile: File | null = null;
   successMessage = '';
   
+  // Autocomplétion Localisation
+  filteredLocations: { ville: string; cite: string }[] = [];
+  showLocationSuggestions: boolean = false;
+
   isEditMode = false; // Controle de gauche (Profil)
   isPasswordEditMode = false; // 🚀 NOUVEAU : Controle de droite (Mot de passe)
 
@@ -228,5 +194,34 @@ export class ProfileSettingsComponent implements OnInit {
       this.passwordErrorMessage = err.message;
       this.cdr.detectChanges();
     });
+  }
+
+  // ============================================================================
+  // 🚀 AUTOCOMPLÉTION ADRESSE
+  // ============================================================================
+
+  onLocationInput(event: Event) {
+    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
+    if (searchTerm.length > 0) {
+      this.filteredLocations = (tunisianCities as { ville: string; cite: string }[]).filter(
+        (loc: { ville: string; cite: string }) => 
+          loc.ville.toLowerCase().startsWith(searchTerm) || 
+          loc.cite.toLowerCase().startsWith(searchTerm)
+      );
+      this.showLocationSuggestions = this.filteredLocations.length > 0;
+    } else {
+      this.filteredLocations = [];
+      this.showLocationSuggestions = false;
+    }
+  }
+
+  selectLocation(location: { ville: string; cite: string }) {
+    this.profile.address = `${location.ville}, ${location.cite}`;
+    this.showLocationSuggestions = false;
+  }
+
+  onLocationBlur() {
+    // Délai pour permettre le clic sur une suggestion avant de cacher la liste
+    setTimeout(() => { this.showLocationSuggestions = false; }, 150);
   }
 }
