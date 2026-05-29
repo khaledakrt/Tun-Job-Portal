@@ -120,9 +120,17 @@
     
     <!-- En-tête -->
     <div class="modal-header">
-      <h3>Candidature de {{ selectedApplication.name }}</h3>
-      <button class="close-btn" (click)="onCloseDetails()">&times;</button>
-    </div>
+  <div class="header-titles-block">
+    <h3>Candidature de {{ selectedApplication.name }}</h3>
+    <!-- Le poste ciblé passe à la ligne ici -->
+    <span class="info-label1">Poste ciblé : {{ selectedApplication.job_title }}</span>
+  </div>
+  <button class="close-btn" (click)="onCloseDetails()">&times;</button>
+</div>
+
+    
+                
+              
 
 
         <!-- Corps des détails avec intégration de l'avatar -->
@@ -132,6 +140,7 @@
         <summary class="ats-section-summary">
           <span><i class="bi bi-person-vcard-fill"></i> Profil candidat</span>
           <i class="bi bi-chevron-down"></i>
+
         </summary>
 
         <div class="ats-section-content">
@@ -157,17 +166,14 @@
             </div>
 
             <div class="candidate-summary-grid">
-              <div class="candidate-summary-item">
-                <span class="info-label">Poste ciblé:</span>
-                <span class="info-value">{{ selectedApplication.job_title }}</span>
-              </div>
+              
               <div class="candidate-summary-item">
                 <span class="info-label">Date candidature:</span>
-                <span class="info-value">{{ selectedApplication.applied_at ? (selectedApplication.applied_at | date:'dd/MM/yyyy à HH:mm') : '—' }}</span>
+                <span class="info-value">{{ selectedApplication.applied_at ? (selectedApplication.applied_at | date:'dd/MM/yyyy ') : '—' }}</span>
               </div>
               <div class="candidate-summary-item">
-                <span class="info-label">Adresse e-mail:</span>
-                <span class="info-value">{{ selectedApplication.email }}</span>
+                <span class="info-label">E-mail:</span>
+                <span class="info-value">{{selectedApplication.email}}</span>
               </div>
               <div class="candidate-summary-item">
                 <span class="info-label">Téléphone:</span>

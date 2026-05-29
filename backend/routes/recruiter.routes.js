@@ -31,6 +31,11 @@ router.get('/stats', jobCtrl.getRecruiterStats);
 // Profil
 router.get('/profile/details', profileCtrl.getCompanyDetails);
 router.post('/profile/update', upload.single('logo'), profileCtrl.updateCompany);
+
+
+
+
+
 router.post('/profile/change-password', profileCtrl.changePassword);
 
 // Gestion des offres (Jobs)

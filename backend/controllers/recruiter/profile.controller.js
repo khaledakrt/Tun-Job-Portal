@@ -11,7 +11,7 @@ exports.getCompanyDetails = async (req, res) => {
     try {
         // 🌟 Requête ciblée sur votre table 'users' avec vos vrais noms de colonnes
         const [rows] = await db.execute(
-            'SELECT company_name, company_bio, phone, address, email, company_logo FROM users WHERE id = ?', 
+            'SELECT name, company_name, company_bio, phone, address, email, company_logo FROM users WHERE id = ?', 
             [userId]
         );
 
@@ -30,7 +30,7 @@ exports.getCompanyDetails = async (req, res) => {
 // 📤 2. SAUVEGARDE ET MISE À JOUR DES INFOS (Avec prise en charge de l'email)
 exports.updateCompany = async (req, res) => {
     // Extraction des données du FormData d'Angular
-    const { company_name, company_bio, phone, address, email } = req.body;
+    const { name, company_name, company_bio, phone, address, email } = req.body;
     
     // 🌟 CORRECTION CHIRURGICALE : On stocke uniquement le nom de fichier brut généré par Multer
     let logoFilename = req.file ? req.file.filename : null;
@@ -44,8 +44,8 @@ exports.updateCompany = async (req, res) => {
     try {
         // Mise à jour de la table 'users' incluant la colonne 'email'
         await db.execute(
-            'UPDATE users SET company_name = ?, company_bio = ?, phone = ?, address = ?, email = ? WHERE id = ?', 
-            [company_name, company_bio, phone, address, email, userId]
+            'UPDATE users SET name = ?, company_name = ?, company_bio = ?, phone = ?, address = ?, email = ? WHERE id = ?', 
+            [name, company_name, company_bio, phone, address, email, userId]
         );
         
         // Si un nouveau fichier logo physique a été sélectionné, on met à jour la colonne

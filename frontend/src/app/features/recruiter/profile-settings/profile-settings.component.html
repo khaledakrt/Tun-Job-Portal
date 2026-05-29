@@ -42,6 +42,15 @@
 
         <div class="compact-form-grid">
           <div class="form-group-compact">
+            <label>Nom du responsable *</label>
+            @if (isEditMode) {
+              <input type="text" name="name" [(ngModel)]="profile.name" required>
+            } @else {
+              <div class="static-text-compact">{{ profile.name || 'Non renseigné' }}</div>
+            }
+          </div>
+
+          <div class="form-group-compact">
             <label>Raison sociale *</label>
             @if (isEditMode) {
               <input type="text" name="company_name" [(ngModel)]="profile.company_name" required>

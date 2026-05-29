@@ -14,8 +14,8 @@ import { environment } from '../../../../environments/environment';
 export class ProfileSettingsComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
-  profile = { company_name: '', phone: '', email: '', address: '', company_bio: '' };
-  backupProfile = { company_name: '', phone: '', email: '', address: '', company_bio: '' };
+  profile = { name: '', company_name: '', phone: '', email: '', address: '', company_bio: '' };
+  backupProfile = { name: '', company_name: '', phone: '', email: '', address: '', company_bio: '' };
   logoPreviewUrl: string | null = null;
   selectedFile: File | null = null;
   successMessage = '';
@@ -34,6 +34,8 @@ export class ProfileSettingsComponent implements OnInit {
   assetsUrl = environment.assetsUrl;
 
   ngOnInit() {
+    // 🚀 Pré-remplissage immédiat avec le nom stocké à la connexion pour éviter le "Non renseigné"
+    this.profile.name = localStorage.getItem('name') || '';
     this.loadCurrentProfile();
   }
 
@@ -71,7 +73,12 @@ export class ProfileSettingsComponent implements OnInit {
     })
     .then(data => {
       if (data) {
-        this.profile.company_name = data.company_name || localStorage.getItem('name') || '';
+        // 🚀 FIX : On récupère le 'name' de la DB. 
+        // Si la DB renvoie null, on tente de restaurer depuis le localStorage
+        // pour éviter d'écraser une session active avec du vide.
+        this.profile.name = data.name || localStorage.getItem('name') || '';
+        
+        this.profile.company_name = data.company_name || '';
         this.profile.phone = data.phone || '';
         this.profile.email = data.email || '';
         this.profile.address = data.address || '';
@@ -88,8 +95,10 @@ export class ProfileSettingsComponent implements OnInit {
         this.cdr.detectChanges();
       }
     })
-    .catch(() => {
-      this.profile.company_name = localStorage.getItem('name') || '';
+    .catch((err) => {
+      console.warn("⚠️ Impossible de charger le profil complet, utilisation du storage local.");
+      // En cas d'erreur, on s'assure que le nom du responsable est au moins celui de la session
+      this.profile.name = this.profile.name || localStorage.getItem('name') || '';
       this.cdr.detectChanges();
     });
   }
@@ -115,6 +124,8 @@ export class ProfileSettingsComponent implements OnInit {
     const token = localStorage.getItem('token');
 
     const formData = new FormData();
+    // On s'assure d'envoyer la valeur actuelle, même si elle vient d'être modifiée
+    formData.append('name', this.profile.name);
     formData.append('company_name', this.profile.company_name);
     formData.append('phone', this.profile.phone);
     formData.append('email', this.profile.email);
@@ -138,9 +149,14 @@ export class ProfileSettingsComponent implements OnInit {
       return res.json();
     })
     .then(resData => {
-      localStorage.setItem('name', this.profile.company_name);
+      // 🚀 FIX : On synchronise le nom du responsable (et non de la société) dans le localStorage
+      localStorage.setItem('name', this.profile.name);
+      
       this.successMessage = resData.message || "Les informations de votre profil et votre logo ont été mis à jour.";
       this.isEditMode = false;
+      
+      // 🔄 On met à jour le backup pour refléter les nouvelles données enregistrées
+      this.backupProfile = { ...this.profile };
       this.cdr.detectChanges();
 
       setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 3000);

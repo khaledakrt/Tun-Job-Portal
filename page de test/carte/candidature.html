@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candidature de Khaled Akrout</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="modal-card">
+    
+    <!-- EN-TÊTE DE LA MODALE -->
+    <div class="modal-header">
+      <div class="header-titles-block">
+        <div class="modal-title">Candidature de khaled akrt</div>
+        <!-- Le poste ciblé est maintenant positionné ici en haut -->
+        <div class="modal-subtitle-job">Développeur Backend Node.js</div>
+      </div>
+      <button class="close-btn">&times;</button>
+    </div>
+
+    <!-- BLOC ACCORDÉON 1 : PROFIL -->
+    <div class="accordion-section">
+      <button class="accordion-header" onclick="toggleAccordion('profile-content', this)">
+        <span class="accordion-header-title">🪪 Profil candidat</span>
+        <span class="accordion-icon">▲</span>
+      </button>
+      
+      <div id="profile-content" class="accordion-content">
+        <div class="profile-container">
+          
+          <!-- BLOC GAUCHE : PHOTO & CV -->
+          <div class="avatar-block">
+            <div class="avatar-wrapper">
+              <img src="https://unsplash.com" alt="Khaled Akrt" class="avatar-img">
+              <div class="online-indicator"></div>
+            </div>
+            <a href="#" class="cv-link">📄 Consulter le CV</a>
+          </div>
+
+          <!-- BLOC DROIT : GRILLE D'INFORMATIONS RESSERRÉE -->
+          <div class="info-grid">
+            <div class="info-box">
+              <span class="label">Date candidature :</span>
+              <span class="value">29/05/2026 à 19:01</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Adresse e-mail :</span>
+              <span class="value">kh.akrout91@gmail.com</span>
+            </div>
+            
+            <div class="info-box">
+              <span class="label">Téléphone :</span>
+              <span class="value">55588322</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Ville / Région :</span>
+              <span class="value">Ariana, Cité Khadhra</span>
+            </div>
+            
+            <div class="info-box">
+              <span class="label">Contrat souhaité :</span>
+              <span class="value">CDD</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Situation actuelle :</span>
+              <span class="value">Étudiant</span>
+            </div>
+            
+            <div class="info-box">
+              <span class="label">Date de naissance :</span>
+              <span class="value">29/05/2026</span>
+            </div>
+            <div class="info-box">
+              <span class="label">Disponibilité :</span>
+              <span class="value">1 mois</span>
+            </div>
+            
+            <div class="info-box full-width-row">
+              <span class="label">Réseaux :</span>
+              <span class="value">
+                <a href="#" target="_blank">LinkedIn</a> | <a href="#" target="_blank">GitHub</a>
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RÉSUMÉ PROFESSIONNEL -->
+        <div class="resume-section">
+          <div class="resume-title">Résumé du profil & Compétences clés</div>
+          <p class="resume-text">
+            Motivated Cloud & DevOps Engineer with a strong background in systems and network administration. Holding a professional degree in Network and IT Services Administration and an engineering diploma in Cloud Computing and Virtualisation. Experienced in IT infrastructure management, automation, and technical support within multicultural environments.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOC ACCORDÉON 2 : QUIZ -->
+    <div class="quiz-section">
+      <button class="accordion-header" onclick="toggleAccordion('quiz-content', this)">
+        <span class="accordion-header-title">❓ Réponses quiz</span>
+        <span class="accordion-icon">▼</span>
+      </button>
+      <div id="quiz-content" class="accordion-content" style="display: none;">
+        <p class="quiz-empty-text">Le contenu détaillé des réponses au quiz s'affichera ici.</p>
+      </div>
+    </div>
+
+    <!-- PIED DE MODALE : BOUTONS D'ACTION -->
+    <div class="modal-footer">
+      <button class="btn btn-accept">✓ Accepter</button>
+      <button class="btn btn-pending">🪘 En attente</button>
+      <button class="btn btn-interview">🗓 Entretien</button>
+      <button class="btn btn-reject">✕ Rejeter</button>
+      <button class="btn btn-close">Fermer</button>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleAccordion(contentId, button) {
+      const content = document.getElementById(contentId);
+      const icon = button.querySelector('.accordion-icon');
+      
+      if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        icon.textContent = '▲';
+      } else {
+        content.style.display = 'none';
+        icon.textContent = '▼';
+      }
+    }
+  </script>
+
+</body>
+</html>
+

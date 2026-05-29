@@ -1,33 +1,3 @@
-/* 🕋 Mise en page globale en 3 colonnes pour la recherche publique */
-.job-search-page-layout {
-  display: grid;
-  /* 280px correspondent à la largeur de votre sidebar Recruteur/Candidat pour la cohérence */
-  grid-template-columns: 280px 1fr 280px;
-  min-height: 100vh;
-  background-color: #f8fafc;
-  width: 100%;
-}
-
-/* 🧭 Style des colonnes vides servant d'espacement */
-.side-spacer {
-  background-color: #ffffff;
-  border-right: 1px solid #e2e8f0;
-  height: 100vh;
-  position: sticky;
-  top: 0;
-}
-
-.right-spacer {
-  border-right: none;
-  border-left: 1px solid #e2e8f0;
-}
-
-/* 🎯 Zone centrale pour les jobs */
-.job-main-content {
-  flex: 1;
-  overflow-y: auto;
-}
-
 .job-search-container {
   animation: fadeIn 0.2s ease-out;
   display: flex;
@@ -166,134 +136,61 @@
 .btn-apply-now { background: #0ea5e9; color: #ffffff; border: none; border-radius: 6px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
 .badge-already-applied { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; padding: 7px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; }
 
-/* MODALE INTERNE */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 11000; display: flex; align-items: center; justify-content: center; }
-.modal-card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 1100px; /* 🚀 AUGMENTEZ CETTE VALEUR ICI POUR ÉLARGIR LA CARTE */
-  max-height: 90vh;
-  border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
-.modal-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: #0f172a; display: flex; gap: 8px; align-items: center; }
-.btn-close-modal { background: #f1f5f9; border: none; font-size: 13px; color: #64748b; cursor: pointer; padding: 5px 10px; border-radius: 6px; }
-.modal-body { display: flex; flex-direction: column; gap: 11px; text-align: left; }
-.detail-row { display: flex; justify-content: space-between; font-size: 13.5px; padding-bottom: 8px; border-bottom: 1px solid #f8fafc; }
-.detail-row span { color: #0f172a; font-weight: 600; }
-.detail-block { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-.detail-block p { background: #f8fafc; padding: 12px; border-radius: 6px; color: #334155; font-size: 13px; line-height: 1.5; margin: 0; white-space: pre-line; border: 1px solid #e2e8f0; }
-.modal-footer-action { margin-top: 15px; display: flex; justify-content: center; }
-.btn-apply-now-large { background: #0ea5e9; color: white; border: none; width: 100%; padding: 11px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
-.badge-already-applied-large { background: #f8fafc; color: #64748b; width: 100%; padding: 11px; border-radius: 6px; text-align: center; font-weight: 600; border: 1px solid #e2e8f0; font-size: 13.5px; }
-
-.loading-state-box, .empty-state-box { padding: 40px; text-align: center; color: #64748b; }
-.spin-animation { display: inline-block; font-size: 24px; animation: spin 1s linear infinite; margin-bottom: 8px; color: #0ea5e9; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-/* Nom du recruteur cliquable */
+/* 🌟 INTERACTION RECRUTEUR */
 .clickable-recruiter {
   cursor: pointer !important;
-  transition: color 0.15s ease;
+  transition: all 0.2s ease;
 }
+
 .clickable-recruiter:hover {
   color: #0ea5e9 !important;
-  text-decoration: underline !important;
+  opacity: 0.8;
+  text-decoration: none;
 }
 
-/* Modale de l'entreprise */
-.recruiter-meta-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: #f8fafc;
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 16px;
-}
-.large-avatar-placeholder {
-  width: 64px;
-  height: 64px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-.large-avatar-placeholder img { width: 100%; height: 100%; object-fit: cover; }
-
-.recruiter-main-titles { text-align: left; }
-.recruiter-main-titles h4 { margin: 0; font-size: 18px; color: #0f172a; font-weight: 700; }
-.badge-verified { font-size: 12px; color: #0ea5e9; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; }
-
-.recruiter-contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  text-align: left;
-}
-.contact-item { font-size: 13.5px; background: #fafbfc; border: 1px solid #f1f5f9; padding: 10px; border-radius: 6px; }
-.contact-item.span-two { grid-column: span 2; }
-.contact-item strong { color: #64748b; }
-.contact-item span { color: #1e293b; font-weight: 600; float: right; }
-.contact-item.span-two span { float: none; display: block; margin-top: 4px; }
-
-.bio-text-box { max-height: 120px; overflow-y: auto; }
 /* ==========================================================================
-   🕋 COUCHE DE DESIGN MODALE LARGE & REORGANISÉE
+   🕋 COUCHE DE DESIGN MODALE ACCORDION
    ========================================================================== */
 
+/* Styles pour la modale de l'offre d'emploi */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(6px);
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99999;
 }
 
-/* Version Élargie et Harmonisée de la Carte */
 .modal-card {
   background: #ffffff;
+  max-width: 1000px; /* Augmentation de la largeur pour le confort */
   width: 100%;
-  max-width: 950px; /* Grand confort de lecture pour les longs textes */
-  max-height: 88vh;
-  border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  max-height: 90vh; /* Utilise 90% de la hauteur de l'écran maximum */
+  animation: slideUp 0.3s ease-out;
 }
 
 .modal-header {
+  padding: 12px 20px;
+  border-bottom: 1px solid #c2b9b9;
+  background-color: #b3b7ba;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 28px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: #0f172a;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .btn-close-modal {
@@ -314,34 +211,40 @@
   color: #ef4444;
 }
 
-/* Zone scrollable interne */
 .modal-body {
-  padding: 28px;
+  padding: 20px;
   overflow-y: auto;
+  flex-grow: 1; /* Permet au corps de prendre tout l'espace et d'activer le scroll */
+  min-height: 0; /* Nécessaire pour forcer le scrollbar interne sur certains navigateurs */
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
 }
 
-/* Structure Héro Alignée */
+/* Scrollbar Premium stylisée */
+.modal-body::-webkit-scrollbar { width: 8px; }
+.modal-body::-webkit-scrollbar-track { background: #f8fafc; }
+.modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid #f8fafc; }
+.modal-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* COMPANY HERO HEADER */
 .job-hero-section {
   display: flex;
-  gap: 24px;
-  align-items: center;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #f1f5f9;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
 }
-
 .job-logo-wrapper {
-  width: 85px;
-  height: 85px;
-  border-radius: 12px;
-  border: 1px solid #cbd5e1;
-  overflow: hidden;
-  background: #ffffff;
+  width: 56px;
+  height: 56px;
+  background-color: #fbfbfb;
+  color: #ffffff;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
   flex-shrink: 0;
 }
 .job-logo-wrapper img {
@@ -349,129 +252,260 @@
   height: 100%;
   object-fit: cover;
 }
-
-.job-meta-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: left;
-}
-
 .job-main-title {
-  margin: 0;
   font-size: 20px;
-  font-weight: 800;
-  color: #0f172a;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2px;
 }
-
-.job-company-link {
-  font-size: 14px;
+.job-company-link { /* Renommé de company-name pour correspondre à l'HTML */
+  color: #2563eb;
   font-weight: 600;
-  color: #0ea5e9;
+  font-size: 13px;
+  margin-bottom: 10px;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
 }
 
+/* METADATA BADGES */
 .job-badges-row {
   display: flex;
-  gap: 10px;
-  margin-top: 4px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
-
-/* Badges Épurés */
 .premium-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 4px 10px;
+  font-size: 12px;
   font-weight: 500;
-  color: #475569;
+  border-radius: 9999px;
 }
+.badge-salary { color: #166534; border: 1px solid #dcfce7; background: #f0fdf4; }
+.badge-contract { color: #6b21a8; border: 1px solid #f3e8ff; background: #faf5ff; }
+.badge-location { color: #1e40af; border: 1px solid #dbeafe; background: #eff6ff; }
+.badge-expiration { color: #9a3412; border: 1px solid #ffedd5; background: #fff7ed; }
+.badge-experience { color: #374151; background: #f3f4f6; }
 
-/* Blocs Textuels Structurés */
-.job-text-block-section {
+/* ACCORDION MENU TOGGLE BUTTONS */
+.ats-section-card { /* Conteneur pour <details> */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-top: 12px;
+  overflow: visible; /* Empêche le tag details de couper les questions qui dépassent sa hauteur initiale */
+}
+.ats-section-summary {
+  width: 100%;
+  background-color: #f9fafb;
+  border: none; /* La bordure est sur .ats-section-card */
+  padding: 12px 16px;
+  border-radius: 8px; /* Sera écrasé par .ats-section-card border-radius */
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  text-align: left;
-}
-
-.job-block-title {
+  justify-content: space-between;
+  align-items: center;
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
-  border-left: 4px solid #0ea5e9;
-  padding-left: 8px;
+  color: #111827;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  list-style: none; /* Supprime le marqueur par défaut de <summary> */
+}
+.ats-section-summary::-webkit-details-marker {
+  display: none; /* Pour Chrome/Safari */
+}
+.ats-section-summary:hover {
+  background-color: #f3f4f6;
+}
+.accordion-icon {
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.ats-section-card[open] .accordion-icon {
+  transform: rotate(180deg);
+}
+
+/* ACCORDION CONTENT BOXES */
+.ats-section-card:not([open]) .ats-section-content {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.ats-section-card[open] .ats-section-content {
+  max-height: none !important; /* Retire toute limite de hauteur pour garantir que 100% du contenu est visible */
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.ats-section-content {
+  overflow: visible; /* Changé de hidden à visible pour éviter tout rognage de texte */
+  transition: max-height 0.3s ease-out, padding 0.3s ease;
+  padding: 16px 10px; /* Ajusté pour correspondre à l'exemple */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Griser et désactiver le quiz si déjà postulé */
+.quiz-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* CONTENT SECTIONS Inside Accordion */
+.job-text-block-section { /* Conteneur pour les sections de texte */
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Réduit le gap pour les titres et paragraphes */
+  text-align: left;
+}
+.section-title { /* Renommé de job-block-title */
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 6px;
   display: flex;
   align-items: center;
   gap: 6px;
 }
-
-.job-block-card {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 18px;
+.section-title::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background-color: #2563eb;
+  border-radius: 2px;
+}
+.job-block-card { /* Conteneur pour le texte de la section */
+  background: transparent; /* Pas de fond blanc */
+  border: none; /* Pas de bordure */
+  padding: 0; /* Pas de padding sur la carte elle-même */
 }
 .job-block-card p {
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.5;
+  padding-left: 10px; /* Indentation pour le texte */
+  white-space: pre-line;
   margin: 0;
-  color: #334155;
-  font-size: 13.5px;
-  line-height: 1.65;
-  white-space: pre-line; /* Permet d'aligner les listes à puces sans écrasement */
 }
 
-/* Footer Actions */
-.modal-footer-action-row {
-  padding-top: 16px;
-  border-top: 1px solid #f1f5f9;
+/* SKILLS GRID */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  background-color: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #f3f4f6;
+}
+@media (min-width: 480px) {
+  .skills-grid { grid-template-columns: 1fr 1fr; }
+}
+.skills-block h3 {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4b5563;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.tags-list {
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 6px;
 }
 
+/* QUIZ SPECIFIC */
+.quiz-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 12px;
+  background: #eff6ff;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.quiz-progress {
+  font-weight: 700;
+  color: #1d4ed8;
+}
+.question-item {
+  margin-bottom: 16px;
+}
+.question-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+.question-text span { color: #2563eb; }
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+@media (min-width: 520px) {
+  .options-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+  transition: all 0.2s;
+}
+.option-card input { accent-color: #2563eb; }
+.option-card.selected { /* Style pour l'option sélectionnée */
+  border-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+/* FOOTER STATUS */
+.modal-footer-action-row {
+  border-top: 1px solid #f3f4f6;
+  background-color: #fffbeb;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  color: #92400e;
+  font-size: 13px;
+  font-weight: 600;
+}
+.premium-applied-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .btn-submit-apply-large {
-  background-color: #0ea5e9;
+  background-color: #2563eb;
   color: #ffffff;
   border: none;
-  padding: 11px 28px;
+  padding: 10px 24px;
   border-radius: 8px;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.2);
+  transition: background 0.2s;
 }
 .btn-submit-apply-large:hover {
-  background-color: #0284c7;
-}
-
-.premium-applied-banner {
-  background-color: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
-  padding: 11px;
-  border-radius: 8px;
-  font-size: 13.5px;
-  font-weight: 600;
-  width: 100%;
-  text-align: center;
-}
-.badge-expiration {
-  background-color: #fff7ed !important; /* Fond orange/ambré très clair */
-  color: #c2410c !important;            /* Écriture orange foncé */
-  border-color: #ffedd5 !important;
-  font-weight: 600;
-}
-
-.badge-expiration i {
-  color: #ea580c;
+  background-color: #1d4ed8;
 }
 
 /* Arrière-plan flouté et assombri de force au premier plan */
@@ -487,99 +521,149 @@
   align-items: center;
   justify-content: center;
   /* 🟢 MODIFICATION : On applique un z-index maximal pour passer devant la grande carte des détails */
-  z-index: 999999 !important; 
+  z-index: 999999 !important;
 }
 
-
-/* Boîte de la popup */
 .custom-modal-box-auth {
   background: #ffffff;
-  border-radius: 12px;
   width: 100%;
-  max-width: 460px;
+  max-width: 440px;
+  border-radius: 16px;
+  padding: 32px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-  animation: modalSlideUp 0.25s ease-out;
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
 }
 
 .custom-modal-header-auth {
-  background: #f8fafc;
-  padding: 18px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.login-icon-ats {
+  font-size: 48px;
+  color: #2563eb;
+  background: #eff6ff;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid #f1f5f9;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .custom-modal-header-auth h3 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 20px;
+  font-weight: 800;
   color: #0f172a;
-  font-weight: 700;
 }
 
-.login-icon-ats {
-  color: #0ea5e9; /* Bleu moderne pour correspondre à votre thème TunJob */
-  font-size: 1.5rem;
-}
-
-.custom-modal-body-auth {
-  padding: 24px;
-  color: #334155;
-  font-size: 0.95rem;
+.custom-modal-body-auth p {
+  font-size: 14.5px;
+  color: #475569;
   line-height: 1.6;
+  margin: 0 0 12px 0;
 }
 
 .sub-text-auth {
-  margin-top: 10px;
-  color: #64748b;
-  font-size: 0.85rem;
-  font-style: italic;
+  font-size: 13px !important;
+  color: #2563eb !important;
+  font-weight: 600;
+  background: #f0f7ff;
+  padding: 8px;
+  border-radius: 8px;
 }
 
 .custom-modal-footer-auth {
-  padding: 16px 24px;
-  background: #f8fafc;
   display: flex;
-  justify-content: flex-end;
   gap: 12px;
-  border-top: 1px solid #f1f5f9;
 }
 
-/* Boutons de la popup */
 .btn-modal-cancel-auth {
-  background: #ffffff;
+  flex: 1;
+  background: #f1f5f9;
   color: #475569;
-  border: 1px solid #cbd5e1;
-  padding: 8px 18px;
-  border-radius: 6px;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-  transition: background 0.15s;
+  transition: all 0.2s;
 }
-
-.btn-modal-cancel-auth:hover {
-  background: #f8fafc;
-}
+.btn-modal-cancel-auth:hover { background: #e2e8f0; }
 
 .btn-modal-confirm-auth {
-  background: #0ea5e9;
+  flex: 1;
+  background: #2563eb;
   color: white;
   border: none;
-  padding: 8px 20px;
-  border-radius: 6px;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-  transition: background 0.15s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+.btn-modal-confirm-auth:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+/* ==========================================================================
+   🏢 DESIGN SPÉCIFIQUE FICHE RECRUTEUR (MODALE 2)
+   ========================================================================== */
+.recruiter-profile-card {
+  max-width: 720px !important; /* Taille optimale pour une fiche entreprise */
 }
 
-.btn-modal-confirm-auth:hover {
-  background: #0284c7;
+.recruiter-hero-section {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 10px 0 20px 0;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-@keyframes modalSlideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+.recruiter-logo-wrapper {
+  width: 80px;
+  height: 80px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
+
+.recruiter-logo-wrapper img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+
+.recruiter-meta-content { flex: 1; display: flex; flex-direction: column; align-items: flex-start; }
+
+.recruiter-main-title { font-size: 22px; font-weight: 800; color: #0f172a; margin: 0; text-align: left; }
+
+.recruiter-verified-badge {
+  display: inline-flex; align-items: center; gap: 6px; background: #eff6ff; color: #2563eb;
+  padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid #dbeafe; margin-top: 6px;
+}
+
+.recruiter-contact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 5px; }
+
+.contact-item {
+  background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 8px;
+  display: flex; justify-content: flex-start; align-items: center; font-size: 13px;
+  gap: 8px;
+}
+
+.contact-item.span-two { grid-column: span 2; }
+.contact-item strong { color: #64748b; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.contact-item span { color: #1e293b; font-weight: 700; }
+
+.section-text { color: #4b5563; font-size: 13.5px; line-height: 1.6; padding-left: 10px; white-space: pre-line; }
+
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

@@ -377,7 +377,7 @@
 /* Style "pill" pour les éléments de résumé (comme sur le screenshot) */
 .candidate-summary-item {
   background: #fdfdfd;
-  border: 1px solid #003d8c;
+  border: 1px solid #c2cede;
   border-radius: 12px;
   padding: 10px 14px;
   align-items: center;
@@ -757,4 +757,36 @@
   font-size: 13px;
   color: #64748b;
   font-style: italic;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* Aligne le bouton fermer en haut à droite */
+  padding: 16px 24px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Force les deux textes à s'empiler l'un sous l'autre */
+.header-titles-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Espace équilibré entre le nom et le poste */
+}
+
+.modal-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+/* Habillage moderne pour valoriser le poste ciblé */
+.info-label1 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2563eb;
+  background-color: #eff6ff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  width: fit-content;
 }

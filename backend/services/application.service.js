@@ -72,6 +72,8 @@ async function applyToJob({ jobId, candidateId, quizAnswers }) {
     return { applicationId, message: 'Votre candidature a été transmise avec succès au recruteur !' };
 }
 
+
+
 async function updateApplicationStatus({ applicationId, status, recruiterId }) {
     const [rows] = await db.execute(
         `SELECT a.id, a.candidate_id, a.job_id, a.status AS old_status,
@@ -94,8 +96,9 @@ async function updateApplicationStatus({ applicationId, status, recruiterId }) {
 
     await db.execute('UPDATE applications SET status = ? WHERE id = ?', [status, applicationId]);
 
-    // Inclure le nom du recruteur dans le message pour faciliter la récupération côté frontend
-    const notificationMessage = `📧 ${app.r_name || app.company_name} a changé le statut de votre candidature pour "${app.job_title}" en ${status}`;
+    // Message mis à jour avec le nom de l'entreprise
+    const notificationMessage = `📧 L'entreprise "${app.company_name}" a changé le statut de votre candidature pour "${app.job_title}" en ${status}`;
+    
     await notificationCtrl.triggerNotification(
         app.candidate_id,
         notificationMessage
@@ -113,5 +116,6 @@ async function updateApplicationStatus({ applicationId, status, recruiterId }) {
 
     return { message: 'Statut ATS mis à jour avec succès !' };
 }
+
 
 module.exports = { applyToJob, updateApplicationStatus };

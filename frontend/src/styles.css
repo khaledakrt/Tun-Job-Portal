@@ -11,7 +11,7 @@ body {
 /* 🕋 Layout 3 colonnes pour toutes les pages publiques (Visiteur uniquement) */
 .public-page-layout {
   display: grid;
-  grid-template-columns: 350px 1fr 350px; /* Augmenté pour plus de focus au centre */
+  grid-template-columns: 400px 1fr 400px; /* 🚀 Élargi pour un confort de lecture maximal */
   min-height: 100vh;
   background-color: #f8fafc;
   width: 100%;
