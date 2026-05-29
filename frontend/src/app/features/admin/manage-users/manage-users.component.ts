@@ -3,6 +3,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-manage-users',
@@ -15,12 +16,15 @@ import { AdminService } from '../../../core/services/admin.service';
 export class ManageUsersComponent implements OnInit {
   private adminService = inject(AdminService);
   private cdr = inject(ChangeDetectorRef);
+  readonly assetsUrl = environment.assetsUrl;
 
   usersList: any[] = [];
   isLoading = false;
   searchTerm = '';
   selectedUser: any = null;
   showUserCard = false;
+  isUserEditMode = false;
+  userEditData: any = {};
 
   get filteredUsers(): any[] {
     if (!this.searchTerm || !this.searchTerm.trim()) {
@@ -60,13 +64,22 @@ export class ManageUsersComponent implements OnInit {
   }
 
   openUserCard(user: any): void {
-    this.selectedUser = user;
+    this.selectedUser = { ...user };
+    this.userEditData = { ...user };
+    this.isUserEditMode = false;
     this.showUserCard = true;
   }
 
   closeUserCard(): void {
     this.showUserCard = false;
     this.selectedUser = null;
+  }
+
+  toggleUserEditMode(mode: boolean): void {
+    this.isUserEditMode = mode;
+    if (!mode) {
+      this.userEditData = { ...this.selectedUser };
+    }
   }
 
   getUserRoleLabel(user: any): string {
@@ -91,5 +104,21 @@ export class ManageUsersComponent implements OnInit {
     });
   }
 
-} // 👈 Cette accolade ferme toute votre classe, laissez-la bien tout en bas
+  onSaveUserEdit(): void {
+    this.adminService.updateUser(this.userEditData.id, this.userEditData).subscribe({
+      next: (res: any) => {
+        const updatedUser = res.user || res;
+        const index = this.usersList.findIndex(u => u.id === updatedUser.id);
+        if (index !== -1) {
+          this.usersList[index] = { ...updatedUser };
+        }
+        this.selectedUser = { ...updatedUser };
+        this.isUserEditMode = false;
+        this.cdr.detectChanges();
+        alert("Profil utilisateur mis à jour !");
+      },
+      error: (err: any) => alert("Erreur : " + (err.error?.message || "Impossible de mettre à jour."))
+    });
+  }
 
+} // 👈 Cette accolade ferme toute votre classe, laissez-la bien tout en bas

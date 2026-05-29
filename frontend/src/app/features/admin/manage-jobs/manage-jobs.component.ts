@@ -1,8 +1,8 @@
- 
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-manage-jobs',
@@ -14,14 +14,15 @@ import { AdminService } from '../../../core/services/admin.service';
 export class ManageJobsComponent implements OnInit {
   private adminService = inject(AdminService);
   private cdr = inject(ChangeDetectorRef);
+  readonly assetsUrl = environment.assetsUrl;
 
   jobsList: any[] = [];
   isLoading = false;
   searchTerm = '';
   selectedJob: any = null;
   showJobCard = false;
-  selectedRecruiter: any = null;
-  showRecruiterCard = false;
+  isJobEditMode = false;
+  jobEditData: any = {};
 
   get filteredJobs(): any[] {
     if (!this.searchTerm || !this.searchTerm.trim()) {
@@ -30,7 +31,7 @@ export class ManageJobsComponent implements OnInit {
     const q = this.searchTerm.toLowerCase();
     return this.jobsList.filter(job =>
       (job.title || '').toLowerCase().includes(q) ||
-      (job.company_name || job.recruiter_name || '').toLowerCase().includes(q) ||
+      (job.company_name || '').toLowerCase().includes(q) ||
       (job.location || '').toLowerCase().includes(q) ||
       (job.contract_type || '').toLowerCase().includes(q)
     );
@@ -49,21 +50,27 @@ export class ManageJobsComponent implements OnInit {
   }
 
   onDeleteJob(jobId: number): void {
-    if (confirm("❌ Voulez-vous vraiment retirer cette offre d'emploi de Tun-Job ?")) {
+    if (confirm("⚠️ Êtes-vous sûr de vouloir supprimer définitivement cette offre d'emploi ?")) {
       this.adminService.deleteJob(jobId).subscribe({
         next: () => {
-          this.jobsList = this.jobsList.filter(j => j.id !== jobId);
+          this.jobsList = this.jobsList.filter(job => job.id !== jobId);
           this.cdr.detectChanges();
-        }
+        },
+        error: (err) => alert("Erreur lors de la suppression : " + (err.error?.message || err.message))
       });
     }
   }
 
   openJobCard(job: any): void {
-    this.selectedJob = job;
+    this.selectedJob = { ...job };
+    // Clone job data for editing and format expires_at for date input
+    this.jobEditData = { 
+      ...job,
+      expires_at: job.expires_at ? new Date(job.expires_at).toISOString().split('T')[0] : null
+    };
+
+    this.isJobEditMode = false;
     this.showJobCard = true;
-    this.showRecruiterCard = false;
-    this.selectedRecruiter = null;
   }
 
   closeJobCard(): void {
@@ -71,39 +78,36 @@ export class ManageJobsComponent implements OnInit {
     this.selectedJob = null;
   }
 
-  openRecruiterCard(job: any): void {
-    this.selectedRecruiter = {
-      name: job.company_name || job.recruiter_name || 'Recruteur',
-      email: job.recruiter_email || '—',
-      phone: job.recruiter_phone || '—',
-      address: job.recruiter_address || '—',
-      company_name: job.company_name || job.recruiter_name || '—',
-      is_verified_company: job.is_verified_company,
-      job_title: job.title || '—',
-      location: job.location || '—',
-      contract_type: job.contract_type || '—'
-    };
-    this.showRecruiterCard = true;
-    this.showJobCard = false;
-    this.selectedJob = null;
-  }
-
-  closeRecruiterCard(): void {
-    this.showRecruiterCard = false;
-    this.selectedRecruiter = null;
-  }
-
-  getJobSkills(skillsText: string | null | undefined): string[] {
-    if (!skillsText) {
-      return [];
+  toggleJobEditMode(mode: boolean): void {
+    this.isJobEditMode = mode;
+    if (!mode) {
+      this.jobEditData = { ...this.selectedJob }; // Réinitialise les données d'édition si on annule
     }
-    return skillsText.split(',').map((skill) => skill.trim()).filter((skill) => skill.length > 0);
   }
 
-  getJobLanguages(languagesText: string | null | undefined): string[] {
-    if (!languagesText) {
-      return [];
-    }
-    return languagesText.split(',').map((language) => language.trim()).filter((language) => language.length > 0);
+  onSaveJobEdit(): void {
+    this.adminService.updateJob(this.jobEditData.id, this.jobEditData).subscribe({
+      next: (res: any) => {
+        const updatedJob = res.job || res;
+        const index = this.jobsList.findIndex(j => j.id === updatedJob.id);
+        if (index !== -1) {
+          this.jobsList[index] = { ...updatedJob };
+        }
+        this.selectedJob = { ...updatedJob };
+        this.isJobEditMode = false;
+        this.cdr.detectChanges();
+        alert("Offre d'emploi mise à jour !");
+      },
+      error: (err: any) => alert("Erreur : " + (err.error?.message || "Impossible de mettre à jour l'offre."))
+    });
+  }
+
+  // Fonctions utilitaires pour les tags (skills, languages)
+  getSkillsArray(skills: string): string[] {
+    return skills ? skills.split(',').map(s => s.trim()).filter(s => s !== '') : [];
+  }
+
+  getLanguagesArray(languages: string): string[] {
+    return languages ? languages.split(',').map(l => l.trim()).filter(l => l !== '') : [];
   }
 }

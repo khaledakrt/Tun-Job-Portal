@@ -31,7 +31,16 @@ router.delete('/jobs/:id', adminCtrl.deleteJob);
 // 🗑️ Route 7 : Supprimer une candidature non conforme par son ID
 router.delete('/applications/:id', adminAppCtrl.deleteApplication);
 
+// 🔄 Route 11 : Mettre à jour le statut d'une candidature par l'Admin
+router.put('/applications/:id', adminAppCtrl.updateApplication);
+
 // 🔑 Route 8 : Valider ou suspendre la certification d'un recruteur
 router.put('/users/:id/verify-company', adminCtrl.toggleCompanyVerification);
+
+// 🔄 Route 9 : Mettre à jour les informations d'un utilisateur par l'Admin
+router.put('/users/:id', adminCtrl.updateUser);
+
+// 🔄 Route 10 : Mettre à jour les informations d'une offre d'emploi par l'Admin
+router.put('/jobs/:id', adminCtrl.updateJob);
 
 module.exports = router;

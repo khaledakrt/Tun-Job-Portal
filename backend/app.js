@@ -50,6 +50,11 @@ app.get('/api/candidate/jobs/list', candidateJobCtrl.getAllAvailableJobs);
 app.get('/api/candidate/profile/details-public/:id', candidateProfileCtrl.getPublicCompanyDetails);
 app.get('/api/public/jobs/:jobId/quiz', candidateQuizCtrl.getJobQuizForCandidate);
 
+
+// ip 
+app.set('trust proxy', true); // This allows Express to pick up the real client IP from headers
+
+
 // Public contact endpoint for the website contact form
 // Expose contact endpoint under /api to match frontend `environment.apiUrl`
 app.post('/api/contact', contactCtrl.postContact);

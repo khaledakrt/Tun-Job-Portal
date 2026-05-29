@@ -56,6 +56,11 @@ export class AdminService {
     return this.http.delete<any>(`${this.apiUrl}/applications/${applicationId}`, this.getAuthHeaders());
   }
 
+  // 🔄 Mettre à jour une candidature (Admin)
+  updateApplication(applicationId: number, applicationData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/applications/${applicationId}`, applicationData, this.getAuthHeaders());
+  }
+
   // 🏢 Valider ou révoquer la certification d'une entreprise recruteur
   toggleCompanyVerification(userId: number, status: number): Observable<any> {
     return this.http.put<any>(
@@ -64,5 +69,12 @@ export class AdminService {
       this.getAuthHeaders()
     );
   }
+  updateUser(userId: number, userData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/users/${userId}`, userData, this.getAuthHeaders());
+  }
 
+  // 🔄 Mettre à jour une offre d'emploi (Admin)
+  updateJob(jobId: number, jobData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/jobs/${jobId}`, jobData, this.getAuthHeaders());
+  }
 }

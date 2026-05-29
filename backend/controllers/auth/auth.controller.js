@@ -92,6 +92,10 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({ id: user.id, role: user.role }, jwtConfig.secret, { expiresIn: jwtConfig.expiresIn });
         
+        // 🌐 ENREGISTREMENT DE L'IP : Capture de l'adresse IP lors de la connexion réussie
+        const userIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        await db.execute("UPDATE users SET last_ip = ? WHERE id = ?", [userIp, user.id]);
+        
         // 🚀 RETOUR LOGGED : Ajout de la valeur de certification d'entreprise pour Angular
         return res.status(200).json({ 
             token, 

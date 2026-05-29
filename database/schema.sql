@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `is_verified` tinyint(1) DEFAULT '0',
   `verification_token` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_verified_company` tinyint DEFAULT '0',
+  `last_ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   KEY `idx_users_role` (`role`),
