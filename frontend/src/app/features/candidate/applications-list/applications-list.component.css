@@ -208,7 +208,7 @@
   width: 100%;
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  border: 1px solid #bfc1c6;
+  border: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -220,9 +220,9 @@
 
 .modal-header {
   padding: 12px 20px;
-  border-bottom: 1px solid #bbbfc4;
-  background-color: #b3b7ba;
-  color: #6b7280;
+  border-bottom: 1px solid #5ab4f0;
+  background-color: #5ab4f0;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 500;
   display: flex;
@@ -382,6 +382,35 @@
   padding-left: 10px; 
   white-space: pre-line;
   margin: 0;
+}
+
+/* SKILLS GRID & TAGS */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  background-color: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #f3f4f6;
+}
+@media (min-width: 480px) { .skills-grid { grid-template-columns: 1fr 1fr; } }
+.skills-block h3 {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4b5563;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.tags-list { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 6px;
 }
 
 .skills-badge-grid { display: flex; flex-wrap: wrap; gap: 10px; }

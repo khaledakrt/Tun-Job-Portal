@@ -183,15 +183,16 @@
 
 .modal-header {
   padding: 12px 20px;
-  border-bottom: 1px solid #c2b9b9;
-  background-color: #b3b7ba;
-  color: #6b7280;
+  border-bottom: 1px solid #5ab4f0;
+  background-color: #5ab4f0;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 500;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 
 .btn-close-modal {
   background: #f1f5f9;

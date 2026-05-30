@@ -88,7 +88,7 @@
     <div class="modal-overlay" (click)="onCloseRecruiterModal()">
       <div class="modal-card recruiter-profile-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h3><i class="bi bi-building-fill"></i> Fiche de l'entreprise</h3>
+          <span>📄 Fiche de l'entreprise</span>
           <button (click)="onCloseRecruiterModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="modal-body">
@@ -127,80 +127,80 @@
       <div class="modal-card" (click)="$event.stopPropagation()">
         
         <div class="modal-header">
-          <h3><i class="bi bi-file-earmark-text-fill"></i> Détails de l'offre d'emploi</h3>
+          <span>📄 Détails de l'offre d'emploi</span>
           <button (click)="onCloseJobModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
         </div>
 
         <div class="modal-body">
           <div class="job-hero-section">
             <div class="job-logo-wrapper">
-              <img [src]="selectedJob.company_logo ? assetsUrl + '/logos/' + selectedJob.company_logo : 'https://placehold.co'" 
+              <img [src]="selectedJob.company_logo ? assetsUrl + '/logos/' + selectedJob.company_logo : 'assets/images/default-avatar.png'" 
                    (error)="$any($event.target).src='https://placehold.co'"
                    alt="Logo entreprise">
             </div>
-            
-            <div class="job-meta-content">
-              <h4 class="job-main-title">{{ selectedJob.title }}</h4>
-              <span class="job-company-link" (click)="onViewRecruiterProfile(selectedJob.recruiter_id)">
-                <i class="bi bi-building"></i> {{ selectedJob.company_name }}
-              </span>
+
+            <div>
+              <h1 class="job-main-title">{{ selectedJob.title }}</h1>
+              <div class="job-company-link" (click)="onViewRecruiterProfile(selectedJob.recruiter_id)">
+                {{ selectedJob.company_name }}
+              </div>
               
               <div class="job-badges-row">
-                <span class="premium-badge badge-contract"><i class="bi bi-file-earmark-text"></i> {{ selectedJob.contract_type }}</span>
-                <span class="premium-badge badge-location"><i class="bi bi-geo-alt-fill"></i> {{ selectedJob.location }}</span>
+                <span class="premium-badge badge-contract">💼 {{ selectedJob.contract_type }}</span>
+                <span class="premium-badge badge-location">📍 {{ selectedJob.location }}</span>
                 
                 @if (selectedJob.expires_at) {
-                  <span class="premium-badge badge-expiration" style="background-color: #fff7ed; color: #c2410c; border-color: #ffedd5; font-weight: 600;">
-                    <i class="bi bi-calendar-x-fill" style="color: #ea580c;"></i> Expire le : {{ selectedJob.expires_at | date:'dd/MM/yyyy' }}
-                  </span>
+                  <span class="premium-badge badge-expiration">⏱️ {{ selectedJob.expires_at | date:'dd/MM/yyyy' }}</span>
                 }
               </div>
             </div>
           </div>
 
-          <div class="job-text-block-section">
-            <span class="job-block-title"><i class="bi bi-list-task"></i> Missions principales</span>
-            <div class="job-block-card">
-              <p style="white-space: pre-line; margin: 0; line-height: 1.65; color: #334155;">{{ selectedJob.missions_desc }}</p>
-            </div>
-          </div>
-
-          <div class="job-text-block-section">
-            <span class="job-block-title"><i class="bi bi-person-badge-fill"></i> Profil requis & Prérequis</span>
-            <div class="job-block-card">
-              <p style="white-space: pre-line; margin: 0; line-height: 1.65; color: #334155;">{{ selectedJob.profile_desc }}</p>
-            </div>
-          </div>
-
-          @if (selectedJob.skills_desc) {
-            <div class="job-text-block-section">
-              <span class="job-block-title"><i class="bi bi-tags-fill"></i> Compétences clés & Technologies</span>
-              <div class="job-block-card">
-                <div class="skills-badge-grid">
-                  @for (skill of getSearchJobSkillsArray(selectedJob.skills_desc); track $index) {
-                    <span class="skill-tag">
-                      <i class="bi bi-check2"></i> {{ skill }}
-                    </span>
-                  }
+          <details class="ats-section-card" open>
+            <summary class="ats-section-summary">
+              <span>📋 Contenu de la fiche de poste</span>
+              <i class="bi bi-chevron-down accordion-icon"></i>
+            </summary>
+            
+            <div class="ats-section-content">
+              <div class="job-text-block-section">
+                <h2 class="section-title">Missions principales</h2>
+                <div class="job-block-card">
+                  <p>{{ selectedJob.missions_desc }}</p>
                 </div>
               </div>
-            </div>
-          }
 
-          @if (selectedJob.languages_desc) {
-            <div class="job-text-block-section">
-              <span class="job-block-title"><i class="bi bi-translate"></i> Langues exigées</span>
-              <div class="job-block-card">
-                <div class="skills-badge-grid">
-                  @for (lang of getSearchJobLanguagesArray(selectedJob.languages_desc); track $index) {
-                    <span class="skill-tag" style="background-color: #faf5ff; color: #6b21a8; border-color: #f3e8ff;">
-                      <i class="bi bi-globe"></i> {{ lang }}
-                    </span>
-                  }
+              <div class="job-text-block-section">
+                <h2 class="section-title">Profil requis & Prérequis</h2>
+                <div class="job-block-card">
+                  <p>{{ selectedJob.profile_desc }}</p>
                 </div>
               </div>
+
+              <div class="skills-grid" style="margin-top: 15px; margin-bottom: 5px;">
+                @if (selectedJob.skills_desc) {
+                  <div class="skills-block">
+                    <h3>Compétences</h3>
+                    <div class="tags-list">
+                      @for (skill of getSearchJobSkillsArray(selectedJob.skills_desc); track $index) {
+                        <span class="tag">{{ skill }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+                @if (selectedJob.languages_desc) {
+                  <div class="skills-block">
+                    <h3>Langues</h3>
+                    <div class="tags-list">
+                      @for (lang of getSearchJobLanguagesArray(selectedJob.languages_desc); track $index) {
+                        <span class="tag">🌐 {{ lang }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
             </div>
-          }
+          </details>
 
           <div class="modal-footer-action-row">
             <span class="premium-applied-banner"><i class="bi bi-check-circle-fill"></i> Vous avez envoyé votre dossier de candidature à ce poste</span>

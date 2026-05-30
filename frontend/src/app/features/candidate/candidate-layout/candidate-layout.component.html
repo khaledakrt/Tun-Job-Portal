@@ -57,23 +57,25 @@
 
   <!-- 💻 ZONE DE CONTENU PRINCIPALE (DROITE) (D'origine, inchangée) -->
   <main class="candidate-main">
-    <header class="candidate-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; padding: 24px 40px; border-bottom: 1px solid #e2e8f0;">
-      <div class="header-welcome">
-        <h2>Bienvenue, <span style="color: #0ea5e9;">{{ candidateName }}</span> 👋</h2>
-        <p>Propulsez votre carrière et trouvez les meilleures opportunités en Tunisie.</p>
-      </div>
+  <!-- HEADER BLANC : Aligne la cloche à l'extrême droite -->
+  <header class="candidate-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; padding: 24px 40px; border-bottom: 1px solid #e2e8f0;">
+    
+    <!-- Bloc vide à gauche pour pousser la notification vers la droite -->
+    <div class="spacer-left"></div>
 
-      <!-- INJECTION UNIQUE DU CENTRE DE NOTIFICATIONS SANS INTERFÉRER SUR LES AUTRES MODALS -->
-      <div style="display: flex; align-items: center; gap: 20px;">
-        <app-notification-center></app-notification-center>
-      </div>
-    </header>
-
-    <!-- ZONE D'INJECTION DYNAMIQUE POUR LES SOUS-PAGES CANDIDAT (D'origine, inchangée) -->
-    <div class="candidate-content-body" style="padding: 30px 40px;">
-      <router-outlet></router-outlet>
+    <!-- INJECTION DU CENTRE DE NOTIFICATIONS TOUT À DROITE -->
+    <div style="display: flex; align-items: center;">
+      <app-notification-center></app-notification-center>
     </div>
-  </main>
+    
+  </header>
+
+  <!-- ZONE D'INJECTION DYNAMIQUE POUR LES SOUS-PAGES (NETTOYÉE ET PROPRE) -->
+  <div class="candidate-content-body" style="padding: 30px 40px;">
+    <router-outlet></router-outlet>
+  </div>
+</main>
+
 
   <!-- 🎛️ UNIQUE AJOUT : MODAL DU SUIVI DE STATUT (S'affiche uniquement au clic sur une notif) -->
   <!-- 🎛️ POPUP DE SUIVI DE CANDIDATURE CANDIDAT EN SURIMPRESSION (DESIGN RECRUTEUR ALIGNÉ) -->
