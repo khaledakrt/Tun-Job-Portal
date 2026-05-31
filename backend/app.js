@@ -24,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/logos', express.static(path.join(__dirname, 'uploads/logos')));
 app.use('/avatars', express.static(path.join(__dirname, 'uploads/avatars')));
 app.use('/cv_files', express.static(path.join(__dirname, 'uploads/cv_files')));
+app.use('/logo-tun-job-portal', express.static(path.join(__dirname, 'uploads/logo-tun-job-portal')));
 
 // 3. IMPORTATION DES FICHIERS DE ROUTAGE COMPLETS ET SÉPARÉS
 const authRoutes = require('./routes/auth.routes');

@@ -3,137 +3,297 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Candidature de Khaled Akrout</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Développeur Mobile Flutter - Offre d'emploi</title>
+  
+  <style>
+    /* Intégration d'une police moderne */
+    @import url('https://googleapis.com');
+
+    :root {
+      --primary: #4f46e5;       /* Violet/Bleu moderne */
+      --primary-hover: #4338ca;
+      --success: #10b981;       /* Vert pour le salaire */
+      --text-dark: #0f172a;     /* Presque noir */
+      --text-muted: #64748b;    /* Gris texte secondaire */
+      --bg-page: #f8fafc;       /* Fond de page ultra-propre */
+      --border: #e2e8f0;        /* Bordures fines */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-dark);
+      padding: 40px 20px;
+      line-height: 1.5;
+    }
+
+    /* Carte principale */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    /* En-tête de la fiche */
+    .header {
+      padding: 32px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #ffffff 0%, #fdfdfd 100%);
+    }
+
+    .company-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .logo-box {
+      background: #ef4444;
+      color: white;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .company-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .job-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    /* Badges alignés de façon compacte */
+    .meta-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #475569;
+    }
+
+    .badge-salary {
+      background: #ecfdf5;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    /* Section Contenu */
+    .content {
+      padding: 32px;
+    }
+
+    .section-headline {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-headline::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .job-block {
+      margin-bottom: 28px;
+    }
+
+    .job-block h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-dark);
+    }
+
+    .job-block p {
+      font-size: 14.5px;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    /* Grille d'infos (Compétences & Langues) */
+    .grid-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .grid-column h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill {
+      font-size: 12.5px;
+      padding: 5px 10px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-weight: 500;
+      color: #334155;
+      transition: all 0.2s ease;
+    }
+
+    .pill:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Pied de page avec bouton d'action */
+    .footer {
+      padding: 24px 32px;
+      background: #fafafa;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end; /* Aligné à droite pour un look plus Pro */
+    }
+
+    .btn-apply {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .btn-apply:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px -1px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Responsive design */
+    @media (max-width: 640px) {
+      .grid-info {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .footer {
+        justify-content: center;
+      }
+      .btn-apply {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <div class="modal-card">
-    
-    <!-- EN-TÊTE DE LA MODALE -->
-    <div class="modal-header">
-      <div class="header-titles-block">
-        <div class="modal-title">Candidature de khaled akrt</div>
-        <!-- Le poste ciblé est maintenant positionné ici en haut -->
-        <div class="modal-subtitle-job">Développeur Backend Node.js</div>
+  <div class="container">
+    <!-- En-tête -->
+    <header class="header">
+      <div class="company-row">
+        <span class="logo-box">UVRR&T</span>
+        <span class="company-name">Sfax Digital Hub</span>
       </div>
-      <button class="close-btn">&times;</button>
-    </div>
-
-    <!-- BLOC ACCORDÉON 1 : PROFIL -->
-    <div class="accordion-section">
-      <button class="accordion-header" onclick="toggleAccordion('profile-content', this)">
-        <span class="accordion-header-title">🪪 Profil candidat</span>
-        <span class="accordion-icon">▲</span>
-      </button>
+      <h1 class="job-title">Développeur Mobile Flutter</h1>
       
-      <div id="profile-content" class="accordion-content">
-        <div class="profile-container">
-          
-          <!-- BLOC GAUCHE : PHOTO & CV -->
-          <div class="avatar-block">
-            <div class="avatar-wrapper">
-              <img src="https://unsplash.com" alt="Khaled Akrt" class="avatar-img">
-              <div class="online-indicator"></div>
-            </div>
-            <a href="#" class="cv-link">📄 Consulter le CV</a>
-          </div>
+      <!-- Badges épurés -->
+      <div class="meta-tags">
+        <span class="badge badge-salary">💵 1800 - 2400 TND</span>
+        <span class="badge">💼 CDI</span>
+        <span class="badge">📍 Sousse - Zone Industrielle</span>
+        <span class="badge">📅 20/07/2026</span>
+        <span class="badge">🎓 Junior (0-2 ans)</span>
+      </div>
+    </header>
 
-          <!-- BLOC DROIT : GRILLE D'INFORMATIONS RESSERRÉE -->
-          <div class="info-grid">
-            <div class="info-box">
-              <span class="label">Date candidature :</span>
-              <span class="value">29/05/2026 à 19:01</span>
-            </div>
-            <div class="info-box">
-              <span class="label">Adresse e-mail :</span>
-              <span class="value">kh.akrout91@gmail.com</span>
-            </div>
-            
-            <div class="info-box">
-              <span class="label">Téléphone :</span>
-              <span class="value">55588322</span>
-            </div>
-            <div class="info-box">
-              <span class="label">Ville / Région :</span>
-              <span class="value">Ariana, Cité Khadhra</span>
-            </div>
-            
-            <div class="info-box">
-              <span class="label">Contrat souhaité :</span>
-              <span class="value">CDD</span>
-            </div>
-            <div class="info-box">
-              <span class="label">Situation actuelle :</span>
-              <span class="value">Étudiant</span>
-            </div>
-            
-            <div class="info-box">
-              <span class="label">Date de naissance :</span>
-              <span class="value">29/05/2026</span>
-            </div>
-            <div class="info-box">
-              <span class="label">Disponibilité :</span>
-              <span class="value">1 mois</span>
-            </div>
-            
-            <div class="info-box full-width-row">
-              <span class="label">Réseaux :</span>
-              <span class="value">
-                <a href="#" target="_blank">LinkedIn</a> | <a href="#" target="_blank">GitHub</a>
-              </span>
-            </div>
-          </div>
+    <!-- Contenu -->
+    <main class="content">
+      <div class="section-headline">Contenu de la fiche de poste</div>
+      
+      <div class="job-block">
+        <h3>Missions principales</h3>
+        <p>Développement et intégration de maquettes pour une application mobile grand public. Publication sur les plateformes App Store et Google Play, gestion de l'état global et intégration de services tiers.</p>
+      </div>
 
+      <div class="job-block">
+        <h3>Profil requis & Prérequis</h3>
+        <p>Technicien supérieur ou diplômé d'école d'informatique avec une première expérience réussie en développement Flutter ou natif.</p>
+      </div>
+
+      <!-- Section Technique Basse -->
+      <div class="grid-info">
+        <div class="grid-column">
+          <h4>Compétences</h4>
+          <div class="pill-container">
+            <span class="pill">Flutter</span>
+            <span class="pill">Dart</span>
+            <span class="pill">Provider/Bloc</span>
+            <span class="pill">REST API</span>
+            <span class="pill">Firebase</span>
+            <span class="pill">Git</span>
+            <span class="pill">UI/UX Material Design</span>
+          </div>
         </div>
-
-        <!-- RÉSUMÉ PROFESSIONNEL -->
-        <div class="resume-section">
-          <div class="resume-title">Résumé du profil & Compétences clés</div>
-          <p class="resume-text">
-            Motivated Cloud & DevOps Engineer with a strong background in systems and network administration. Holding a professional degree in Network and IT Services Administration and an engineering diploma in Cloud Computing and Virtualisation. Experienced in IT infrastructure management, automation, and technical support within multicultural environments.
-          </p>
+        
+        <div class="grid-column">
+          <h4>Langues</h4>
+          <div class="pill-container">
+            <span class="pill">🌐 Français</span>
+            <span class="pill">🌐 Anglais technique</span>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
 
-    <!-- BLOC ACCORDÉON 2 : QUIZ -->
-    <div class="quiz-section">
-      <button class="accordion-header" onclick="toggleAccordion('quiz-content', this)">
-        <span class="accordion-header-title">❓ Réponses quiz</span>
-        <span class="accordion-icon">▼</span>
-      </button>
-      <div id="quiz-content" class="accordion-content" style="display: none;">
-        <p class="quiz-empty-text">Le contenu détaillé des réponses au quiz s'affichera ici.</p>
-      </div>
-    </div>
-
-    <!-- PIED DE MODALE : BOUTONS D'ACTION -->
-    <div class="modal-footer">
-      <button class="btn btn-accept">✓ Accepter</button>
-      <button class="btn btn-pending">🪘 En attente</button>
-      <button class="btn btn-interview">🗓 Entretien</button>
-      <button class="btn btn-reject">✕ Rejeter</button>
-      <button class="btn btn-close">Fermer</button>
-    </div>
-
+    <!-- Pied de page -->
+    <footer class="footer">
+      <button class="btn-apply">Complétez le quiz pour postuler</button>
+    </footer>
   </div>
-
-  <script>
-    function toggleAccordion(contentId, button) {
-      const content = document.getElementById(contentId);
-      const icon = button.querySelector('.accordion-icon');
-      
-      if (content.style.display === 'none' || content.style.display === '') {
-        content.style.display = 'block';
-        icon.textContent = '▲';
-      } else {
-        content.style.display = 'none';
-        icon.textContent = '▼';
-      }
-    }
-  </script>
 
 </body>
 </html>
-

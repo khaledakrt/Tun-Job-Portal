@@ -1,36 +1,115 @@
-    <div class="companies-page-container">
-      <div class="page-header">
-        <h2><i class="bi bi-building-check"></i> Nos Entreprises Partenaires</h2>
-        <p>Découvrez les sociétés qui recrutent activement les meilleurs talents en Tunisie sur TunJob.</p>
+<div class="job-search-container visitor-layout">
+  
+  <!-- 🔍 SIDEBAR : RECHERCHE & FILTRES SOCIÉTÉS -->
+  <div class="search-advanced-card">
+    <div class="advanced-search-grid">
+      <div class="search-filter-group">
+        <label><i class="bi bi-building"></i> Nom de l'entreprise</label>
+        <div class="input-with-icon">
+          <i class="bi bi-search"></i>
+          <input type="text" [(ngModel)]="searchTerm" placeholder="Ex: Google, Devoteam...">
+        </div>
       </div>
+      <div class="search-filter-group">
+        <label><i class="bi bi-geo-alt"></i> Localisation</label>
+        <div class="input-with-icon">
+          <i class="bi bi-map"></i>
+          <input type="text" [(ngModel)]="searchLocation" placeholder="Ex: Tunis, Sousse...">
+        </div>
+      </div>
+    </div>
+    <div class="reset-filters-row" *ngIf="searchTerm || searchLocation">
+      <button type="button" class="btn-reset-filters" (click)="onResetFilters()">
+        <i class="bi bi-x-circle"></i> Réinitialiser
+      </button>
+    </div>
+  </div>
 
-      @if (isLoading) {
-        <div class="loading-box"><i class="bi bi-arrow-clockwise spin"></i> Chargement des partenaires...</div>
-      } @else {
-        <div class="companies-grid">
-          @for (company of companies; track company.id) {
-            <div class="company-card">
-              <div class="company-logo">
-                <img [src]="company.company_logo ? assetsUrl + '/logos/' + company.company_logo : 'assets/images/default-avatar.png'" 
-                     (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
-              </div>
-              <div class="company-info">
-                <h4>{{ company.company_name }}</h4>
-                <span class="location-badge"><i class="bi bi-geo-alt-fill"></i> {{ company.address || 'Tunisie' }}</span>
-                <p class="company-bio">{{ company.company_bio | slice:0:120 }}{{ company.company_bio?.length > 120 ? '...' : '' }}</p>
-              </div>
-              <div class="card-footer">
-                <a [href]="'mailto:' + company.email" class="btn-contact-public"><i class="bi bi-envelope"></i> Contact</a>
+  <!-- 🏢 GRILLE DES SOCIÉTÉS (3 PAR LIGNE) -->
+  <div class="jobs-cards-grid-3">
+    @if (isLoading) {
+      <div class="loading-state-box" style="grid-column: span 3; text-align: center; padding: 40px;">
+        <i class="bi bi-arrow-clockwise spin-animation" style="font-size: 30px;"></i>
+        <p>Chargement des partenaires...</p>
+      </div>
+    } @else {
+      @for (company of companies; track company.id) {
+        <div class="job-feed-card clickable-recruiter" (click)="onViewCompanyDetails(company)">
+          <div class="card-top-info">
+            <div class="company-logo-placeholder">
+              <img [src]="company.company_logo ? assetsUrl + '/logos/' + company.company_logo : 'assets/images/default-avatar.png'" 
+                   (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
+            </div>
+            <div class="job-title-block">
+              <h4 class="feed-job-title">{{ company.company_name }}</h4>
+              <span class="feed-company-name"><i class="bi bi-patch-check-fill" style="color: #0ea5e9;"></i> Partenaire Vérifié</span>
+            </div>
+          </div>
+
+          <div class="card-mid-meta">
+            <span class="meta-item"><i class="bi bi-geo-alt-fill"></i> {{ company.address || 'Tunisie' }}</span>
+            <span class="meta-item salary-tag"><i class="bi bi-envelope-fill"></i> {{ company.email }}</span>
+          </div>
+
+          <p class="job-short-desc">
+            {{ company.company_bio | slice:0:100 }}{{ company.company_bio?.length > 100 ? '...' : '' }}
+          </p>
+
+          <div class="card-bottom-actions">
+            <button class="btn-consult-job"><i class="bi bi-info-circle"></i> Profil</button>
+            <a [href]="'mailto:' + company.email" class="btn-apply-now" (click)="$event.stopPropagation()">Contact</a>
+          </div>
+        </div>
+      }
+
+      @if (companies.length === 0) {
+        <div class="empty-placeholder" style="grid-column: span 3; padding: 60px;">
+          <i class="bi bi-building-slash" style="font-size: 48px;"></i>
+          <p>Aucune entreprise ne correspond à votre recherche.</p>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- 🏢 MODALE : DÉTAILS DE LA SOCIÉTÉ -->
+  @if (selectedCompany) {
+    <div class="modal-overlay" (click)="onCloseCompanyModal()">
+      <div class="modal-card recruiter-profile-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <span>📄 Fiche de l'entreprise</span>
+          <button (click)="onCloseCompanyModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="recruiter-hero-section">
+            <div class="recruiter-logo-wrapper">
+              <img [src]="selectedCompany.company_logo ? assetsUrl + '/logos/' + selectedCompany.company_logo : 'assets/images/default-avatar.png'" 
+                   (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
+            </div>
+            <div class="recruiter-meta-content">
+              <h1 class="recruiter-main-title">{{ selectedCompany.company_name }}</h1>
+              <div class="recruiter-verified-badge"><i class="bi bi-patch-check-fill"></i> Partenaire Officiel</div>
+            </div>
+          </div>
+
+          <details class="ats-section-card" open>
+            <summary class="ats-section-summary">
+              <span>📋 Coordonnées & Contact</span>
+              <i class="bi bi-chevron-down accordion-icon"></i>
+            </summary>
+            <div class="ats-section-content">
+              <div class="recruiter-contact-grid">
+                <div class="contact-item"><strong>Email :</strong> <span>{{ selectedCompany.email }}</span></div>
+                <div class="contact-item"><strong>Siège :</strong> <span>{{ selectedCompany.address || 'Tunisie' }}</span></div>
               </div>
             </div>
-          }
-        </div>
+          </details>
 
-        @if (companies.length === 0) {
-          <div class="empty-state">
-            <i class="bi bi-building-slash"></i>
-            <p>Aucune entreprise n'est encore répertoriée.</p>
-          </div>
-        }
-      }
+          <details class="ats-section-card" open>
+            <summary class="ats-section-summary"><span><i class="bi bi-info-circle-fill"></i> Présentation</span></summary>
+            <div class="ats-section-content"><p class="section-text">{{ selectedCompany.company_bio || 'Aucune description.' }}</p></div>
+          </details>
+        </div>
+      </div>
     </div>
+  }
+</div>
