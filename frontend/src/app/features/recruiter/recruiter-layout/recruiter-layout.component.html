@@ -1,13 +1,16 @@
 <div class="app-container">
   
-  <!-- 🧭 SIDEBAR COMPLÈTE & PROFESSIONNELLE SÉCURISÉE -->
+  <!-- 🧭 SIDEBAR SAAS PREMIUM -->
   <aside class="app-sidebar">
     <div class="sidebar-brand">
-      <div class="logo-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
-      <div class="logo-text">Tun<span>Job</span> Pro</div>
+      <img 
+        [src]="assetsUrl + '/logo-tun-job-portal/logo-tun-job-portal.png'" 
+        alt="Logo TunJob" 
+        class="sidebar-logo-img"
+      >
     </div>
 
-    <!-- 👤 BLOC PROFIL DYNAMIQUE UNIQUE : Connecté au statut de modération Admin -->
+    <!-- 👤 BLOC PROFIL SAAS -->
     <div class="recruiter-profile-summary">
       <div class="avatar-circle">
         <img [src]="recruiterAvatar ? assetsUrl + '/logos/' + recruiterAvatar : 'assets/images/default-avatar.png'" 
@@ -44,11 +47,12 @@
       
       <a routerLink="/recruiter/job-manage" routerLinkActive="active" class="nav-link-item">
         <i class="bi bi-briefcase-fill"></i> Gérer mes annonces
+        <span class="nav-status-badge">8</span>
       </a>
       
       <a routerLink="/recruiter/ats-pipeline" routerLinkActive="active" class="nav-link-item">
         <i class="bi bi-people-fill"></i> Suivi Candidats (ATS)
-        <span class="nav-badge">14</span>
+        <span class="nav-status-badge badge-new">14</span>
       </a>
 
       <div class="nav-section-title">Entreprise & Paramètres</div>
@@ -65,24 +69,18 @@
 
   <!-- 💻 ZONE DE CONTENU PRINCIPALE DYNAMIQUE -->
   <main class="app-main">
-    <header class="app-header">
-      <div class="header-welcome">
-        <h2>Bienvenue, <span class="highlight">{{ recruiterName }}</span> 👋</h2>
-        <p>Voici l'état actuel de vos campagnes de recrutement en Tunisie.</p>
-      </div>
+    <!-- 🔝 HEADER UNIFIÉ : VERT ÉMERAUDE -->
+    <header class="app-header" style="background-color: #12b395; padding: 10px 40px; display: flex; align-items: center; justify-content: flex-end; min-height: 85px; border-bottom: 1px solid rgba(0,0,0,0.05);">
 
-      <div class="header-actions">
-        <button routerLink="/recruiter/create-job" class="btn-quick-add">
-          <i class="bi bi-plus"></i> Nouvelle Annonce
+      <div class="header-right" style="display: flex; align-items: center; gap: 20px;">
+        <button routerLink="/recruiter/create-job" class="btn-saas-primary">
+          <i class="bi bi-plus-lg"></i> Publier un poste
         </button>
-
-        <!-- 🚀 INJECTION DU CENTRE DE NOTIFICATIONS AUTONOME & PARTAGÉ -->
         <app-notification-center></app-notification-center>
       </div>
     </header>
 
-    <!-- Zone d'injection principale pour les formulaires et listes -->
-    <div class="content-body">
+    <div class="content-body" style="padding: 20px 40px;">
       <router-outlet></router-outlet>
     </div>
   </main>

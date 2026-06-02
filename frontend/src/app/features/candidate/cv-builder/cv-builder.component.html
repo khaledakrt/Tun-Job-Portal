@@ -7,15 +7,64 @@
       </div>
     }
 
+    <div class="cv-builder-mini-header">
+      <div>
+        <span><i class="bi bi-file-earmark-person-fill"></i> Mon CV</span>
+        <h2>Informations du CV</h2>
+      </div>
+      <div class="cv-top-actions">
+        <strong [class.editing]="isEditable">
+          {{ isEditable ? 'Édition active' : 'Lecture seule' }}
+        </strong>
+        @if (!isEditable) {
+          <button type="button" class="btn-top-edit-cv" (click)="enableEdit()">
+            <i class="bi bi-pencil-square"></i>
+            Modifier
+          </button>
+        } @else {
+          <button type="button" class="btn-top-cancel-cv" (click)="cancelEdit()" [disabled]="isSaving">
+            <i class="bi bi-x-circle"></i>
+            Annuler
+          </button>
+          <button type="submit" form="candidateCvForm" class="btn-top-save-cv" [disabled]="isSaving">
+            <i class="bi bi-cloud-arrow-up-fill"></i>
+            {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="cv-stepper-card" aria-label="Étapes de création du CV">
+      <button type="button" class="cv-step-pill" [class.active]="activeCvStep === 'identity'" (click)="setCvStep('identity')">
+        <span>1</span>
+        Identité
+      </button>
+      <button type="button" class="cv-step-pill" [class.active]="activeCvStep === 'experience'" (click)="setCvStep('experience')">
+        <span>2</span>
+        Expériences
+        <small>{{ cvData.experiences.length }}</small>
+      </button>
+      <button type="button" class="cv-step-pill" [class.active]="activeCvStep === 'education'" (click)="setCvStep('education')">
+        <span>3</span>
+        Formations
+        <small>{{ cvData.educations.length }}</small>
+      </button>
+      <button type="button" class="cv-step-pill" [class.active]="activeCvStep === 'skills'" (click)="setCvStep('skills')">
+        <span>4</span>
+        Compétences
+      </button>
+    </div>
+
     <!-- ================= LAYOUT PRINCIPAL ================= -->
 
     <div class="cv-split-layout">
 
       <!-- ================= PANNEAU GAUCHE ================= -->
 
-      <div class="cv-panel-card scrollable-form-panel">
+      <div class="cv-panel-card scrollable-form-panel" [class.hidden-step]="activeCvStep !== 'identity'">
 
         <form
+          id="candidateCvForm"
           (ngSubmit)="onSaveCV($event)"
           class="compact-form-grid-vertical">
 
@@ -29,7 +78,7 @@
           <!-- PHOTO -->
 
           <div
-            class="form-group-compact"
+            class="form-group-compact identity-photo-row"
             style="flex-direction: row; align-items: center; gap: 16px; margin-bottom: 10px;">
 
             <div class="cv-avatar-wrapper-pro" style="margin: 0;">
@@ -59,7 +108,7 @@
 
           <!-- NOM -->
 
-          <div class="form-group-compact">
+          <div class="form-group-compact identity-name-field">
             <label>Nom & Prénom *</label>
 
             <input
@@ -73,7 +122,7 @@
 
           <!-- TITRE -->
 
-          <div class="form-group-compact">
+          <div class="form-group-compact identity-title-field">
             <label>Titre du poste recherché *</label>
 
             <input
@@ -83,21 +132,6 @@
               [disabled]="!isEditable"
               placeholder="Ex: Développeur Fullstack Angular"
               required>
-          </div>
-
-          <!-- RÉSUMÉ -->
-
-          <div class="form-group-compact">
-            <label>Résumé / Accroche professionnelle *</label>
-
-            <textarea
-              name="summary"
-              [(ngModel)]="cvData.summary"
-              [disabled]="!isEditable"
-              rows="3"
-              placeholder="Ex: Développeur motivé spécialisé dans..."
-              required>
-            </textarea>
           </div>
 
           <!-- CONTACT -->
@@ -110,7 +144,7 @@
             Informations Personnelles & Contact
           </div>
 
-          <div class="form-group-compact">
+          <div class="form-group-compact contact-email-field">
             <label>Adresse Email *</label>
 
             <input
@@ -122,7 +156,7 @@
               required>
           </div>
 
-          <div class="form-group-compact">
+          <div class="form-group-compact contact-phone-field">
             <label>Numéro de Téléphone *</label>
 
             <input
@@ -134,7 +168,7 @@
               required>
           </div>
 
-          <div class="form-group-compact">
+          <div class="form-group-compact contact-address-field">
             <label>Adresse Géographique *</label>
 
             <input
@@ -144,6 +178,21 @@
               [disabled]="!isEditable"
               placeholder="Ex: Tunis, Tunisie"
               required>
+          </div>
+
+          <!-- RÉSUMÉ -->
+
+          <div class="form-group-compact identity-summary-field">
+            <label>Résumé / Accroche professionnelle *</label>
+
+            <textarea
+              name="summary"
+              [(ngModel)]="cvData.summary"
+              [disabled]="!isEditable"
+              rows="3"
+              placeholder="Ex: Développeur motivé spécialisé dans..."
+              required>
+            </textarea>
           </div>
 
           <!-- HIDDEN -->
@@ -158,38 +207,11 @@
             name="interests"
             [(ngModel)]="cvData.interests">
 
-          <!-- ACTIONS -->
-
-          <div
-            class="form-actions-compact"
-            style="margin-top: 15px;">
-
-            @if (!isEditable) {
-
-              <button
-                type="button"
-                class="btn-modify-cv-compact"
-                (click)="enableEdit()"
-                style="background-color: #475569; color: white; padding: 10px 16px; border: none; border-radius: 6px; font-size: 13.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center;">
-
-                <i class="bi bi-pencil-square"></i>
-                Modifier le Formulaire
-              </button>
-
-            } @else {
-
-              <button
-                type="submit"
-                class="btn-save-cv-compact"
-                [disabled]="isSaving">
-
-                <i class="bi bi-cloud-arrow-up-fill"></i>
-
-                {{ isSaving ? 'Enregistrement...' : 'Enregistrer les Informations' }}
-              </button>
-
-            }
-
+          <div class="cv-step-footer">
+            <button type="button" class="btn-step-next" (click)="setCvStep('experience')">
+              Continuer vers expériences
+              <i class="bi bi-arrow-right"></i>
+            </button>
           </div>
 
         </form>
@@ -198,13 +220,13 @@
 
       <!-- ================= PANNEAU DROIT ================= -->
 
-      <div class="cv-right-layout-cards scrollable-form-panel">
+      <div class="cv-right-layout-cards scrollable-form-panel" [class.hidden-step]="activeCvStep === 'identity'">
 
         <div class="cv-panel-card-inner-box">
 
           <!-- ================= EXPERIENCES ================= -->
 
-          <div class="preview-section-item">
+          <div class="preview-section-item" [class.active-step]="activeCvStep === 'experience'">
 
             <div class="section-flex-header-pro">
 
@@ -219,7 +241,7 @@
   (click)="openExperienceModal()"
   [style.display]="isEditable ? 'flex' : 'none'">
   <i class="bi bi-plus-circle-fill"></i>
-  Ajouter
+  Ajouter une expérience
 </button>
 
             </div>
@@ -258,7 +280,7 @@
                       <button
   type="button"
   class="btn-remove-dynamic-pro"
-  (click)="removeEducation($index)"
+  (click)="removeExperience($index)"
   [style.display]="isEditable ? 'flex' : 'none'">
   <i class="bi bi-trash3-fill"></i>
   Supprimer
@@ -299,6 +321,7 @@
 
           <div
             class="preview-section-item"
+            [class.active-step]="activeCvStep === 'education'"
             style="margin-top: 24px;">
 
             <div class="section-flex-header-pro">
@@ -315,7 +338,7 @@
   (click)="openEducationModal()"
   [style.display]="isEditable ? 'flex' : 'none'">
   <i class="bi bi-plus-circle-fill"></i>
-  Ajouter
+  Ajouter une formation
 </button>
 
             </div>
@@ -350,7 +373,7 @@
                       <button
   type="button"
   class="btn-remove-dynamic-pro"
-  (click)="removeExperience($index)"
+  (click)="removeEducation($index)"
   [style.display]="isEditable ? 'flex' : 'none'">
   <i class="bi bi-trash3-fill"></i>
   Supprimer
@@ -385,6 +408,7 @@
 
           <div
             class="preview-section-item"
+            [class.active-step]="activeCvStep === 'skills'"
             style="margin-top: 24px;">
 
             <span class="preview-section-label">
@@ -426,6 +450,7 @@
 
           <div
             class="preview-section-item"
+            [class.active-step]="activeCvStep === 'skills'"
             style="margin-top: 24px;">
 
             <span class="preview-section-label">

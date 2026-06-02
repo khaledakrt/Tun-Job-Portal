@@ -32,4 +32,21 @@ const login = Joi.object({
     }),
 });
 
-module.exports = { register, login };
+const forgotPassword = Joi.object({
+    email: emailRule.required().messages({
+        'string.empty': "L'adresse e-mail est obligatoire.",
+        'string.email': 'Adresse e-mail invalide.',
+    }),
+});
+
+const resetPassword = Joi.object({
+    token: Joi.string().trim().required().messages({
+        'string.empty': 'Le lien de réinitialisation est invalide.',
+    }),
+    password: Joi.string().min(8).max(128).required().messages({
+        'string.empty': 'Le nouveau mot de passe est obligatoire.',
+        'string.min': 'Le mot de passe doit contenir au moins 8 caractères.',
+    }),
+});
+
+module.exports = { register, login, forgotPassword, resetPassword };

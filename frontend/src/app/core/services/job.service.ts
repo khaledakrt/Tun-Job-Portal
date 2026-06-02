@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { from, Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class JobService {
-  // 🚀 RESTRUCTURATION COMPLÈTE ET FIXE : 127.0.0.1 (avec un 1) ET le port :3000 de l'API !
-  private apiUrl = 'http://127.0.0.1:3000'; 
+  private apiUrl = environment.apiUrl;
 
   private getHeaders() {
     const token = localStorage.getItem('token');
@@ -17,7 +17,7 @@ export class JobService {
   }
 
   searchJobs(): Observable<any[]> {
-    const promise = fetch(`${this.apiUrl}/auth/jobs/search_public_placeholder_fallback`, {
+    const promise = fetch(`${this.apiUrl}/candidate/jobs/list`, {
       method: 'GET',
       headers: this.getHeaders()
     }).then(res => {
@@ -54,7 +54,7 @@ export class JobService {
     const promise = fetch(`${this.apiUrl}/recruiter/jobs/toggle-status`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ id, status })
+      body: JSON.stringify({ jobId: id })
     }).then(res => {
       if (!res.ok) throw new Error(res.statusText);
       return res.json();

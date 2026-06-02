@@ -109,7 +109,8 @@ async function setQuizActive(jobId, recruiterId, isActive) {
 
     const active = isActive ? 1 : 0;
     await db.execute('UPDATE job_quizzes SET is_active = ? WHERE job_id = ?', [active, jobId]);
-    await db.execute('UPDATE jobs SET has_quiz = ? WHERE id = ?', [active, jobId]);
+    // has_quiz means the job owns a quiz; visibility is controlled by job_quizzes.is_active.
+    await db.execute('UPDATE jobs SET has_quiz = 1 WHERE id = ?', [jobId]);
 
     return {
         message: active ? 'Quiz rendu disponible pour les candidats.' : 'Quiz masqué aux candidats.',
@@ -179,9 +180,10 @@ async function saveApplicationAnswers(applicationId, quizAnswers) {
 
 async function getApplicationQuizAnswers(applicationId, recruiterId) {
     const [apps] = await db.execute(
-        `SELECT a.id, a.job_id, j.has_quiz
+        `SELECT a.id, a.job_id, CASE WHEN jq.id IS NULL THEN 0 ELSE 1 END AS has_quiz
          FROM applications a
          JOIN jobs j ON a.job_id = j.id
+         LEFT JOIN job_quizzes jq ON jq.job_id = j.id
          WHERE a.id = ? AND j.recruiter_id = ?`,
         [applicationId, recruiterId]
     );
@@ -199,7 +201,7 @@ async function getApplicationQuizAnswers(applicationId, recruiterId) {
     const [quizRows] = await db.execute(
         `SELECT jq.title AS quiz_title
          FROM job_quizzes jq
-         WHERE jq.job_id = ? AND jq.is_active = 1`,
+         WHERE jq.job_id = ?`,
         [app.job_id]
     );
     const quizTitle = quizRows[0]?.quiz_title || 'Quiz de présélection';

@@ -55,6 +55,45 @@ export class CompaniesListComponent implements OnInit {
     });
   }
 
+  get companiesCount(): number {
+    return this.allCompanies.length;
+  }
+
+  get citiesCount(): number {
+    return new Set(
+      this.allCompanies
+        .map((company) => this.getCompanyCity(company.address))
+        .filter(Boolean)
+    ).size;
+  }
+
+  get contactReadyCount(): number {
+    return this.allCompanies.filter((company) => !!company.email || !!company.phone).length;
+  }
+
+  getCompanyLogo(company: any): string {
+    return company.company_logo
+      ? `${this.assetsUrl}/logos/${company.company_logo}`
+      : 'assets/images/default-avatar.png';
+  }
+
+  getCompanyCity(address: string): string {
+    if (!address) return 'Tunisie';
+    const parts = address.split(',').map((part) => part.trim()).filter(Boolean);
+    return parts[parts.length - 1] || address;
+  }
+
+  getCompanyInitials(company: any): string {
+    const name = company.company_name || company.name || 'TJ';
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part: string) => part[0])
+      .join('')
+      .toUpperCase();
+  }
+
   // 🛠️ Méthodes d'actions
   onResetFilters() {
     this.searchTerm = '';

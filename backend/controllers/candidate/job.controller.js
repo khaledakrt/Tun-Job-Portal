@@ -8,9 +8,10 @@ exports.getAllAvailableJobs = async (req, res) => {
         const sql = quizReady
             ? `
             SELECT j.*, u.company_name, u.company_logo,
-                   COALESCE(j.has_quiz, 0) AS has_quiz
+                   CASE WHEN jq.id IS NOT NULL AND jq.is_active = 1 THEN 1 ELSE 0 END AS has_quiz
             FROM jobs j
             LEFT JOIN users u ON j.recruiter_id = u.id
+            LEFT JOIN job_quizzes jq ON j.id = jq.job_id
             WHERE j.status = 'disponible'
             ORDER BY j.id DESC
             `

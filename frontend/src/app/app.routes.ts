@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from './core/guards/admin.guard';
 import { candidateGuard } from './core/guards/candidate.guard';
+import { publicJobSearchGuard } from './core/guards/public-job-search.guard';
 import { recruiterGuard } from './core/guards/recruiter.guard';
 
 export const routes: Routes = [
@@ -9,7 +10,8 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public/public-layout/public-layout.component').then(m => m.PublicLayoutComponent), // Chemin corrigé
     children: [
       { path: '', redirectTo: 'job-search', pathMatch: 'full' },
-      { path: 'job-search', loadComponent: () => import('./features/candidate/job-search/job-search.component').then(m => m.JobSearchComponent) },
+      { path: 'job-search', canActivate: [publicJobSearchGuard], loadComponent: () => import('./features/candidate/job-search/job-search.component').then(m => m.JobSearchComponent) },
+      { path: 'jobs/:id', loadComponent: () => import('./features/public/job-detail/job-detail.component').then(m => m.JobDetailComponent) },
       { path: 'login', loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
       { path: 'register', loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
       { path: 'about', loadComponent: () => import('./features/public/about/about.component').then(m => m.AboutComponent) }, // Chemin corrigé
@@ -85,6 +87,10 @@ export const routes: Routes = [
       {
         path: 'ats-pipeline',
         loadComponent: () => import('./features/recruiter/ats-pipeline/ats-pipeline.component').then(m => m.AtsPipelineComponent)
+      },
+      {
+        path: 'candidate-cv/:id',
+        loadComponent: () => import('./features/candidate/cv-view/cv-view.component').then(m => m.CvViewComponent)
       }
     ]
   },

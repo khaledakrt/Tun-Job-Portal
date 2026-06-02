@@ -12,6 +12,17 @@ backend/uploads/
 # Angular cache
 frontend/.angular/
 
+# Build outputs
+frontend/dist/
+dist/
+coverage/
+
+# Package manager debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
 # IDE / OS
 .idea/
 .vscode/

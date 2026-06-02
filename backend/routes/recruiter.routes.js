@@ -48,6 +48,7 @@ router.delete('/jobs/delete/:id', jobCtrl.deleteJob);
 router.get('/ats/applications', atsCtrl.getApplications);
 router.get('/ats/applications/:applicationId/quiz-answers', atsCtrl.getApplicationQuizAnswers);
 router.post('/ats/update-status', validate(appSchemas.updateStatus), atsCtrl.updateStatus);
+router.post('/ats/schedule-interview', atsCtrl.scheduleInterview);
 
 router.get('/jobs/:jobId/quiz', quizCtrl.getJobQuiz);
 router.post('/jobs/:jobId/quiz', validate(quizSchemas.upsertQuiz), quizCtrl.saveJobQuiz);

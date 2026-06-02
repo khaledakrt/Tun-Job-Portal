@@ -1,5 +1,6 @@
 const db = require('../../config/db');
 const quizService = require('../../services/quiz.service');
+const jobAlertService = require('../../services/job-alert.service');
 const { hasQuizSchema } = require('../../utils/dbSchema');
 
 async function fetchRecruiterJobs(recruiter_id) {
@@ -7,7 +8,7 @@ async function fetchRecruiterJobs(recruiter_id) {
     if (quizReady) {
         const [rows] = await db.execute(
             `SELECT j.*, COUNT(a.id) AS application_count,
-                    COALESCE(j.has_quiz, 0) AS has_quiz,
+                    CASE WHEN jq.id IS NULL THEN 0 ELSE 1 END AS has_quiz,
                     jq.is_active AS quiz_is_active,
                     jq.title AS quiz_title
              FROM jobs j
@@ -87,6 +88,9 @@ exports.createJob = async (req, res) => {
         if (quizReady && has_quiz && quiz?.questions?.length) {
             await quizService.upsertQuizForJob(jobId, recruiter_id, quiz);
         }
+
+        jobAlertService.notifyMatchingCandidatesForJob(jobId)
+            .catch((e) => console.error('❌ Alertes emploi:', e.message));
 
         return res.status(201).json({
             message: "Annonce d'emploi publiée avec succès !",

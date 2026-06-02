@@ -15,7 +15,7 @@ export class QuizService {
 
   getQuizForJob(jobId: number, publicAccess = false): Observable<any> {
     const url = publicAccess
-      ? `${environment.assetsUrl}/api/public/jobs/${jobId}/quiz`
+      ? `${this.api}/public/jobs/${jobId}/quiz`
       : `${this.api}/candidate/jobs/${jobId}/quiz`;
     return this.http.get(url);
   }

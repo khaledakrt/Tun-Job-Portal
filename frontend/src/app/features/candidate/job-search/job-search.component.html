@@ -1,7 +1,72 @@
 <div class="job-search-container" [class.visitor-layout]="!isLoggedIn">
+  @if (!isLoggedIn) {
+    <section class="public-jobs-hero">
+      <div class="hero-content">
+        <span class="hero-kicker"><i class="bi bi-stars"></i> Plateforme emploi en Tunisie</span>
+        <h1>Trouvez l'offre qui correspond vraiment à votre profil.</h1>
+        <p>
+          Explorez les meilleures opportunités, comparez les entreprises, consultez les détails des postes
+          et postulez avec un profil candidat complet.
+        </p>
+        <div class="hero-actions">
+          <button type="button" class="hero-primary-btn" (click)="goToLogin()">
+            Créer mon compte candidat
+            <i class="bi bi-arrow-right"></i>
+          </button>
+          <button type="button" class="hero-secondary-btn" (click)="onResetFilters()">
+            Voir toutes les offres
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-stats-card">
+        <div class="stat-item">
+          <strong>{{ totalJobsCount }}</strong>
+          <span>offres actives</span>
+        </div>
+        <div class="stat-item">
+          <strong>{{ companiesCount }}</strong>
+          <span>entreprises</span>
+        </div>
+        <div class="stat-item">
+          <strong>{{ citiesCount }}</strong>
+          <span>villes couvertes</span>
+        </div>
+        <div class="stat-item">
+          <strong>{{ quizJobsCount }}</strong>
+          <span>offres avec quiz</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="visitor-trust-strip">
+      <span><i class="bi bi-shield-check"></i> Entreprises vérifiées</span>
+      <span><i class="bi bi-search-heart"></i> Recherche avancée</span>
+      <span><i class="bi bi-file-earmark-person"></i> Profil candidat centralisé</span>
+      <span><i class="bi bi-bell"></i> Suivi de candidature</span>
+    </div>
+  }
   
   <!-- 🔍 ZONE SUPÉRIEURE : RECHERCHE AVANCÉE -->
   <div class="search-advanced-card">
+    @if (isLoggedIn) {
+      <div class="connected-search-heading">
+        <div>
+          <span>Recherche rapide</span>
+          <strong>Filtrez les offres disponibles</strong>
+        </div>
+        <div class="connected-search-metrics">
+          <span>{{ totalJobsCount }} offres actives</span>
+          <span>{{ quizJobsCount }} avec quiz</span>
+        </div>
+      </div>
+    }
+    @if (!isLoggedIn) {
+      <div class="search-card-heading">
+        <span>Recherche rapide</span>
+        <strong>{{ filteredJobs.length }} offre(s) trouvée(s)</strong>
+      </div>
+    }
     <div class="advanced-search-grid">
       <div class="search-filter-group">
         <label><i class="bi bi-briefcase"></i> Titre du poste</label>
@@ -17,7 +82,7 @@
           <option value="">Tous les niveaux</option>
           <option value="Junior (0-2 ans)">Junior (0-2 ans)</option>
           <option value="Intermédiaire (2-5 ans)">Intermédiaire (2-5 ans)</option>
-          <option value="Senior (5+ ans)">Senior (5+ ans)</option>
+          <option value="Senior (5 ans+)">Senior (5 ans+)</option>
         </select>
       </div>
       <div class="search-filter-group">
@@ -26,12 +91,69 @@
           <option value="">Tous les contrats</option>
           <option value="CDI">CDI</option>
           <option value="CDD">CDD</option>
-          <option value="SIVP">SIVP</option>
+          <option value="Stage">SIVP</option>
         </select>
       </div>
     </div>
     @if (hasActiveFilters) {
-      <div class="reset-filters-row"><button type="button" class="btn-reset-filters" (click)="onResetFilters()"><i class="bi bi-x-circle"></i> Réinitialiser</button></div>
+      <div class="reset-filters-row">
+        <button type="button" class="btn-reset-filters" (click)="onResetFilters()"><i class="bi bi-x-circle"></i> Réinitialiser</button>
+        @if (isLoggedIn) {
+          @if (editingAlertId) {
+            <button type="button" class="btn-create-alert" (click)="saveEditedJobAlert()">
+              <i class="bi bi-check-circle-fill"></i>
+              Enregistrer l'alerte
+            </button>
+            <button type="button" class="btn-reset-filters" (click)="cancelEditJobAlert()">
+              Annuler modification
+            </button>
+          } @else {
+            <button type="button" class="btn-create-alert" (click)="createAlertFromFilters()">
+              <i class="bi bi-bell-fill"></i>
+              Créer une alerte
+            </button>
+          }
+        }
+      </div>
+    }
+    @if (alertSuccessMessage) {
+      <div class="job-alert-success">
+        <i class="bi bi-bell-check-fill"></i>
+        {{ alertSuccessMessage }}
+      </div>
+    }
+
+    @if (isLoggedIn && jobAlerts.length > 0) {
+      <div class="job-alerts-manager">
+        <div class="alerts-manager-heading">
+          <strong><i class="bi bi-bell-fill"></i> Mes alertes emploi</strong>
+          <span>{{ jobAlerts.length }} alerte(s)</span>
+        </div>
+        <div class="alerts-manager-list">
+          @for (alert of jobAlerts; track alert.id) {
+            <article class="alert-manager-card" [class.editing]="editingAlertId === alert.id">
+              <div>
+                <strong>{{ alert.title_keyword || 'Toutes offres' }}</strong>
+                <span>
+                  {{ alert.location_keyword || 'Toute la Tunisie' }}
+                  @if (alert.contract_type) { · {{ alert.contract_type }} }
+                  @if (alert.experience_level) { · {{ alert.experience_level }} }
+                </span>
+              </div>
+              <div class="alert-card-actions">
+                <button type="button" (click)="editJobAlert(alert)">
+                  <i class="bi bi-pencil-square"></i>
+                  Modifier
+                </button>
+                <button type="button" class="danger" (click)="deleteJobAlert(alert.id)">
+                  <i class="bi bi-trash3"></i>
+                  Supprimer
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
     }
   </div>
 
@@ -42,6 +164,15 @@
 
   <!-- 🚀 GRILLE DES CARTES (3 PAR LIGNE) -->
   @if (!isLoading && filteredJobs.length > 0) {
+    @if (!isLoggedIn) {
+      <div class="visitor-results-header">
+        <div>
+          <span class="results-kicker">Offres recommandées</span>
+          <h2>Dernières opportunités disponibles</h2>
+        </div>
+        <p>Consultez les détails, découvrez l'entreprise et connectez-vous pour postuler.</p>
+      </div>
+    }
     <div class="jobs-cards-grid-3" [class.logged-in-grid]="isLoggedIn">
       @for (job of filteredJobs; track job.id) {
         <div class="job-feed-card">
@@ -59,6 +190,11 @@
               </span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+              @if (isLoggedIn) {
+                <button type="button" class="btn-save-job-card" [class.saved]="job.isSaved" (click)="toggleSavedJob(job, $event)">
+                  <i class="bi" [ngClass]="job.isSaved ? 'bi-bookmark-fill' : 'bi-bookmark'"></i>
+                </button>
+              }
               <span class="contract-badge-feed">{{ job.contract_type }}</span>
               @if (job.salary) {
                 <span class="salary-tag" style="font-size: 11.5px;">{{ job.salary }}</span>
@@ -91,6 +227,15 @@
     </div>
   }
 
+  @if (!isLoading && filteredJobs.length === 0) {
+    <div class="empty-jobs-state">
+      <i class="bi bi-search"></i>
+      <h3>Aucune offre ne correspond à votre recherche</h3>
+      <p>Essayez un autre mot-clé, une autre ville ou réinitialisez les filtres.</p>
+      <button type="button" class="hero-secondary-btn" (click)="onResetFilters()">Réinitialiser les filtres</button>
+    </div>
+  }
+
   <!-- 👁️ MODALE 1 : DETAILS DU POSTE (INTEGRATION DU LOGO ALIGNÉ) -->
     <!-- 👁️ MODALE 1 : DETAILS DU POSTE (DESIGN PREMIUM UNIFIÉ) -->
      @if (selectedJob) {
@@ -104,60 +249,81 @@
         </div>
 
         <!-- BODY -->
-        <div class="modal-body">
-          
-          <!-- HERO INFO -->
-          <div class="job-hero-section">
-            <div class="job-logo-wrapper">
-              <img [src]="selectedJob.company_logo ? environment.assetsUrl + '/logos/' + selectedJob.company_logo : 'assets/images/default-avatar.png'" 
+        <div class="modal-body job-offer-new-body">
+          <div class="offer-top-header">
+            <div class="offer-top-logo">
+              <img [src]="selectedJob.company_logo ? environment.assetsUrl + '/logos/' + selectedJob.company_logo : 'assets/images/default-avatar.png'"
                    (error)="$any($event.target).src='assets/images/default-avatar.png'"
                    alt="Logo entreprise">
             </div>
-            
-            <div>
-              <h1 class="job-main-title">{{ selectedJob.title }}</h1>
-              <div class="job-company-link" (click)="onViewRecruiterProfile(selectedJob.recruiter_id)">
+            <div class="offer-top-title">
+              <h1>{{ selectedJob.title }}</h1>
+              <button type="button" class="offer-company-link" (click)="onViewRecruiterProfile(selectedJob.recruiter_id)">
+                <i class="bi bi-building-check"></i>
                 {{ selectedJob.company_name || 'Entreprise Partenaire' }}
-              </div>
-              
-              <div class="job-badges-row">
-                <span class="premium-badge badge-salary">💵 {{ selectedJob.salary || 'Non spécifié' }}</span>
-                <span class="premium-badge badge-contract">💼 {{ selectedJob.contract_type }}</span>
-                <span class="premium-badge badge-location">📍 {{ selectedJob.location }}</span>
-                @if (selectedJob.expires_at) {
-                  <span class="premium-badge badge-expiration">⏱️ {{ selectedJob.expires_at | date:'dd/MM/yyyy' }}</span>
-                }
-                <span class="premium-badge badge-experience">🎓 {{ selectedJob.experience_level }}</span>
-              </div>
+              </button>
             </div>
           </div>
 
-          <!-- ACCORDION 1 : L'OFFRE -->
-          <details class="ats-section-card" open>
-            <summary class="ats-section-summary">
-              <span><i class="bi bi-file-earmark-text-fill"></i> Contenu de la fiche de poste</span>
-              <i class="bi bi-chevron-down accordion-icon"></i>
-            </summary>
-            
-            <div class="ats-section-content">
-              <div class="job-text-block-section">
-                <h2 class="section-title">Missions principales</h2>
-                <div class="job-block-card">
-                  <p>{{ selectedJob.missions_desc }}</p>
+          <div class="offer-content-layout">
+          <aside class="offer-side-panel">
+            <h3 class="offer-summary-title">Résumé de l'offre</h3>
+            <div class="offer-info-list">
+              <div><i class="bi bi-cash-stack"></i><span>Salaire</span><strong>{{ selectedJob.salary || 'Non spécifié' }}</strong></div>
+              <div><i class="bi bi-geo-alt"></i><span>Lieu</span><strong>{{ selectedJob.location }}</strong></div>
+              <div><i class="bi bi-briefcase"></i><span>Contrat</span><strong>{{ selectedJob.contract_type }}</strong></div>
+              <div><i class="bi bi-laptop"></i><span>Mode</span><strong>{{ selectedJob.workplace_type }}</strong></div>
+              <div><i class="bi bi-mortarboard"></i><span>Expérience</span><strong>{{ selectedJob.experience_level }}</strong></div>
+              <div><i class="bi bi-patch-question"></i><span>Quiz</span><strong>{{ selectedJob.has_quiz ? 'Quiz requis' : 'Sans quiz' }}</strong></div>
+              @if (selectedJob.expires_at) {
+                <div><i class="bi bi-calendar-event"></i><span>Date limite</span><strong>{{ selectedJob.expires_at | date:'dd/MM/yyyy' }}</strong></div>
+              }
+            </div>
+
+            <div class="offer-side-nav">
+              <button type="button" (click)="scrollOfferSection('offer-missions')"><i class="bi bi-list-task"></i> Missions</button>
+              <button type="button" (click)="scrollOfferSection('offer-profile')"><i class="bi bi-person-check"></i> Profil</button>
+              <button type="button" (click)="scrollOfferSection('offer-skills')"><i class="bi bi-tools"></i> Compétences</button>
+              @if (selectedJob.has_quiz) {
+                <button type="button" (click)="scrollOfferSection('offer-quiz')"><i class="bi bi-patch-question"></i> Quiz</button>
+              }
+            </div>
+          </aside>
+
+          <section class="offer-main-panel">
+            <section id="offer-missions" class="offer-content-card">
+              <div class="offer-section-heading">
+                <i class="bi bi-list-task"></i>
+                <div>
+                  <span>Responsabilités</span>
+                  <h2>Missions principales</h2>
                 </div>
               </div>
+              <p>{{ selectedJob.missions_desc }}</p>
+            </section>
 
-              <div class="job-text-block-section">
-                <h2 class="section-title">Profil requis & Prérequis</h2>
-                <div class="job-block-card">
-                  <p>{{ selectedJob.profile_desc }}</p>
+            <section id="offer-profile" class="offer-content-card">
+              <div class="offer-section-heading">
+                <i class="bi bi-person-check"></i>
+                <div>
+                  <span>Candidat attendu</span>
+                  <h2>Profil requis & prérequis</h2>
                 </div>
               </div>
+              <p>{{ selectedJob.profile_desc }}</p>
+            </section>
 
-              <!-- SECTION COMPÉTENCES & LANGUES (RÉINTÉGRÉE DANS L'ACCORDÉON) -->
-              <div class="skills-grid" style="margin-top: 15px; margin-bottom: 5px;">
+            <section id="offer-skills" class="offer-content-card">
+              <div class="offer-section-heading">
+                <i class="bi bi-tools"></i>
+                <div>
+                  <span>Critères clés</span>
+                  <h2>Compétences & langues</h2>
+                </div>
+              </div>
+              <div class="offer-tags-grid">
                 @if (selectedJob.skills_desc) {
-                  <div class="skills-block">
+                  <div>
                     <h3>Compétences</h3>
                     <div class="tags-list">
                       @for (skill of getSearchJobSkillsArray(selectedJob.skills_desc); track $index) {
@@ -167,37 +333,36 @@
                   </div>
                 }
                 @if (selectedJob.languages_desc) {
-                  <div class="skills-block">
+                  <div>
                     <h3>Langues</h3>
                     <div class="tags-list">
                       @for (lang of getSearchJobLanguagesArray(selectedJob.languages_desc); track $index) {
-                        <span class="tag">🌐 {{ lang }}</span>
+                        <span class="tag">{{ lang }}</span>
                       }
                     </div>
                   </div>
                 }
               </div>
-            </div>
-          </details>
+            </section>
 
-          <!-- ACCORDION 2 : LE QUIZ -->
-          @if (selectedJob.has_quiz) {
-            <details class="ats-section-card" style="margin-top: 10px;">
-              <summary class="ats-section-summary">
-                <span>📝 Questionnaire de présélection</span>
-                <i class="bi bi-chevron-down accordion-icon"></i>
-              </summary>
-              <div class="ats-section-content" [class.quiz-disabled]="selectedJob.isAlreadyApplied">
+            @if (selectedJob.has_quiz) {
+              <section id="offer-quiz" class="offer-content-card offer-quiz-card" [class.quiz-disabled]="selectedJob.isAlreadyApplied">
+                <div class="offer-section-heading">
+                  <i class="bi bi-patch-question-fill"></i>
+                  <div>
+                    <span>Présélection</span>
+                    <h2>Questionnaire de présélection</h2>
+                  </div>
+                </div>
+
                 @if (isLoadingQuiz) {
-                  <div style="text-align: center; padding: 20px; color: #64748b;">
+                  <div class="quiz-loading-state">
                     <i class="bi bi-arrow-clockwise spin-animation"></i> Chargement du questionnaire...
                   </div>
                 } @else if (jobQuiz?.questions?.length) {
                   <div class="quiz-info-row">
-                    <span>Répondez aux questions obligatoires</span>
-                    <span class="quiz-progress">
-                      {{ selectedJob.isAlreadyApplied ? 'Déjà postulé' : 'Évaluation de profil' }}
-                    </span> 
+                    <span><i class="bi bi-list-check"></i> {{ jobQuiz.questions.length }} question(s) obligatoire(s)</span>
+                    <span class="quiz-progress">{{ selectedJob.isAlreadyApplied ? 'Déjà postulé' : 'Évaluation de profil' }}</span>
                   </div>
 
                   @for (q of jobQuiz.questions; track q.id; let i = $index) {
@@ -208,30 +373,39 @@
                       <div class="options-grid">
                         @for (c of q.choices; track c.id) {
                           <label class="option-card" [class.selected]="quizAnswers[q.id] === c.id">
-                            <input type="radio" 
-                                   [name]="'q' + q.id" 
-                                   [value]="c.id" 
+                            <input type="radio"
+                                   [name]="'q' + q.id"
+                                   [value]="c.id"
                                    [disabled]="selectedJob.isAlreadyApplied"
                                    [checked]="quizAnswers[q.id] === c.id"
-                                   (change)="onQuizAnswerChange({questionId: q.id, choiceId: c.id})"> 
+                                   (change)="onQuizAnswerChange({questionId: q.id, choiceId: c.id})">
                             <span>{{ c.choice_text }}</span>
                           </label>
                         }
                       </div>
                     </div>
                   }
+                } @else {
+                  <div class="quiz-loading-state">
+                    <i class="bi bi-info-circle"></i>
+                    Ce quiz n'est pas disponible pour le moment.
+                  </div>
                 }
-              </div>
-            </details>
-          }
+              </section>
+            }
 
-
-          @if (applyError) {
-            <p style="color: #ef4444; font-size: 13px; margin: 0 0 12px;">{{ applyError }}</p>
-          }
+            @if (applyError) {
+              <p class="offer-error-message">{{ applyError }}</p>
+            }
+          </section>
+          </div>
         </div>
 
         <div class="modal-footer-action-row">
+          <button type="button" class="btn-isolated-offer" (click)="openIsolatedOffer()">
+            <i class="bi bi-box-arrow-up-right"></i>
+            Consulter isolé
+          </button>
           @if (selectedJob.isAlreadyApplied) {
             <span class="premium-applied-banner"><i class="bi bi-check-circle-fill"></i> Vous avez déjà postulé à cette offre</span>
           } @else {

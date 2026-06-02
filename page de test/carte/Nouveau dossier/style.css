@@ -1,0 +1,217 @@
+/* --- RESET & BASE --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f1f5f9;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* --- STRUCTURE POPUP --- */
+.modal-card {
+    background: #ffffff;
+    width: 780px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- ENTÊTE --- */
+.modal-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+}
+
+.poste-texte {
+    font-size: 13px;
+    color: #475569;
+    margin: 0;
+}
+
+.poste-texte span {
+    color: #12b395; /* Rappel harmonieux de la couleur du menu */
+    font-weight: 600;
+}
+
+/* --- ACCORDÉONS AVEC BARRES DE TITRE VERTES VALIDES --- */
+.accordion-item {
+    border: 1px solid #12b395;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden; /* Assure que le fond vert suit l'arrondi des angles */
+}
+
+/* En-tête corrigé : Fond vert #12b395 et texte blanc pur */
+.accordion-header {
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 700; /* Plus épais pour ressortir parfaitement */
+    color: #ffffff !important; /* Blanc pur obligatoire pour éliminer l'effet flou */
+    background-color: #12b395; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Sécurité pour forcer les textes/icônes internes en blanc */
+.accordion-header span {
+    color: #ffffff !important;
+}
+
+.accordion-content {
+    padding: 14px;
+    background: #ffffff; /* L'intérieur reste blanc pur pour un contraste maximal */
+}
+
+/* --- PROFIL CANDIDAT --- */
+.profile-compact-layout {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.avatar-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.avatar-mini {
+    width: 44px;
+    height: 44px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
+
+.lnk-cv {
+    font-size: 11px;
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.data-timeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 16px;
+    flex-grow: 1;
+}
+
+.data-cell {
+    font-size: 13px;
+    color: #334155;
+}
+
+.data-cell .lbl {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* --- ZONE DU RÉSUMÉ (HAUTE LISIBILITÉ) --- */
+.mini-summary {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background-color: #ffffff;
+    border-left: 3px solid #12b395; /* Ligne de structure verte */
+    border-top: 1px solid #f1f5f9;
+}
+
+.summary-title {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+}
+
+.summary-text {
+    font-size: 13px;
+    color: #0f172a; /* Écriture noire profonde ultra-nette */
+    line-height: 1.6; /* Aération de l'interligne pour confort visuel */
+    margin: 0;
+}
+
+/* --- QUIZ --- */
+.accordion-content.no-padding {
+    padding: 0;
+}
+
+.quiz-meta {
+    padding: 12px 14px 6px 14px;
+}
+
+.quiz-meta h3 {
+    font-size: 13px;
+    margin: 0;
+    color: #0f172a;
+}
+
+.quiz-meta span {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.quiz-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.q-txt {
+    font-size: 13px;
+    color: #0f172a;
+    max-width: 75%;
+    line-height: 1.4;
+}
+
+.a-txt {
+    font-size: 12px;
+    font-weight: 600;
+    color: #b91c1c; /* Rouge franc pour les réponses erronées */
+    white-space: nowrap;
+}
+
+/* --- BOUTONS --- */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-success { background: #10b981; color: #fff; }
+.btn-secondary { background: #64748b; color: #fff; }
+.btn-warning { background: #f97316; color: #fff; }
+.btn-danger { background: #ef4444; color: #fff; }
+.btn-light { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }

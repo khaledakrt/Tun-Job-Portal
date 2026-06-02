@@ -22,6 +22,16 @@ export class AtsPipelineComponent implements OnInit {
 
   applicationsList: any[] = [];
   selectedApplication: any = null;
+  showInterviewPlanner = false;
+  isSchedulingInterview = false;
+  interviewMessage = '';
+  interviewForm = {
+    scheduled_at: '',
+    mode: 'En ligne',
+    meeting_link: '',
+    location: '',
+    message: '',
+  };
 
   isQuizAccordionOpen = false;
   quizAnswersData: {
@@ -171,6 +181,75 @@ export class AtsPipelineComponent implements OnInit {
         error: () => alert('Impossible de modifier le statut.'),
       });
   }
+
+  openInterviewPlanner() {
+    if (!this.selectedApplication) return;
+    this.showInterviewPlanner = true;
+    this.interviewMessage = '';
+    this.interviewForm = {
+      scheduled_at: '',
+      mode: 'En ligne',
+      meeting_link: '',
+      location: '',
+      message: `Bonjour ${this.selectedApplication.name || ''}, nous souhaitons planifier un entretien pour votre candidature.`,
+    };
+    this.cdr.detectChanges();
+  }
+
+  closeInterviewPlanner() {
+    this.showInterviewPlanner = false;
+    this.isSchedulingInterview = false;
+    this.interviewMessage = '';
+    this.cdr.detectChanges();
+  }
+
+  scheduleInterview() {
+    if (!this.selectedApplication?.id || !this.interviewForm.scheduled_at) {
+      this.interviewMessage = 'Veuillez choisir une date et une heure.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.isSchedulingInterview = true;
+    this.http.post(`${environment.apiUrl}/recruiter/ats/schedule-interview`, {
+      application_id: this.selectedApplication.id,
+      ...this.interviewForm,
+    }).subscribe({
+      next: () => {
+        const appIndex = this.applicationsList.findIndex((a) => a.id === this.selectedApplication.id);
+        if (appIndex !== -1) {
+          this.applicationsList[appIndex].status = 'Entretien';
+          this.applicationsList[appIndex].interview_scheduled_at = this.interviewForm.scheduled_at;
+          this.applicationsList[appIndex].interview_mode = this.interviewForm.mode;
+          this.applicationsList[appIndex].interview_meeting_link = this.interviewForm.meeting_link;
+          this.applicationsList[appIndex].interview_location = this.interviewForm.location;
+          this.applicationsList[appIndex].interview_message = this.interviewForm.message;
+          this.applicationsList[appIndex].interview_candidate_response = 'pending';
+          this.applicationsList[appIndex].interview_responded_at = null;
+        }
+        this.selectedApplication = {
+          ...this.selectedApplication,
+          status: 'Entretien',
+          interview_scheduled_at: this.interviewForm.scheduled_at,
+          interview_mode: this.interviewForm.mode,
+          interview_meeting_link: this.interviewForm.meeting_link,
+          interview_location: this.interviewForm.location,
+          interview_message: this.interviewForm.message,
+          interview_candidate_response: 'pending',
+          interview_responded_at: null,
+        };
+        this.isSchedulingInterview = false;
+        this.showInterviewPlanner = false;
+        this.interviewMessage = 'Entretien planifié et email envoyé au candidat.';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isSchedulingInterview = false;
+        this.interviewMessage = err.error?.message || 'Impossible de planifier cet entretien.';
+        this.cdr.detectChanges();
+      },
+    });
+  }
   private filterApplication(app: any, statusName: string): boolean {
     // 1. Filtrage par titre d'offre
     if (this.selectedJobTitle !== 'all' && app.job_title !== this.selectedJobTitle) {
@@ -250,6 +329,8 @@ export class AtsPipelineComponent implements OnInit {
 
   onCloseDetails() {
     this.selectedApplication = null;
+    this.showInterviewPlanner = false;
+    this.interviewMessage = '';
     this.isQuizAccordionOpen = false;
     this.quizAnswersData = null;
     this.isLoadingQuizAnswers = false;
@@ -262,7 +343,7 @@ export class AtsPipelineComponent implements OnInit {
 
   openCandidateCV(candidateId: number) {
     if (!candidateId) return;
-    window.open(`/candidate/cv-view/${candidateId}`, '_blank');
+    window.open(`/recruiter/candidate-cv/${candidateId}`, '_blank');
   }
 
   logoUrl(filename: string | null): string {

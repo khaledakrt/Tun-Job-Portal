@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tun-Job Enterprise</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+    <div class="app-layout">
+        
+        <!-- ==========================================
+             1. SIDEBAR PREMIUM (DARK CHARCOAL)
+             ========================================== -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="brand-logo">
+                    <span class="logo-icon">🎯</span>
+                    <span class="logo-text">Tun-Job <small>Enterprise</small></span>
+                </div>
+            </div>
+
+            <!-- Profil connecté discret -->
+            <div class="profile-pill">
+                <div class="avatar-circle">RL</div>
+                <div class="profile-details">
+                    <span class="profile-name">Rania Louati</span>
+                    <span class="profile-badge">Recruteur Principal</span>
+                </div>
+            </div>
+
+            <!-- Liens de navigation condensés -->
+            <nav class="sidebar-nav">
+                <div class="nav-group-title">Recrutement</div>
+                <a href="#" class="sidebar-item active">
+                    <span class="item-icon">📊</span> Vue d'ensemble
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="item-icon">➕</span> Publier une offre
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="item-icon">💼</span> Gérer les offres
+                    <span class="pill-count">8</span>
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="item-icon">👥</span> Suivi Candidats (ATS)
+                    <span class="pill-count alert">14</span>
+                </a>
+                
+                <div class="nav-group-title">Système</div>
+                <a href="#" class="sidebar-item">
+                    <span class="item-icon">⚙️</span> Configuration & Logs
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" class="logout-link">🚪 Quitter la session</a>
+            </div>
+        </aside>
+
+        <!-- ==========================================
+             2. MAIN WORKSPACE
+             ========================================== -->
+        <main class="app-workspace">
+            
+            <!-- Topbar épurée -->
+            <header class="workspace-header">
+                <div class="header-titles">
+                    <h1>Centre de Contrôle</h1>
+                    <p class="subtitle">Pilotez vos campagnes de recrutement en Tunisie en temps réel.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary-outline">Exporter les stats</button>
+                    <button class="btn-action-primary">+ Nouvelle Annonce</button>
+                </div>
+            </header>
+
+            <!-- ==========================================
+                 3. NOUVELLE SECTION : KPI QUICK STATS (PRATIQUE)
+                 ========================================== -->
+            <section class="kpi-strip">
+                <div class="kpi-box">
+                    <span class="kpi-label">Annonces actives</span>
+                    <span class="kpi-value">12</span>
+                </div>
+                <div class="kpi-box">
+                    <span class="kpi-label">Candidatures reçues</span>
+                    <span class="kpi-value">148 <small class="trend-up">+24%</small></span>
+                </div>
+                <div class="kpi-box">
+                    <span class="kpi-label">Entretiens planifiés</span>
+                    <span class="kpi-value">6</span>
+                </div>
+            </section>
+
+            <!-- ==========================================
+                 4. CARTES D'ACTION CONTEMPORAINES
+                 ========================================== -->
+            <section class="action-grid">
+                
+                <!-- Carte 1 -->
+                <div class="premium-card">
+                    <div class="card-header-row">
+                        <div class="icon-wrapper bg-blue">📝</div>
+                        <span class="card-status-pill">Dispo immédiate</span>
+                    </div>
+                    <div class="card-contents">
+                        <h3>Publier un poste</h3>
+                        <p>Rédigez et diffusez une offre d'emploi optimisée pour le marché tunisien.</p>
+                    </div>
+                    <div class="card-footer-action">
+                        <span>Lancer l'assistant</span>
+                        <span class="arrow-icon">→</span>
+                    </div>
+                </div>
+
+                <!-- Carte 2 -->
+                <div class="premium-card">
+                    <div class="card-header-row">
+                        <div class="icon-wrapper bg-teal">📋</div>
+                        <span class="card-status-pill unique">8 en cours</span>
+                    </div>
+                    <div class="card-contents">
+                        <h3>Gérer les offres</h3>
+                        <p>Suivez les performances de vos annonces, modifiez les critères ou archivez.</p>
+                    </div>
+                    <div class="card-footer-action">
+                        <span>Ouvrir la liste</span>
+                        <span class="arrow-icon">→</span>
+                    </div>
+                </div>
+
+                <!-- Carte 3 -->
+                <div class="premium-card active-border">
+                    <div class="card-header-row">
+                        <div class="icon-wrapper bg-purple">👥</div>
+                        <span class="card-status-pill alert">14 nouveaux</span>
+                    </div>
+                    <div class="card-contents">
+                        <h3>Suivi des CV (ATS)</h3>
+                        <p>Qualifiez vos candidats, gérez les étapes du pipeline et accédez aux quiz.</p>
+                    </div>
+                    <div class="card-footer-action color-teal">
+                        <span>Accéder à l'ATS</span>
+                        <span class="arrow-icon">→</span>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+</html>

@@ -1,6 +1,7 @@
 const db = require('../config/db');
 
 let quizSchemaCache = null;
+let interviewSchemaCache = null;
 
 /**
  * Vérifie si la migration quiz (colonne jobs.has_quiz + table job_quizzes) est appliquée.
@@ -29,4 +30,35 @@ function resetQuizSchemaCache() {
     quizSchemaCache = null;
 }
 
-module.exports = { hasQuizSchema, resetQuizSchemaCache };
+async function hasInterviewSchema() {
+    if (interviewSchemaCache !== null) return interviewSchemaCache;
+
+    try {
+        const [tables] = await db.execute(
+            `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'application_interviews'`
+        );
+        const [cols] = await db.execute(
+            `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'application_interviews'
+               AND COLUMN_NAME IN ('candidate_response', 'responded_at')`
+        );
+        interviewSchemaCache = tables.length > 0 && cols.length >= 2;
+    } catch {
+        interviewSchemaCache = false;
+    }
+
+    return interviewSchemaCache;
+}
+
+function resetInterviewSchemaCache() {
+    interviewSchemaCache = null;
+}
+
+module.exports = {
+    hasQuizSchema,
+    resetQuizSchemaCache,
+    hasInterviewSchema,
+    resetInterviewSchemaCache,
+};

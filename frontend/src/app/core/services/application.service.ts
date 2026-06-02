@@ -23,4 +23,39 @@ export class ApplicationService {
   getHistory(): Observable<any> {
     return this.http.get(`${this.api}/history`);
   }
+
+  getSavedJobs(): Observable<any> {
+    return this.http.get(`${this.api}/saved-jobs`);
+  }
+
+  toggleSavedJob(jobId: number): Observable<any> {
+    return this.http.post(`${this.api}/saved-jobs/toggle`, { job_id: jobId });
+  }
+
+  getJobAlerts(): Observable<any> {
+    return this.http.get(`${this.api}/job-alerts`);
+  }
+
+  createJobAlert(payload: {
+    title_keyword?: string;
+    location_keyword?: string;
+    contract_type?: string;
+    experience_level?: string;
+  }): Observable<any> {
+    return this.http.post(`${this.api}/job-alerts`, payload);
+  }
+
+  deleteJobAlert(alertId: number): Observable<any> {
+    return this.http.delete(`${this.api}/job-alerts/${alertId}`);
+  }
+
+  updateJobAlert(alertId: number, payload: {
+    title_keyword?: string;
+    location_keyword?: string;
+    contract_type?: string;
+    experience_level?: string;
+    is_active?: boolean;
+  }): Observable<any> {
+    return this.http.patch(`${this.api}/job-alerts/${alertId}`, payload);
+  }
 }

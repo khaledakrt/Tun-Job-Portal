@@ -140,6 +140,79 @@ exports.verifyEmail = async (req, res) => {
     }
 };
 
+exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    const genericMessage = "Si un compte existe avec cette adresse, un e-mail de réinitialisation vient d'être envoyé.";
+
+    try {
+        const [users] = await db.execute(
+            'SELECT id, name, email, role FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1',
+            [email]
+        );
+
+        if (!users.length) {
+            return res.json({ message: genericMessage });
+        }
+
+        const user = users[0];
+        const resetToken = jwt.sign(
+            {
+                id: user.id,
+                email: user.email,
+                purpose: 'password_reset',
+            },
+            jwtConfig.secret,
+            { expiresIn: '30m' }
+        );
+
+        const resetUrl = `${frontendUrl}/login?resetToken=${encodeURIComponent(resetToken)}`;
+
+        emailService.sendPasswordResetEmail({
+            email: user.email,
+            name: user.name,
+            resetUrl,
+        }).catch((mailErr) => console.error("❌ E-mail reset password:", mailErr.message));
+
+        return res.json({ message: genericMessage });
+    } catch (e) {
+        console.error("❌ Erreur forgotPassword :", e);
+        return res.status(500).json({ message: "Impossible de traiter la demande actuellement." });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    const { token, password } = req.body;
+
+    try {
+        const payload = jwt.verify(token, jwtConfig.secret);
+
+        if (payload.purpose !== 'password_reset' || !payload.id || !payload.email) {
+            return res.status(400).json({ message: 'Lien de réinitialisation invalide.' });
+        }
+
+        const [users] = await db.execute(
+            'SELECT id FROM users WHERE id = ? AND LOWER(email) = LOWER(?) LIMIT 1',
+            [payload.id, payload.email]
+        );
+
+        if (!users.length) {
+            return res.status(400).json({ message: 'Lien de réinitialisation invalide.' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        await db.execute('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, payload.id]);
+
+        return res.json({ message: 'Votre mot de passe a été réinitialisé avec succès. Vous pouvez vous connecter.' });
+    } catch (e) {
+        const message = e.name === 'TokenExpiredError'
+            ? 'Le lien de réinitialisation a expiré. Demandez un nouveau lien.'
+            : 'Lien de réinitialisation invalide.';
+        return res.status(400).json({ message });
+    }
+};
+
 exports.getProfile = async (req, res) => {
     try {
         // 🚀 REQUÊTE PROFIL : Ajout chirurgical de is_verified_company dans la sélection MySQL

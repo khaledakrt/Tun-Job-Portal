@@ -2,7 +2,7 @@ const db = require('../config/db');
 const notificationCtrl = require('../controllers/shared/notification.controller');
 const emailService = require('./email.service');
 const quizService = require('./quiz.service');
-const { hasQuizSchema } = require('../utils/dbSchema');
+const { hasQuizSchema, hasInterviewSchema } = require('../utils/dbSchema');
 
 async function applyToJob({ jobId, candidateId, quizAnswers }) {
     const [existing] = await db.execute(
@@ -18,9 +18,12 @@ async function applyToJob({ jobId, candidateId, quizAnswers }) {
     const quizReady = await hasQuizSchema();
     const [jobs] = await db.execute(
         quizReady
-            ? `SELECT j.id, j.title, COALESCE(j.has_quiz, 0) AS has_quiz, j.recruiter_id,
+            ? `SELECT j.id, j.title,
+                      CASE WHEN jq.id IS NOT NULL AND jq.is_active = 1 THEN 1 ELSE 0 END AS has_quiz,
+                      j.recruiter_id,
                       u.email AS recruiter_email, u.name AS recruiter_name, u.company_name
                FROM jobs j
+               LEFT JOIN job_quizzes jq ON j.id = jq.job_id
                JOIN users u ON j.recruiter_id = u.id
                WHERE j.id = ? AND j.status = 'disponible'`
             : `SELECT j.id, j.title, 0 AS has_quiz, j.recruiter_id,
@@ -46,6 +49,12 @@ async function applyToJob({ jobId, candidateId, quizAnswers }) {
         [jobId, candidateId]
     );
     const applicationId = insertResult.insertId;
+
+    await db.execute(
+        `INSERT INTO application_status_history (application_id, status, note)
+         VALUES (?, ?, ?)`,
+        [applicationId, 'Nouveau', 'Candidature envoyée par le candidat']
+    ).catch(() => {});
 
     if (quizReady && job.has_quiz && quizAnswers?.length) {
         await quizService.saveApplicationAnswers(applicationId, quizAnswers);
@@ -95,6 +104,11 @@ async function updateApplicationStatus({ applicationId, status, recruiterId }) {
     const app = rows[0];
 
     await db.execute('UPDATE applications SET status = ? WHERE id = ?', [status, applicationId]);
+    await db.execute(
+        `INSERT INTO application_status_history (application_id, status, note)
+         VALUES (?, ?, ?)`,
+        [applicationId, status, 'Statut mis à jour par le recruteur']
+    ).catch(() => {});
 
     // Message mis à jour avec le nom de l'entreprise
     const notificationMessage = `📧 L'entreprise "${app.company_name}" a changé le statut de votre candidature pour "${app.job_title}" en ${status}`;
@@ -117,5 +131,81 @@ async function updateApplicationStatus({ applicationId, status, recruiterId }) {
     return { message: 'Statut ATS mis à jour avec succès !' };
 }
 
+async function scheduleInterview({
+    applicationId,
+    recruiterId,
+    scheduledAt,
+    mode,
+    meetingLink,
+    location,
+    message,
+}) {
+    if (!(await hasInterviewSchema())) {
+        const err = new Error('Module entretien non installé. Exécutez les migrations 004_interview_scheduling.sql puis 005_interview_confirmation.sql.');
+        err.statusCode = 400;
+        throw err;
+    }
 
-module.exports = { applyToJob, updateApplicationStatus };
+    const [rows] = await db.execute(
+        `SELECT a.id, a.candidate_id, a.job_id,
+                j.title AS job_title, j.recruiter_id,
+                c.email AS candidate_email, c.name AS candidate_name,
+                r.company_name, r.name AS recruiter_name
+         FROM applications a
+         JOIN jobs j ON a.job_id = j.id
+         JOIN users c ON a.candidate_id = c.id
+         JOIN users r ON j.recruiter_id = r.id
+         WHERE a.id = ? AND j.recruiter_id = ?`,
+        [applicationId, recruiterId]
+    );
+
+    if (!rows.length) {
+        const err = new Error('Candidature introuvable.');
+        err.statusCode = 404;
+        throw err;
+    }
+
+    const app = rows[0];
+    const sqlScheduledAt = String(scheduledAt).replace('T', ' ').slice(0, 19);
+
+    await db.execute(
+        `INSERT INTO application_interviews (application_id, scheduled_at, mode, meeting_link, location, message)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+            applicationId,
+            sqlScheduledAt,
+            mode || 'En ligne',
+            meetingLink || null,
+            location || null,
+            message || null,
+        ]
+    );
+
+    await db.execute('UPDATE applications SET status = ? WHERE id = ?', ['Entretien', applicationId]);
+    await db.execute(
+        `INSERT INTO application_status_history (application_id, status, note)
+         VALUES (?, ?, ?)`,
+        [applicationId, 'Entretien', 'Entretien planifié par le recruteur']
+    ).catch(() => {});
+
+    const notificationMessage = `📅 ${app.company_name} a planifié un entretien pour "${app.job_title}"`;
+    await notificationCtrl.triggerNotification(app.candidate_id, notificationMessage);
+
+    if (app.candidate_email) {
+        emailService.notifyCandidateInterviewScheduled({
+            candidateEmail: app.candidate_email,
+            candidateName: app.candidate_name,
+            jobTitle: app.job_title,
+            companyName: app.company_name,
+            scheduledAt: sqlScheduledAt,
+            mode: mode || 'En ligne',
+            meetingLink,
+            location,
+            message,
+        }).catch((e) => console.error('❌ Email candidat (entretien planifié):', e.message));
+    }
+
+    return { message: 'Entretien planifié avec succès.' };
+}
+
+module.exports = { applyToJob, updateApplicationStatus, scheduleInterview };

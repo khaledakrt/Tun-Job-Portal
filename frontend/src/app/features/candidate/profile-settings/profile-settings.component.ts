@@ -42,6 +42,31 @@ export class ProfileSettingsComponent implements OnInit {
   passwordSuccessMessage = '';
   passwordErrorMessage = '';
 
+  get profileCompletionItems() {
+    return [
+      { label: 'Nom complet', done: !!this.profile.name },
+      { label: 'Email', done: !!this.profile.email },
+      { label: 'Téléphone', done: !!this.profile.phone },
+      { label: 'Adresse', done: !!this.profile.address },
+      { label: 'Photo', done: !!this.logoPreviewUrl },
+      { label: 'Date de naissance', done: !!this.profile.birth_date },
+      { label: 'Lien LinkedIn ou GitHub', done: !!this.profile.linkedin || !!this.profile.github },
+      { label: 'Situation professionnelle', done: !!this.profile.job_status },
+      { label: 'Disponibilité', done: !!this.profile.availability },
+      { label: 'Contrat recherché', done: !!this.profile.job_type },
+      { label: 'Localisation souhaitée', done: !!this.profile.location_pref || !!this.profile.address },
+    ];
+  }
+
+  get profileCompletionScore(): number {
+    const completed = this.profileCompletionItems.filter((item) => item.done).length;
+    return Math.round((completed / this.profileCompletionItems.length) * 100);
+  }
+
+  get missingProfileItems(): string[] {
+    return this.profileCompletionItems.filter((item) => !item.done).slice(0, 4).map((item) => item.label);
+  }
+
   ngOnInit() {
     this.loadCurrentProfile();
   }

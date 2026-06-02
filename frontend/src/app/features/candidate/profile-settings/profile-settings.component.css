@@ -333,3 +333,464 @@ form > .profile-split-layout {
   background-color: #f0f9ff;
   color: #0ea5e9;
 }
+
+/* Final candidate profile settings refresh */
+:host {
+  --profile-primary: #4338ca;
+  --profile-secondary: #0891b2;
+  --profile-text: #0f172a;
+  --profile-muted: #526179;
+  --profile-border: #dbe3ef;
+  font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.profile-container-compact {
+  min-height: calc(100vh - 90px);
+  padding: 4px 0 42px !important;
+  background:
+    radial-gradient(circle at top left, rgba(67, 56, 202, 0.10), transparent 30%),
+    radial-gradient(circle at top right, rgba(6, 182, 212, 0.10), transparent 28%),
+    linear-gradient(180deg, #f8fbff 0%, #f4f7fb 100%);
+}
+
+.card-header-flex-compact:first-child {
+  max-width: 1180px;
+  margin: 0 auto 18px;
+  padding: 22px 24px;
+  border-radius: 28px;
+  color: #ffffff;
+  background:
+    linear-gradient(135deg, rgba(49, 46, 129, 0.97), rgba(8, 145, 178, 0.95)),
+    radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.24), transparent 32%);
+  box-shadow: 0 24px 58px rgba(49, 46, 129, 0.22);
+}
+
+.card-header-left h3 {
+  color: #ffffff;
+  font-size: 27px;
+  font-weight: 950;
+  letter-spacing: -0.65px;
+}
+
+.card-header-left h3 i {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+form {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.profile-split-layout {
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: 18px;
+}
+
+.profile-panel-card {
+  border: 1px solid rgba(216, 224, 238, 0.95);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 22px 52px rgba(15, 23, 42, 0.08);
+}
+
+.panel-inner-title {
+  color: var(--profile-text);
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.panel-inner-title i {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: var(--profile-primary);
+  background: #eef2ff;
+}
+
+.logo-section-compact {
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid #dbeafe;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #ffffff, #f0f9ff);
+}
+
+.logo-preview-compact {
+  width: 82px;
+  height: 82px;
+  border: 4px solid #ffffff;
+  outline: 2px solid #a5b4fc;
+  box-shadow: 0 18px 32px rgba(67, 56, 202, 0.16);
+}
+
+.upload-actions-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.upload-actions-compact::before {
+  content: "Photo de profil";
+  color: var(--profile-text);
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.upload-actions-compact::after {
+  content: "Utilisée dans votre CV et vos candidatures.";
+  color: var(--profile-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.btn-secondary-upload-compact,
+.btn-cancel-compact,
+.btn-save-compact {
+  min-height: 40px;
+  border-radius: 14px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.btn-secondary-upload-compact {
+  width: fit-content;
+  border-color: #c7d2fe;
+  color: #3730a3;
+  background: #eef2ff;
+}
+
+.btn-save-compact {
+  background: linear-gradient(135deg, var(--profile-primary), var(--profile-secondary));
+  box-shadow: 0 14px 28px rgba(67, 56, 202, 0.16);
+}
+
+.btn-cancel-compact {
+  color: #334155;
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.btn-save-compact.btn-dark-theme {
+  background: linear-gradient(135deg, #0f172a, #334155) !important;
+}
+
+.compact-form-grid {
+  gap: 13px;
+}
+
+.horizontal-form-grid-compact {
+  gap: 16px;
+}
+
+.form-group-compact label {
+  color: #475569;
+  font-size: 11.5px;
+  font-weight: 950;
+  letter-spacing: 0.45px;
+}
+
+.form-group-compact input,
+.form-group-compact select,
+.static-text-compact {
+  min-height: 44px;
+  border: 1px solid var(--profile-border);
+  border-radius: 14px;
+  color: var(--profile-text);
+  background: #ffffff;
+  font-size: 13.5px;
+  font-weight: 750;
+}
+
+.static-text-compact {
+  background: #f8fafc;
+}
+
+.form-group-compact input:focus,
+.form-group-compact select:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.13);
+  outline: none;
+}
+
+.form-actions-compact {
+  border-top-color: #eaf0f7;
+}
+
+.alert-box-compact {
+  max-width: 1180px;
+  margin: 0 auto 14px;
+  border-radius: 16px;
+  padding: 13px 16px;
+}
+
+.profile-completion-card {
+  max-width: 1180px;
+  margin: 0 auto 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.7fr);
+  gap: 18px;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid #dbeafe;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
+}
+
+.completion-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--profile-primary);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.profile-completion-card h4 {
+  margin: 7px 0 5px;
+  color: var(--profile-text);
+  font-size: 22px;
+  font-weight: 950;
+}
+
+.profile-completion-card p,
+.completion-progress-block small {
+  margin: 0;
+  color: var(--profile-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.completion-progress-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.completion-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--profile-primary), var(--profile-secondary));
+}
+
+.completion-progress-block {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.full-width-card-compact {
+  margin-top: 18px;
+}
+
+.full-width-card-compact > .card-header-flex-compact {
+  padding: 0 !important;
+  margin: 0 0 18px !important;
+  color: inherit;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.professional-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.professional-card-header .panel-inner-title {
+  margin-bottom: 0;
+}
+
+.professional-card-header > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.autocomplete-dropdown {
+  border-radius: 14px;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.13);
+}
+
+@media (max-width: 980px) {
+  .profile-split-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .card-header-flex-compact:first-child {
+    padding: 18px;
+  }
+
+  .card-header-left h3 {
+    font-size: 22px;
+  }
+
+  .logo-section-compact {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* ==========================================================================
+   PROFILE SETTINGS - CLEAN CANDIDATE THEME
+   ========================================================================== */
+:host {
+  --profile-accent: #2563eb;
+  --profile-text: #111827;
+  --profile-muted: #64748b;
+  --profile-border: #e2e8f0;
+  --profile-soft: #f8fafc;
+}
+
+.profile-container-compact {
+  color: var(--profile-text);
+  padding: 0 !important;
+}
+
+.card-header-flex-compact,
+.profile-panel-card,
+.profile-completion-card,
+.full-width-card-compact,
+.professional-card-header {
+  background: #ffffff !important;
+  border: 1px solid var(--profile-border) !important;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04) !important;
+  border-radius: 18px !important;
+}
+
+.card-header-left h3,
+.panel-inner-title,
+.professional-card-header h4 {
+  color: var(--profile-text) !important;
+}
+
+.panel-inner-title i,
+.card-header-left h3 i,
+.profile-completion-card i {
+  color: var(--profile-accent) !important;
+}
+
+.logo-section-compact,
+.static-text-compact,
+.text-muted-dots {
+  background: var(--profile-soft) !important;
+  border-color: var(--profile-border) !important;
+}
+
+.form-group-compact input:focus,
+.form-group-compact select:focus {
+  border-color: var(--profile-accent) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10) !important;
+}
+
+.btn-save-compact,
+.btn-save-compact.btn-dark-theme {
+  background: var(--profile-accent) !important;
+  color: #ffffff !important;
+  border-color: var(--profile-accent) !important;
+  box-shadow: none !important;
+}
+
+.btn-cancel-compact,
+.btn-secondary-upload-compact {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border-color: var(--profile-border) !important;
+}
+
+.alert-success {
+  background: #f0fdf4 !important;
+  color: #047857 !important;
+  border-color: #bbf7d0 !important;
+}
+
+.profile-split-layout {
+  gap: 16px !important;
+}
+
+.profile-panel-card {
+  padding: 20px !important;
+}
+
+.panel-inner-title {
+  margin-bottom: 12px !important;
+  font-size: 13px !important;
+}
+
+.compact-form-grid,
+.horizontal-form-grid-compact {
+  gap: 12px !important;
+}
+
+.form-group-compact label {
+  color: var(--profile-muted) !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* ==========================================================================
+   STRICT PROFESSIONAL PROFILE OVERRIDE
+   ========================================================================== */
+.profile-container-compact,
+.profile-container-compact * {
+  letter-spacing: normal !important;
+}
+
+.profile-container-compact .card-header-flex-compact,
+.profile-container-compact .profile-panel-card,
+.profile-container-compact .profile-completion-card,
+.profile-container-compact .full-width-card-compact,
+.profile-container-compact .professional-card-header,
+.profile-container-compact .logo-section-compact,
+.profile-container-compact .static-text-compact {
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+
+.profile-container-compact h1,
+.profile-container-compact h2,
+.profile-container-compact h3,
+.profile-container-compact h4,
+.profile-container-compact strong {
+  color: #111827 !important;
+}
+
+.profile-container-compact p,
+.profile-container-compact span,
+.profile-container-compact label,
+.profile-container-compact small {
+  color: #4b5563 !important;
+}
+
+.profile-container-compact i {
+  color: #6b7280 !important;
+}
+
+.profile-container-compact .btn-save-compact,
+.profile-container-compact .btn-dark-theme {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #2563eb !important;
+  box-shadow: none !important;
+}

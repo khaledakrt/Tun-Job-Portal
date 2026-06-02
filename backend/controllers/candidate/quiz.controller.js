@@ -20,15 +20,6 @@ exports.getJobQuizForCandidate = async (req, res) => {
             return res.json({ has_quiz: false, quiz: null });
         }
 
-        const [quizFlags] = await db.execute(
-            'SELECT COALESCE(has_quiz, 0) AS has_quiz FROM jobs WHERE id = ?',
-            [jobId]
-        );
-
-        if (!quizFlags[0]?.has_quiz) {
-            return res.json({ has_quiz: false, quiz: null });
-        }
-
         const quiz = await quizService.getQuizByJobId(jobId, { includeCorrect: false });
         if (!quiz) {
             return res.json({ has_quiz: false, quiz: null });

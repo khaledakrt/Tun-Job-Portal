@@ -21,6 +21,7 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
 
   candidateName = 'Candidat';
   candidateAvatar: string | null = null;
+  profileAvatarLoaded = false;
   assetsUrl = environment.assetsUrl;
   
   // 🚀 Variable réactive liée au *ngIf du HTML pour afficher la popup
@@ -31,6 +32,12 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
     const storedName = localStorage.getItem('name');
     if (storedName) {
       this.candidateName = storedName;
+    }
+
+    const cachedAvatar = localStorage.getItem('candidate_avatar');
+    if (cachedAvatar) {
+      this.candidateAvatar = cachedAvatar;
+      this.profileAvatarLoaded = true;
     }
     
     // Charge les informations de profil (incluant l'avatar)
@@ -66,6 +73,20 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
     });
   }
 
+  get candidateInitials(): string {
+    return this.candidateName
+      .split(' ')
+      .map((part) => part.trim()[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || 'C';
+  }
+
+  get isCandidateJobSearchPage(): boolean {
+    return this.router.url.includes('/candidate/job-search');
+  }
+
   // 📡 Récupère l'avatar actuel pour la sidebar
   loadProfileSidebar() {
     const token = localStorage.getItem('token');
@@ -79,10 +100,18 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
         // Nettoyage du chemin si nécessaire (similaire à profile-settings)
         const cleanFilename = data.avatar_logo.replace('/logos/', '').replace('uploads/logos/', '');
         this.candidateAvatar = cleanFilename;
-        this.cdr.detectChanges();
+        localStorage.setItem('candidate_avatar', cleanFilename);
+      } else {
+        this.candidateAvatar = null;
+        localStorage.removeItem('candidate_avatar');
       }
+      this.profileAvatarLoaded = true;
+      this.cdr.detectChanges();
     })
-    .catch(() => {});
+    .catch(() => {
+      this.profileAvatarLoaded = true;
+      this.cdr.detectChanges();
+    });
   }
 
   // ❌ Méthode de fermeture liée au bouton "Fermer" et à la croix (X)
@@ -103,7 +132,10 @@ export class CandidateLayoutComponent implements OnInit, OnDestroy {
   }
 
   onLogout() {
-    localStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('name');
+    localStorage.removeItem('is_verified_company');
     this.router.navigate(['/login']);
   }
 }

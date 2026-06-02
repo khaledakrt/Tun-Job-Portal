@@ -40,7 +40,7 @@
           <!-- 💬 TEXTE DU MESSAGE (Différenciation Recruteur / Candidat) -->
           <div class="candidate-job-small" style="color: #475569; font-size: 13px; margin: 4px 0;">
             <!-- Cas A : Message déjà complet (ex: "khaled akrt a postulé pour votre offre...") -->
-            <span *ngIf="notif.message && notif.message.includes('postulé'); else candidateStatusTemplate">
+            <span *ngIf="notif.message && (notif.message.includes('postulé') || notif.message.includes('planifié un entretien')); else candidateStatusTemplate">
               {{ notif.message }}
             </span>
 
@@ -60,8 +60,8 @@
             <span class="meta-pill" *ngIf="notif.address"><i class="bi bi-geo-alt"></i> {{ notif.address }}</span>
             
             <!-- Badge d'action contextualisé -->
-            <span class="meta-pill" [style.background]="notif.message.includes('postulé') ? '#f0fdf4' : '#f0f9ff'" [style.color]="notif.message.includes('postulé') ? '#16a34a' : '#0ea5e9'" style="font-weight: 600;">
-              {{ notif.message.includes('postulé') ? 'Nouvelle candidature' : (notif.status || 'Alerte') }}
+            <span class="meta-pill" [style.background]="notif.message.includes('postulé') ? '#f0fdf4' : (notif.message.includes('planifié un entretien') ? '#fff7ed' : '#f0f9ff')" [style.color]="notif.message.includes('postulé') ? '#16a34a' : (notif.message.includes('planifié un entretien') ? '#f97316' : '#0ea5e9')" style="font-weight: 600;">
+              {{ notif.message.includes('postulé') ? 'Nouvelle candidature' : (notif.message.includes('planifié un entretien') ? 'Entretien planifié' : (notif.status || 'Alerte')) }}
             </span>
           </div>
 

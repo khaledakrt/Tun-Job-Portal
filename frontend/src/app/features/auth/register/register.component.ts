@@ -9,29 +9,7 @@ import { NgIf } from '@angular/common';
   standalone: true,
   imports: [FormsModule, NgIf, RouterLink], // 🚀 2. AJOUT DE RouterLink DANS LES IMPORTS
   templateUrl: './register.component.html',
-  styles: [`
-    .register-container { display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 80px); width: 100%; background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0 auto; position: relative; }
-    .register-card { background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 20px 48px rgba(0, 0, 0, 0.05); width: 100%; max-width: 440px; box-sizing: border-box; }
-    .register-header { text-align: center; margin-bottom: 28px; }
-    .brand-title { font-size: 28px; font-weight: 800; color: #1e293b; margin: 0 0 8px 0; letter-spacing: -0.5px; }
-    .brand-title span { color: #0284c7; }
-    .brand-subtitle { font-size: 14px; color: #64748b; margin: 0; line-height: 1.5; }
-    .register-form { display: flex; flex-direction: column; gap: 18px; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 13px; font-weight: 600; color: #334155; }
-    .form-group input, .form-select { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #1e293b; background-color: #ffffff; box-sizing: border-box; }
-    .btn-submit { width: 100%; padding: 14px; background-color: #0284c7; color: #ffffff; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-    .btn-submit:hover { background-color: #0369a1; }
-    .register-footer { text-align: center; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 18px; }
-    .register-footer p { font-size: 14px; color: #64748b; margin: 0; }
-    .register-footer a { color: #0284c7; text-decoration: none; font-weight: 600; cursor: pointer; }
-
-    /* Bandeaux d'alertes */
-    .alert-box { padding: 14px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; font-weight: 500; text-align: center; animation: slideDown 0.3s ease-out; }
-    .alert-success { background-color: #e6f4ea; color: #137333; border: 1px solid #ceead6; }
-    .alert-error { background-color: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
-    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-  `]
+  styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent {
   private router = inject(Router);

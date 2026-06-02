@@ -20,6 +20,24 @@
     <div class="alert-box-compact alert-danger">{{ passwordErrorMessage }}</div>
   }
 
+  <section class="profile-completion-card">
+    <div>
+      <span class="completion-kicker"><i class="bi bi-clipboard2-check-fill"></i> Qualité du profil</span>
+      <h4>Profil complété à {{ profileCompletionScore }}%</h4>
+      <p>Un profil complet augmente vos chances d’être retenu par les recruteurs.</p>
+    </div>
+    <div class="completion-progress-block">
+      <div class="completion-progress-track">
+        <span [style.width.%]="profileCompletionScore"></span>
+      </div>
+      @if (missingProfileItems.length > 0) {
+        <small>À compléter : {{ missingProfileItems.join(', ') }}</small>
+      } @else {
+        <small>Votre profil candidat est complet.</small>
+      }
+    </div>
+  </section>
+
   <!-- FORM GLOBAL -->
   <form (ngSubmit)="onSaveProfile($event)">
 
@@ -200,8 +218,8 @@
     <div class="profile-panel-card full-width-card-compact">
 
       <!-- 🟢 EN-TÊTE ALIGNÉ AVEC BOUTON D'ACTION ISOLÉ -->
-      <div class="card-header-flex-compact" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <div class="panel-inner-title" style="margin-bottom: 0;">
+      <div class="professional-card-header">
+        <div class="panel-inner-title">
           <i class="bi bi-briefcase-fill"></i> Profil professionnel
         </div>
         <div>
@@ -210,10 +228,10 @@
               <i class="bi bi-pencil-square"></i> Modifier
             </button>
           } @else {
-            <button type="button" class="btn-cancel-compact" style="padding: 5px 10px; font-size: 12px; margin-right: 5px;" (click)="toggleProEditMode(false)">
+            <button type="button" class="btn-cancel-compact" (click)="toggleProEditMode(false)">
               Annuler
             </button>
-            <button type="submit" class="btn-save-compact" style="padding: 5px 12px; font-size: 12px;">
+            <button type="submit" class="btn-save-compact">
               <i class="bi bi-shield-check"></i> Enregistrer
             </button>
           }
@@ -304,6 +322,16 @@
               <option value="Freelance">Freelance</option>
               <option value="Stage">Stage</option>
             </select>
+          }
+        </div>
+
+        <div class="form-group-compact">
+          <label>Localisation souhaitée</label>
+
+          @if (!isProEditMode) {
+            <div class="static-text-compact">{{ profile.location_pref || 'Non renseignée' }}</div>
+          } @else {
+            <input type="text" [(ngModel)]="profile.location_pref" name="location_pref" placeholder="Ex: Tunis, Sousse, Télétravail">
           }
         </div>
 

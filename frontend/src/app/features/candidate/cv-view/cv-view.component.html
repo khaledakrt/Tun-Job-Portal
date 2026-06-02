@@ -1,10 +1,17 @@
 <div class="cv-view-container">
 
-  
-<button class="btn-export-pdf" onclick="window.print()">
+  <section class="cv-view-action-bar no-print">
+    <div class="bar-left">
+      <span class="cv-view-kicker"><i class="bi bi-eye-fill"></i> Aperçu public</span>
+      <h3>Votre CV professionnel</h3>
+      <p>Vérifiez le rendu final et exportez une version PDF prête à partager.</p>
+    </div>
+    <button class="btn-export-pdf" onclick="window.print()">
       <i class="bi bi-file-earmark-pdf-fill"></i>
       Télécharger au format PDF
     </button>
+  </section>
+
   <!-- LOADING -->
   @if (isLoading) {
     <div class="cv-loading-screen no-print">
@@ -91,6 +98,10 @@
 
       <!-- MAIN BODY -->
       <div class="cv-main-body-white">
+        <div class="cv-pdf-brand">
+          <span>Tun Job Portal</span>
+          <small>CV professionnel généré via la plateforme</small>
+        </div>
 
         <!-- PROFILE -->
         <div class="main-cv-section">

@@ -8,6 +8,8 @@ const authSchemas = require('../validators/auth.validator');
 
 router.post('/register', validate(authSchemas.register), ctrl.register);
 router.post('/login', validate(authSchemas.login), ctrl.login);
+router.post('/forgot-password', validate(authSchemas.forgotPassword), ctrl.forgotPassword);
+router.post('/reset-password', validate(authSchemas.resetPassword), ctrl.resetPassword);
 
 // 🔑 NOUVEAU : Endpoint public pour intercepter le clic de confirmation par e-mail
 router.get('/verify-email', ctrl.verifyEmail);

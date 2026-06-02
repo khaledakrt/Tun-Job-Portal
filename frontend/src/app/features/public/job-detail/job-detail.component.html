@@ -1,0 +1,174 @@
+@if (isLoading) {
+  <div class="job-detail-loading">Chargement de l'offre...</div>
+} @else if (!job) {
+  <div class="job-detail-empty">
+    <h1>Offre introuvable</h1>
+    <p>Cette offre n'est plus disponible ou n'existe pas.</p>
+  </div>
+} @else {
+  <main class="job-detail-page">
+    <section class="job-view-context" [class.connected]="isCandidateConnected()" [class.applied]="openedFromApplications">
+      @if (openedFromApplications) {
+        <div>
+          <strong><i class="bi bi-check-circle-fill"></i> Candidature déjà envoyée</strong>
+          <span>Vous consultez cette offre depuis votre espace candidat.</span>
+        </div>
+        <button type="button" (click)="goToCandidateApplications()">
+          Retour à mes candidatures
+        </button>
+      } @else if (isCandidateConnected()) {
+        <div>
+          <strong><i class="bi bi-person-check-fill"></i> Connecté comme candidat</strong>
+          <span>{{ currentUserName || 'Votre session candidat est active.' }}</span>
+        </div>
+      } @else if (isLoggedIn()) {
+        <div>
+          <strong><i class="bi bi-eye-fill"></i> Mode consultation</strong>
+          <span>Vous êtes connecté avec un rôle non candidat. La postulation est réservée aux candidats.</span>
+        </div>
+      } @else {
+        <div>
+          <strong><i class="bi bi-globe2"></i> Vue publique</strong>
+          <span>Connectez-vous avec un compte candidat pour postuler.</span>
+        </div>
+      }
+    </section>
+
+    <section class="job-detail-hero">
+      <img [src]="logoUrl(job.company_logo)" (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo entreprise">
+      <div>
+        <span class="hero-kicker">Offre d'emploi</span>
+        <h1>{{ job.title }}</h1>
+        <p class="company-name"><i class="bi bi-building-check"></i> {{ job.company_name || 'Entreprise Partenaire' }}</p>
+        <div class="hero-badges">
+          <span>{{ job.salary || 'Salaire non spécifié' }}</span>
+          <span>{{ job.location }}</span>
+          <span>{{ job.contract_type }}</span>
+          <span>{{ job.workplace_type }}</span>
+          <span>{{ job.experience_level }}</span>
+          <span>{{ job.has_quiz ? 'Quiz requis' : 'Sans quiz' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="job-detail-layout">
+      <aside class="job-detail-sidebar">
+        <h2>Résumé</h2>
+        <div class="sidebar-row"><span>Salaire</span><strong>{{ job.salary || 'Non spécifié' }}</strong></div>
+        <div class="sidebar-row"><span>Lieu</span><strong>{{ job.location }}</strong></div>
+        <div class="sidebar-row"><span>Contrat</span><strong>{{ job.contract_type }}</strong></div>
+        <div class="sidebar-row"><span>Mode</span><strong>{{ job.workplace_type }}</strong></div>
+        <div class="sidebar-row"><span>Expérience</span><strong>{{ job.experience_level }}</strong></div>
+        @if (job.expires_at) {
+          <div class="sidebar-row"><span>Date limite</span><strong>{{ job.expires_at | date:'dd/MM/yyyy' }}</strong></div>
+        }
+        <button
+          class="btn-apply-sticky"
+          [class.already-applied]="openedFromApplications"
+          [disabled]="openedFromApplications"
+          (click)="onRequestApply()">
+          {{ applyButtonLabel() }}
+        </button>
+      </aside>
+
+      <section class="job-detail-main">
+        <article class="detail-card">
+          <h2>Missions principales</h2>
+          <p>{{ job.missions_desc }}</p>
+        </article>
+
+        <article class="detail-card">
+          <h2>Profil requis</h2>
+          <p>{{ job.profile_desc }}</p>
+        </article>
+
+        <article class="detail-card">
+          <h2>Compétences & langues</h2>
+          <div class="tags-block">
+            @for (skill of getTextList(job.skills_desc); track skill) {
+              <span>{{ skill }}</span>
+            }
+          </div>
+          <div class="tags-block muted-tags">
+            @for (lang of getTextList(job.languages_desc); track lang) {
+              <span>{{ lang }}</span>
+            }
+          </div>
+        </article>
+
+        @if (job.has_quiz) {
+          <article class="detail-card quiz-card">
+            <h2>Questionnaire de présélection</h2>
+            @if (isLoadingQuiz) {
+              <p>Chargement du quiz...</p>
+            } @else if (jobQuiz?.questions?.length) {
+              @for (question of jobQuiz.questions; track question.id; let i = $index) {
+                <div class="quiz-question">
+                  <h3>{{ i + 1 }}. {{ question.question_text }}</h3>
+                  <div class="quiz-options">
+                    @for (choice of question.choices; track choice.id) {
+                      <label [class.selected]="quizAnswers[question.id] === choice.id">
+                        <input type="radio"
+                               [name]="'question-' + question.id"
+                               [value]="choice.id"
+                               [checked]="quizAnswers[question.id] === choice.id"
+                               (change)="onQuizAnswerChange(question.id, choice.id)">
+                        <span>{{ choice.choice_text }}</span>
+                      </label>
+                    }
+                  </div>
+                </div>
+              }
+            } @else {
+              <p>Quiz indisponible pour le moment.</p>
+            }
+          </article>
+        }
+
+        @if (applyError) {
+          <p class="apply-error">{{ applyError }}</p>
+        }
+      </section>
+    </section>
+  </main>
+}
+
+@if (showAuthRequiredPopup) {
+  <div class="custom-modal-overlay-auth" (click)="showAuthRequiredPopup = false">
+    <div class="custom-modal-box-auth" (click)="$event.stopPropagation()">
+      <div class="custom-modal-header-auth">
+        <i class="bi bi-box-arrow-in-right login-icon-ats"></i>
+        <h3>Connexion requise</h3>
+      </div>
+      <div class="custom-modal-body-auth">
+        <p>Pour postuler à cette offre et transmettre votre dossier aux recruteurs sur <strong>TunJob Portal</strong>, vous devez posséder un compte candidat connecté.</p>
+        <p class="sub-text-auth">L'inscription est gratuite et prend moins de 2 minutes !</p>
+      </div>
+      <div class="custom-modal-footer-auth">
+        <button type="button" class="btn-modal-cancel-auth" (click)="showAuthRequiredPopup = false">Plus tard</button>
+        <button type="button" class="btn-modal-confirm-auth" (click)="goToLogin()">Se connecter / S'inscrire</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showConfirmApplyPopup) {
+  <div class="custom-modal-overlay-auth" (click)="onCancelApplyConfirmation()">
+    <div class="custom-modal-box-auth" (click)="$event.stopPropagation()">
+      @if (applyPopupSuccess) {
+        <div class="success-icon">✓</div>
+        <h3>Candidature envoyée</h3>
+        <p>Votre candidature a bien été transmise au recruteur.</p>
+      } @else {
+        <h3>Confirmer votre candidature</h3>
+        <p>Souhaitez-vous postuler à cette offre ?</p>
+        <div class="custom-modal-footer-auth">
+          <button type="button" class="btn-modal-cancel-auth" (click)="onCancelApplyConfirmation()">Annuler</button>
+          <button type="button" class="btn-modal-confirm-auth" [disabled]="isSubmitting" (click)="executeApplySubmit()">
+            {{ isSubmitting ? 'Envoi...' : 'Confirmer' }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}

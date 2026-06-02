@@ -1,0 +1,121 @@
+<main class="contact-page">
+  <section class="contact-hero">
+    <div class="hero-content">
+      <span class="hero-kicker"><i class="bi bi-chat-dots-fill"></i> Contact Tun Job Portal</span>
+      <h1>Besoin d'aide ou d'une information ? Parlons-en.</h1>
+      <p>
+        Notre équipe vous accompagne pour les questions liées aux candidatures, aux offres, aux comptes recruteurs et aux partenariats.
+      </p>
+    </div>
+
+    <div class="hero-support-card">
+      <i class="bi bi-headset"></i>
+      <strong>Support réactif</strong>
+      <span>Nous traitons les messages importants avec priorité afin de garder votre expérience fluide.</span>
+    </div>
+  </section>
+
+  <section class="contact-layout">
+    <aside class="contact-info-panel">
+      <div class="info-card">
+        <i class="bi bi-envelope-paper"></i>
+        <div>
+          <span>Email</span>
+          <strong>support&#64;tunjob.tn</strong>
+          <p>Pour toute demande générale ou assistance compte.</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <i class="bi bi-building-check"></i>
+        <div>
+          <span>Recruteurs</span>
+          <strong>Publication & partenariats</strong>
+          <p>Aide pour publier des offres, gérer les candidatures et certifier votre entreprise.</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <i class="bi bi-person-check"></i>
+        <div>
+          <span>Candidats</span>
+          <strong>Compte & candidatures</strong>
+          <p>Questions sur le CV, le suivi des candidatures ou la connexion.</p>
+        </div>
+      </div>
+
+      <div class="response-note">
+        <i class="bi bi-clock-history"></i>
+        <p>Réponse habituelle sous 24 à 48h ouvrées selon la nature de la demande.</p>
+      </div>
+    </aside>
+
+    <section class="contact-form-card">
+      <div class="form-heading">
+        <span>Envoyer un message</span>
+        <h2>Expliquez-nous votre besoin</h2>
+        <p>Remplissez les informations ci-dessous, nous reviendrons vers vous dès que possible.</p>
+      </div>
+
+      @if (submitted) {
+        <div class="success">
+          <i class="bi bi-check-circle-fill"></i>
+          <div>
+            <strong>Message envoyé avec succès</strong>
+            <p>{{ successMessage || 'Merci, nous vous répondrons bientôt.' }}</p>
+          </div>
+        </div>
+      }
+
+      @if (error) {
+        <div class="error">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ error }}</span>
+        </div>
+      }
+
+      <form #f="ngForm" (ngSubmit)="onSubmit()" novalidate class="contact-form">
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="contact-name">Nom complet <span>*</span></label>
+            <div class="input-with-icon">
+              <i class="bi bi-person"></i>
+              <input id="contact-name" name="name" [(ngModel)]="payload.name" required placeholder="Votre nom">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="contact-email">Email <span>*</span></label>
+            <div class="input-with-icon">
+              <i class="bi bi-envelope"></i>
+              <input id="contact-email" name="email" type="email" [(ngModel)]="payload.email" required placeholder="exemple@email.com">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="contact-subject">Sujet</label>
+          <div class="input-with-icon">
+            <i class="bi bi-tag"></i>
+            <input id="contact-subject" name="subject" [(ngModel)]="payload.subject" placeholder="Ex: problème de connexion, partenariat...">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="contact-message">Message <span>*</span></label>
+          <textarea id="contact-message" name="message" rows="7" [(ngModel)]="payload.message" required placeholder="Décrivez votre demande avec le maximum de détails utiles..."></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="submit" [disabled]="isSubmitting">
+            @if (isSubmitting) {
+              <i class="bi bi-arrow-clockwise spin"></i> Envoi en cours...
+            } @else {
+              <i class="bi bi-send-fill"></i> Envoyer le message
+            }
+          </button>
+        </div>
+      </form>
+    </section>
+  </section>
+</main>

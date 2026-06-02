@@ -15,7 +15,7 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./recruiter-layout.component.css'] 
 })
 export class RecruiterLayoutComponent implements OnInit, OnDestroy {
-  private router = inject(Router);
+  public router = inject(Router);
   private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone); 
@@ -120,7 +120,7 @@ export class RecruiterLayoutComponent implements OnInit, OnDestroy {
 
   openCandidateCV(candidateId: number) {
     if (!candidateId) return;
-    window.open(`/candidate/cv-view/${candidateId}`, '_blank');
+    window.open(`/recruiter/candidate-cv/${candidateId}`, '_blank');
   }
 
   // 🚀 ACTION DE FERMETURE : Supprime les données en mémoire du service et du composant

@@ -1,23 +1,24 @@
 <div class="candidate-app-container">
   
-  <!-- 🧭 SIDEBAR COMPLÈTE & PROFESSIONNELLE DU CANDIDAT (D'origine, inchangée) -->
   <aside class="candidate-sidebar">
     <div class="sidebar-brand">
-      <!-- 1. Titre de la marque en haut -->
-      <div class="logo-text">Tun<span>Job</span> Candidate</div>
-      
-      <!-- 2. Bloc utilisateur en dessous -->
+      <div class="logo-text">Tun<span>Job</span></div>
+      <div class="sidebar-label">Espace candidat</div>
+
       <div class="user-profile-section">
-        <div class="sidebar-user-avatar">
-          <img [src]="candidateAvatar ? assetsUrl + '/logos/' + candidateAvatar : 'assets/images/default-avatar.png'" 
-               (error)="$any($event.target).src='https://placehold.co/100x100?text=User'"
+        <div class="sidebar-user-avatar" [class.loading]="!profileAvatarLoaded && !candidateAvatar">
+          <img *ngIf="candidateAvatar" [src]="assetsUrl + '/logos/' + candidateAvatar" 
+               (error)="candidateAvatar = null"
                alt="Profile">
+          <span *ngIf="!candidateAvatar" class="avatar-initials">{{ candidateInitials }}</span>
         </div>
-        <div class="user-sidebar-name">{{ candidateName }}</div>
+        <div>
+          <div class="user-sidebar-name">{{ candidateName }}</div>
+          <div class="user-sidebar-role">Candidat connecté</div>
+        </div>
       </div>
     </div>
 
-    <!-- Menu de navigation -->
     <nav class="sidebar-nav">
       <div class="nav-section-title">Recherche & Suivi</div>
       
@@ -49,29 +50,24 @@
       </a>
 
       <!-- Bouton Déconnexion sécurisé en bas de la Sidebar -->
-      <a (click)="onLogout()" class="nav-link-item logout-item" style="margin-top: auto; color: #ef4444; cursor: pointer;">
-        <i class="bi bi-box-arrow-left" style="color: #ef4444;"></i> Quitter la session
+      <a (click)="onLogout()" class="nav-link-item logout-item">
+        <i class="bi bi-box-arrow-left"></i> Quitter la session
       </a>
     </nav>
   </aside>
 
-  <!-- 💻 ZONE DE CONTENU PRINCIPALE (DROITE) (D'origine, inchangée) -->
   <main class="candidate-main">
-  <!-- HEADER BLANC : Aligne la cloche à l'extrême droite -->
-  <header class="candidate-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; padding: 24px 40px; border-bottom: 1px solid #e2e8f0;">
-    
-    <!-- Bloc vide à gauche pour pousser la notification vers la droite -->
-    <div class="spacer-left"></div>
-
-    <!-- INJECTION DU CENTRE DE NOTIFICATIONS TOUT À DROITE -->
-    <div style="display: flex; align-items: center;">
+  <header class="candidate-header">
+    <div class="candidate-page-title" *ngIf="isCandidateJobSearchPage">
+      <span>Recherche d'offres</span>
+      <h1>Trouvez votre prochaine opportunité</h1>
+    </div>
+    <div class="header-actions">
       <app-notification-center></app-notification-center>
     </div>
-    
   </header>
 
-  <!-- ZONE D'INJECTION DYNAMIQUE POUR LES SOUS-PAGES (NETTOYÉE ET PROPRE) -->
-  <div class="candidate-content-body" style="padding: 30px 40px;">
+  <div class="candidate-content-body">
     <router-outlet></router-outlet>
   </div>
 </main>

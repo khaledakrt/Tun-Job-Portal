@@ -1,3 +1,4 @@
+USE `tun_job_portal`;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- 1. Table USERS

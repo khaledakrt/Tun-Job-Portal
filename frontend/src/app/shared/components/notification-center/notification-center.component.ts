@@ -89,17 +89,6 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
           return true;
         }
 
-        if (
-          ncand &&
-          cand &&
-          ncand === cand &&
-          njob &&
-          job &&
-          njob === job
-        ) {
-          return true;
-        }
-
         return false;
       });
 
@@ -441,8 +430,10 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
         currentStatus = 'Refusé';
       }
 
+      const applicationQuery = notif.application_id ? `?applicationId=${notif.application_id}` : '';
+
       fetch(
-        `${environment.apiUrl}/notifications/recruiter-by-notif/${notif.id}`,
+        `${environment.apiUrl}/notifications/recruiter-by-notif/${notif.id}${applicationQuery}`,
         {
           method: 'GET',
           headers: {
@@ -547,10 +538,7 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
       return filename;
     }
 
-    const baseUrl =
-      environment.apiUrl || 'http://localhost:3000';
-
-    return `${baseUrl}/uploads/avatars/${filename}`;
+    return `${environment.assetsUrl}/avatars/${filename}`;
   }
 
   // ============================================================================
@@ -573,18 +561,17 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
       return filename;
     }
     
-    const baseUrl = 'http://localhost:3000';
     const msg = (messageContext || '').toLowerCase();
 
     // Si le message contient l'emoji ou parle de statut, on force le dossier des logos recruteurs
     if (msg.includes('📧') || msg.includes('statut') || msg.includes('candidature') || msg.includes('entretien')) {
       const cleanLogo = filename.replace('/logos/', '').replace('/uploads/logos/', '');
-      return `${baseUrl}/uploads/logos/${cleanLogo}`;
+      return `${environment.assetsUrl}/logos/${cleanLogo}`;
     }
     
     // Sinon, comportement normal pour l'avatar d'un candidat
     const cleanAvatar = filename.replace('/avatars/', '').replace('/uploads/avatars/', '');
-    return `${baseUrl}/uploads/avatars/${cleanAvatar}`;
+    return `${environment.assetsUrl}/avatars/${cleanAvatar}`;
   }
 
 }

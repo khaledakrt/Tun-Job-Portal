@@ -1,0 +1,365 @@
+/* --- CONFIGURATION DESIGN SYSTEM --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc; /* Fond gris clair de l'application */
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ==========================================
+   1. STYLE SIDEBAR PREMIUM (DARK MODE CHIC)
+   ========================================== */
+.app-sidebar {
+    width: 260px;
+    background-color: #0b0f19; /* Noir ardoise ultra-pro */
+    color: #94a3b8;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px;
+    position: fixed;
+    height: 100vh;
+    z-index: 10;
+}
+
+.sidebar-header {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #1e293b;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.logo-text small {
+    display: block;
+    font-size: 11px;
+    color: #12b395; /* Votre signature couleur */
+    font-weight: 500;
+}
+
+/* Profil Pill */
+.profile-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #151f32;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    background-color: #12b395;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.profile-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    display: block;
+}
+
+.profile-badge {
+    font-size: 10px;
+    color: #64748b;
+}
+
+/* Liens navigation */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-grow: 1;
+}
+
+.nav-group-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #475569;
+    letter-spacing: 0.05em;
+    margin: 14px 0 6px 8px;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #94a3b8;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+
+.sidebar-item:hover {
+    background: #151f32;
+    color: #ffffff;
+}
+
+.sidebar-item.active {
+    background: #12b395; /* Accentuation sur le bouton actif */
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.item-icon {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.pill-count {
+    margin-left: auto;
+    background: #1e293b;
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+
+.pill-count.alert {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.logout-link {
+    font-size: 12px;
+    color: #94a3b8;
+    text-decoration: none;
+}
+.logout-link:hover { color: #ef4444; }
+
+/* ==========================================
+   2. SPACE CONTENU PRINCIPAL
+   ========================================== */
+.app-workspace {
+    margin-left: 260px;
+    flex-grow: 1;
+    padding: 40px 50px;
+}
+
+/* Header moderne */
+.workspace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.workspace-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* Boutons haut de gamme */
+.btn-action-primary {
+    font-family: 'Inter', sans-serif;
+    background-color: #0f172a; /* Bouton noir épuré */
+    color: #ffffff;
+    border: none;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.btn-action-primary:hover { background: #1e293b; }
+
+.btn-secondary-outline {
+    font-family: 'Inter', sans-serif;
+    background: #ffffff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+.btn-secondary-outline:hover { background: #f8fafc; }
+
+/* ==========================================
+   3. STRIP DES INDEX KPI (PRATIQUE)
+   ========================================== */
+.kpi-strip {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.kpi-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    flex-grow: 1;
+}
+
+.kpi-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.kpi-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.trend-up {
+    font-size: 11px;
+    color: #10b981;
+    font-weight: 600;
+}
+
+/* ==========================================
+   4. GRILLE DES CARTES PREMIUM
+   ========================================== */
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.premium-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 190px;
+    transition: all 0.2s ease;
+}
+
+.premium-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.02);
+}
+
+.premium-card.active-border {
+    border-color: #12b395; /* Focus sur la carte principale ATS */
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.bg-blue { background: #eff6ff; }
+.bg-teal { background: #e6f7f4; }
+.bg-purple { background: #f5f3ff; }
+
+.card-status-pill {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.card-status-pill.unique { color: #0d9488; background: #ccfbf1; }
+.card-status-pill.alert { color: #b91c1c; background: #fee2e2; }
+
+.card-contents {
+    margin: 16px 0;
+}
+
+.card-contents h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+.card-contents p {
+    font-size: 12px;
+    color: #475569;
+    line-height: 1.5;
+}
+
+/* Actions en bas de carte */
+.card-footer-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.premium-card:hover .card-footer-action {
+    color: #12b395;
+}
+
+.arrow-icon {
+    font-size: 14px;
+    transition: transform 0.2s;
+}
+
+.premium-card:hover .arrow-icon {
+    transform: translateX(4px);
+}

@@ -67,7 +67,7 @@ app.use('/api/public', publicRoutes);
 app.use('/api/candidate', verifyToken, checkRole(['candidate']), candidateRoutes);
 
 // Espace Recruteur privé
-app.use('/api/recruiter', verifyToken, recruiterRoutes);
+app.use('/api/recruiter', verifyToken, checkRole(['recruiter']), recruiterRoutes);
 
 // Espace Administrateur privé
 app.use('/api/admin', verifyToken, checkRole(['admin']), adminRoutes);

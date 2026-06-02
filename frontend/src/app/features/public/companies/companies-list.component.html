@@ -1,115 +1,197 @@
-<div class="job-search-container visitor-layout">
-  
-  <!-- 🔍 SIDEBAR : RECHERCHE & FILTRES SOCIÉTÉS -->
-  <div class="search-advanced-card">
+<main class="companies-page">
+  <section class="companies-hero">
+    <div class="hero-content">
+      <span class="hero-kicker"><i class="bi bi-patch-check-fill"></i> Entreprises vérifiées</span>
+      <h1>Découvrez les entreprises qui recrutent en Tunisie</h1>
+      <p>
+        Consultez les profils des partenaires certifiés, leurs coordonnées et leurs présentations pour mieux choisir votre prochain environnement de travail.
+      </p>
+      <div class="hero-actions">
+        <a href="/job-search" class="btn-primary-hero">Voir les offres</a>
+        <a href="/register" class="btn-secondary-hero">Créer un compte</a>
+      </div>
+    </div>
+
+    <div class="hero-stats-card">
+      <div class="stat-item">
+        <strong>{{ companiesCount }}</strong>
+        <span>Entreprises</span>
+      </div>
+      <div class="stat-item">
+        <strong>{{ citiesCount }}</strong>
+        <span>Villes couvertes</span>
+      </div>
+      <div class="stat-item">
+        <strong>{{ contactReadyCount }}</strong>
+        <span>Contacts directs</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="companies-search-card">
+    <div class="search-card-heading">
+      <div>
+        <span>Recherche rapide</span>
+        <h2>Trouvez une entreprise partenaire</h2>
+      </div>
+      <strong>{{ companies.length }} résultat(s)</strong>
+    </div>
+
     <div class="advanced-search-grid">
       <div class="search-filter-group">
         <label><i class="bi bi-building"></i> Nom de l'entreprise</label>
         <div class="input-with-icon">
           <i class="bi bi-search"></i>
-          <input type="text" [(ngModel)]="searchTerm" placeholder="Ex: Google, Devoteam...">
+          <input type="text" [(ngModel)]="searchTerm" placeholder="Ex: Devoteam, Orange, Vermeg...">
         </div>
       </div>
       <div class="search-filter-group">
         <label><i class="bi bi-geo-alt"></i> Localisation</label>
         <div class="input-with-icon">
           <i class="bi bi-map"></i>
-          <input type="text" [(ngModel)]="searchLocation" placeholder="Ex: Tunis, Sousse...">
+          <input type="text" [(ngModel)]="searchLocation" placeholder="Ex: Tunis, Sousse, Sfax...">
         </div>
       </div>
-    </div>
-    <div class="reset-filters-row" *ngIf="searchTerm || searchLocation">
-      <button type="button" class="btn-reset-filters" (click)="onResetFilters()">
-        <i class="bi bi-x-circle"></i> Réinitialiser
+      <button type="button" class="btn-reset-filters" [disabled]="!searchTerm && !searchLocation" (click)="onResetFilters()">
+        <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
       </button>
     </div>
-  </div>
+  </section>
 
-  <!-- 🏢 GRILLE DES SOCIÉTÉS (3 PAR LIGNE) -->
-  <div class="jobs-cards-grid-3">
+  <section class="companies-results-header">
+    <div>
+      <span>Annuaire recruteurs</span>
+      <h2>Partenaires disponibles</h2>
+    </div>
+    <p>Des profils vérifiés pour contacter les recruteurs et suivre les opportunités ouvertes.</p>
+  </section>
+
+  <section class="companies-grid">
     @if (isLoading) {
-      <div class="loading-state-box" style="grid-column: span 3; text-align: center; padding: 40px;">
-        <i class="bi bi-arrow-clockwise spin-animation" style="font-size: 30px;"></i>
+      <div class="loading-state-box">
+        <i class="bi bi-arrow-clockwise spin-animation"></i>
         <p>Chargement des partenaires...</p>
       </div>
     } @else {
       @for (company of companies; track company.id) {
-        <div class="job-feed-card clickable-recruiter" (click)="onViewCompanyDetails(company)">
-          <div class="card-top-info">
+        <article class="company-card clickable-recruiter" (click)="onViewCompanyDetails(company)">
+          <div class="company-card-top">
             <div class="company-logo-placeholder">
-              <img [src]="company.company_logo ? assetsUrl + '/logos/' + company.company_logo : 'assets/images/default-avatar.png'" 
-                   (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
+              <img [src]="getCompanyLogo(company)" (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
             </div>
-            <div class="job-title-block">
-              <h4 class="feed-job-title">{{ company.company_name }}</h4>
-              <span class="feed-company-name"><i class="bi bi-patch-check-fill" style="color: #0ea5e9;"></i> Partenaire Vérifié</span>
+            <div class="company-card-title">
+              <h3>{{ company.company_name }}</h3>
+              <span><i class="bi bi-patch-check-fill"></i> Partenaire vérifié</span>
             </div>
           </div>
 
-          <div class="card-mid-meta">
-            <span class="meta-item"><i class="bi bi-geo-alt-fill"></i> {{ company.address || 'Tunisie' }}</span>
-            <span class="meta-item salary-tag"><i class="bi bi-envelope-fill"></i> {{ company.email }}</span>
-          </div>
-
-          <p class="job-short-desc">
-            {{ company.company_bio | slice:0:100 }}{{ company.company_bio?.length > 100 ? '...' : '' }}
+          <p class="company-description">
+            {{ company.company_bio || 'Cette entreprise partenaire n’a pas encore ajouté de présentation détaillée.' }}
           </p>
 
-          <div class="card-bottom-actions">
-            <button class="btn-consult-job"><i class="bi bi-info-circle"></i> Profil</button>
-            <a [href]="'mailto:' + company.email" class="btn-apply-now" (click)="$event.stopPropagation()">Contact</a>
+          <div class="company-meta-list">
+            <span><i class="bi bi-geo-alt-fill"></i> {{ getCompanyCity(company.address) }}</span>
+            <span><i class="bi bi-envelope-fill"></i> {{ company.email || 'Contact non publié' }}</span>
+            <span><i class="bi bi-briefcase-fill"></i> {{ company.active_jobs_count || 0 }} offre(s) active(s)</span>
           </div>
-        </div>
+
+          <div class="company-card-footer">
+            <button type="button" class="btn-consult-job">
+              <i class="bi bi-info-circle"></i> Voir le profil
+            </button>
+            <a *ngIf="company.email" [href]="'mailto:' + company.email" class="btn-apply-now" (click)="$event.stopPropagation()">
+              Contacter
+            </a>
+          </div>
+        </article>
       }
 
       @if (companies.length === 0) {
-        <div class="empty-placeholder" style="grid-column: span 3; padding: 60px;">
-          <i class="bi bi-building-slash" style="font-size: 48px;"></i>
-          <p>Aucune entreprise ne correspond à votre recherche.</p>
+        <div class="empty-placeholder">
+          <i class="bi bi-building-slash"></i>
+          <h3>Aucune entreprise trouvée</h3>
+          <p>Essayez une autre ville ou un autre nom d'entreprise.</p>
+          <button type="button" (click)="onResetFilters()">Réinitialiser la recherche</button>
         </div>
       }
     }
-  </div>
+  </section>
 
-  <!-- 🏢 MODALE : DÉTAILS DE LA SOCIÉTÉ -->
   @if (selectedCompany) {
     <div class="modal-overlay" (click)="onCloseCompanyModal()">
       <div class="modal-card recruiter-profile-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <span>📄 Fiche de l'entreprise</span>
-          <button (click)="onCloseCompanyModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
+          <span>Fiche entreprise</span>
+          <button type="button" (click)="onCloseCompanyModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="modal-body">
-          <div class="recruiter-hero-section">
+          <section class="recruiter-hero-section">
             <div class="recruiter-logo-wrapper">
-              <img [src]="selectedCompany.company_logo ? assetsUrl + '/logos/' + selectedCompany.company_logo : 'assets/images/default-avatar.png'" 
-                   (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
+              <img [src]="getCompanyLogo(selectedCompany)" (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
             </div>
             <div class="recruiter-meta-content">
+              <span class="recruiter-verified-badge"><i class="bi bi-patch-check-fill"></i> Partenaire officiel</span>
               <h1 class="recruiter-main-title">{{ selectedCompany.company_name }}</h1>
-              <div class="recruiter-verified-badge"><i class="bi bi-patch-check-fill"></i> Partenaire Officiel</div>
+              <p>{{ selectedCompany.address || 'Tunisie' }}</p>
             </div>
-          </div>
+          </section>
 
-          <details class="ats-section-card" open>
-            <summary class="ats-section-summary">
-              <span>📋 Coordonnées & Contact</span>
-              <i class="bi bi-chevron-down accordion-icon"></i>
-            </summary>
-            <div class="ats-section-content">
-              <div class="recruiter-contact-grid">
-                <div class="contact-item"><strong>Email :</strong> <span>{{ selectedCompany.email }}</span></div>
-                <div class="contact-item"><strong>Siège :</strong> <span>{{ selectedCompany.address || 'Tunisie' }}</span></div>
+          <section class="company-modal-layout">
+            <aside class="company-modal-sidebar">
+              <div class="contact-item">
+                <i class="bi bi-envelope"></i>
+                <div>
+                  <span>Email</span>
+                  <strong>{{ selectedCompany.email || 'Non publié' }}</strong>
+                </div>
               </div>
-            </div>
-          </details>
+              <div class="contact-item">
+                <i class="bi bi-telephone"></i>
+                <div>
+                  <span>Téléphone</span>
+                  <strong>{{ selectedCompany.phone || 'Non publié' }}</strong>
+                </div>
+              </div>
+              <div class="contact-item">
+                <i class="bi bi-geo-alt"></i>
+                <div>
+                  <span>Siège</span>
+                  <strong>{{ selectedCompany.address || 'Tunisie' }}</strong>
+                </div>
+              </div>
+              <a *ngIf="selectedCompany.email" [href]="'mailto:' + selectedCompany.email" class="btn-modal-contact">
+                Contacter l'entreprise
+              </a>
+            </aside>
 
-          <details class="ats-section-card" open>
-            <summary class="ats-section-summary"><span><i class="bi bi-info-circle-fill"></i> Présentation</span></summary>
-            <div class="ats-section-content"><p class="section-text">{{ selectedCompany.company_bio || 'Aucune description.' }}</p></div>
-          </details>
+            <article class="company-modal-content">
+              <h2>Présentation</h2>
+              <p>{{ selectedCompany.company_bio || 'Aucune description détaillée n’est disponible pour cette entreprise.' }}</p>
+
+              <div class="company-active-jobs">
+                <div class="company-active-jobs-header">
+                  <h2>Offres actives</h2>
+                  <span>{{ selectedCompany.active_jobs_count || 0 }} offre(s)</span>
+                </div>
+
+                @if (selectedCompany.latest_jobs?.length) {
+                  @for (job of selectedCompany.latest_jobs; track job.id) {
+                    <a class="company-job-mini-card" [href]="'/jobs/' + job.id" target="_blank">
+                      <div>
+                        <strong>{{ job.title }}</strong>
+                        <small>{{ job.location }} • {{ job.contract_type }}</small>
+                      </div>
+                      <span>{{ job.salary || 'Salaire non spécifié' }}</span>
+                    </a>
+                  }
+                } @else {
+                  <p class="company-no-jobs">Aucune offre active publiée actuellement.</p>
+                }
+              </div>
+            </article>
+          </section>
         </div>
       </div>
     </div>
   }
-</div>
+</main>

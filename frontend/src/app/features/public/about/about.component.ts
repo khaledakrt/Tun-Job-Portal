@@ -5,11 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-about',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <section>
-      <h1>À propos</h1>
-      <p>Bienvenue sur Tun Job Portal — trouvez des offres rapidement.</p>
-    </section>
-  `,
+  templateUrl: './about.component.html',
+  styleUrls: ['./about.component.css'],
 })
 export class AboutComponent {}

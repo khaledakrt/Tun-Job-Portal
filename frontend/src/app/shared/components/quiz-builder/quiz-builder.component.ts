@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgClass } from '@angular/common';
 import {
   QUIZ_MAX_QUESTIONS,
   QUIZ_CHOICES_PER_QUESTION,
@@ -21,7 +20,7 @@ export interface QuizQuestionDraft {
 @Component({
   selector: 'app-quiz-builder',
   standalone: true,
-  imports: [FormsModule, NgClass],
+  imports: [FormsModule],
   templateUrl: './quiz-builder.component.html',
   styleUrls: ['./quiz-builder.component.css'],
 })

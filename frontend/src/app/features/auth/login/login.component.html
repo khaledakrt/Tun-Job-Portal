@@ -1,50 +1,112 @@
-<div class="login-container">
-  <div class="login-card">
+<main class="auth-page">
+  <section class="auth-visual-panel">
+    <span class="auth-kicker"><i class="bi bi-shield-check"></i> Accès sécurisé</span>
+    <h1>Connectez-vous à votre espace Tun Job Portal</h1>
+    <p>
+      Retrouvez vos candidatures, offres, quiz, notifications et outils de recrutement depuis un espace clair et sécurisé.
+    </p>
+
+    <div class="auth-benefits">
+      <div><i class="bi bi-person-check"></i><span>Espace candidat complet</span></div>
+      <div><i class="bi bi-kanban"></i><span>ATS recruteur structuré</span></div>
+      <div><i class="bi bi-bell"></i><span>Notifications et suivi</span></div>
+    </div>
+  </section>
+
+  <section class="auth-card">
     <div class="login-header">
-      <h2 class="brand-title">Tun<span>Job</span> Portal</h2>
-      <p class="brand-subtitle">Connectez-vous pour accéder à votre espace membre</p>
+      <span class="brand-pill">Tun Job Portal</span>
+      @if (authMode === 'login') {
+        <h2>Bon retour parmi nous</h2>
+        <p>Connectez-vous pour accéder à votre espace membre.</p>
+      } @else if (authMode === 'forgot') {
+        <h2>Réinitialiser le mot de passe</h2>
+        <p>Recevez un lien sécurisé pour retrouver l’accès à votre compte.</p>
+      } @else {
+        <h2>Nouveau mot de passe</h2>
+        <p>Choisissez un mot de passe sécurisé pour votre compte.</p>
+      }
     </div>
 
-    <!-- 🟢 BANDEAU VERT : Apparaît suite au clic dans le mail (?verified=true) -->
     <div *ngIf="isEmailVerified" class="alert-box alert-success">
-      ✅ Votre adresse e-mail a été validée avec succès ! Vous pouvez maintenant vous connecter.
+      <i class="bi bi-check-circle-fill"></i>
+      <span>Votre adresse e-mail a été validée avec succès. Vous pouvez maintenant vous connecter.</span>
     </div>
 
-    <!-- 🔴 BANDEAU ROUGE : Apparaît si le compte n'est pas activé (403) ou identifiants faux -->
     <div *ngIf="errorMessage" class="alert-box alert-error">
-      ⚠️ {{ errorMessage }}
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ errorMessage }}</span>
     </div>
 
-    <form (ngSubmit)="onSubmit($event)" class="login-form">
-      <div class="form-group">
-        <label for="email">Adresse e-mail</label>
-        <input 
-          type="email" 
-          id="email" 
-          name="email" 
-          [(ngModel)]="credentials.email" 
-          placeholder="exemple@domaine.tn" 
-          required
-        >
-      </div>
+    <div *ngIf="successMessage" class="alert-box alert-success">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>{{ successMessage }}</span>
+    </div>
 
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          [(ngModel)]="credentials.password" 
-          placeholder="••••••••" 
-          required
-        >
-      </div>
+    @if (authMode === 'login') {
+      <form (ngSubmit)="onSubmit($event)" class="login-form">
+        <div class="form-group">
+          <label for="email">Adresse e-mail</label>
+          <div class="input-with-icon">
+            <i class="bi bi-envelope"></i>
+            <input type="email" id="email" name="email" [(ngModel)]="credentials.email" placeholder="exemple@domaine.tn" required>
+          </div>
+        </div>
 
-      <button type="submit" class="btn-submit">S'authentifier</button>
-    </form>
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <div class="input-with-icon">
+            <i class="bi bi-lock"></i>
+            <input type="password" id="password" name="password" [(ngModel)]="credentials.password" placeholder="Minimum 8 caractères" required>
+          </div>
+        </div>
+
+        <div class="form-helper">
+          <a (click)="showForgotPassword()">Mot de passe oublié ?</a>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <i class="bi bi-box-arrow-in-right"></i> Se connecter
+        </button>
+      </form>
+    } @else if (authMode === 'forgot') {
+      <form (ngSubmit)="onForgotPassword($event)" class="login-form">
+        <div class="form-group">
+          <label for="forgotEmail">Adresse e-mail du compte</label>
+          <div class="input-with-icon">
+            <i class="bi bi-envelope"></i>
+            <input type="email" id="forgotEmail" name="forgotEmail" [(ngModel)]="forgotEmail" placeholder="exemple@domaine.tn" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Envoyer le lien de réinitialisation</button>
+        <button type="button" class="btn-secondary-action" (click)="showLogin()">Retour à la connexion</button>
+      </form>
+    } @else {
+      <form (ngSubmit)="onResetPassword($event)" class="login-form">
+        <div class="form-group">
+          <label for="newPassword">Nouveau mot de passe</label>
+          <div class="input-with-icon">
+            <i class="bi bi-lock"></i>
+            <input type="password" id="newPassword" name="newPassword" [(ngModel)]="resetPasswordData.password" placeholder="Minimum 8 caractères" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmNewPassword">Confirmer le mot de passe</label>
+          <div class="input-with-icon">
+            <i class="bi bi-shield-lock"></i>
+            <input type="password" id="confirmNewPassword" name="confirmNewPassword" [(ngModel)]="resetPasswordData.confirmPassword" placeholder="Répétez le nouveau mot de passe" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Changer mon mot de passe</button>
+        <button type="button" class="btn-secondary-action" (click)="showLogin()">Retour à la connexion</button>
+      </form>
+    }
 
     <div class="login-footer">
-      <p>Pas encore de compte ? <a (click)="goToRegister()">S'inscrire</a></p>
+      <p>Pas encore de compte ? <a (click)="goToRegister()">Créer un compte</a></p>
     </div>
-  </div>
-</div>
+  </section>
+</main>

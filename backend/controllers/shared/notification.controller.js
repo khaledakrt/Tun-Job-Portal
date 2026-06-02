@@ -92,8 +92,13 @@ exports.triggerNotification = async (userId, messageText) => {
             clientRes.write(`data: ${JSON.stringify(payloadToSend)}\n\n`);
             console.log(`⚡ [SSE-SHARED] Notification dynamique poussée en direct.`);
         }
+        return {
+            id: result.insertId,
+            deliveredLive: Boolean(clientRes),
+        };
     } catch (err) {
         console.error("❌ Erreur lors du déclenchement de la notification :", err.message);
+        throw err;
     }
 };
 
@@ -162,6 +167,7 @@ exports.getNotificationHistory = async (req, res) => {
             } else {
                 const [recruiterData] = await db.execute(`
                     SELECT 
+                        a.id AS application_id,
                         r.id AS recruiter_id,
                         r.name AS name,
                         r.address AS address,
@@ -182,6 +188,7 @@ exports.getNotificationHistory = async (req, res) => {
                     const rec = recruiterData[0];
                     processedRows.push({
                         id: row.id,
+                        application_id: rec.application_id,
                         message: row.message,
                         is_read: row.is_read,
                         created_at: row.created_at,
@@ -241,6 +248,7 @@ exports.getRecruiterByNotificationId = async (req, res) => {
     try {
         const notificationId = req.params.id;
         const currentUserId = req.user.id; // ID du candidat connecté (ex: 7)
+        const applicationId = Number(req.query.applicationId || 0);
 
         // A. On récupère d'abord le texte exact de la notification
         const [notifCheck] = await db.execute(
@@ -253,6 +261,31 @@ exports.getRecruiterByNotificationId = async (req, res) => {
         }
 
         const notifMessage = notifCheck[0].message;
+
+        if (applicationId) {
+            const [directRows] = await db.execute(`
+                SELECT
+                    a.id AS application_id,
+                    a.status AS status,
+                    j.title AS job_title,
+                    recruiter.name AS company_name,
+                    recruiter.email AS email,
+                    recruiter.phone AS phone,
+                    recruiter.address AS address,
+                    recruiter.company_logo AS avatar_logo,
+                    ? AS message
+                FROM applications a
+                JOIN jobs j ON a.job_id = j.id
+                JOIN users recruiter ON j.recruiter_id = recruiter.id
+                WHERE a.id = ? AND a.candidate_id = ?
+                LIMIT 1`,
+                [notifMessage, applicationId, currentUserId]
+            );
+
+            if (directRows && directRows.length > 0) {
+                return res.json(directRows[0]);
+            }
+        }
 
         // B. REQUÊTE PRINCIPALE OPTIMISÉE :
         // On récupère TOUTES les offres de la table jobs pour lesquelles l'étudiant connecté a postulé,

@@ -313,3 +313,408 @@
 }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ==========================================================================
+   CANDIDATE THEME REFRESH
+   ========================================================================== */
+:host {
+  --candidate-primary: #4f46e5;
+  --candidate-primary-dark: #3730a3;
+  --candidate-secondary: #0ea5e9;
+  --candidate-success: #12b395;
+  --candidate-bg: #f8fafc;
+  --candidate-soft: #eef2ff;
+  --candidate-text: #0f172a;
+}
+
+.candidate-app-container {
+  width: 100%;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(79, 70, 229, 0.08), transparent 32%),
+    linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+}
+
+.candidate-sidebar {
+  width: 286px;
+  padding: 22px 16px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(14, 165, 233, 0.28), transparent 32%),
+    linear-gradient(180deg, #312e81 0%, #1e1b4b 100%);
+  box-shadow: 18px 0 55px rgba(30, 27, 75, 0.18);
+}
+
+.sidebar-brand {
+  gap: 12px !important;
+  margin-bottom: 22px;
+}
+
+.logo-text {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 950;
+  letter-spacing: -0.8px;
+}
+
+.logo-text span {
+  color: #7dd3fc;
+}
+
+.sidebar-label {
+  width: fit-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #c7d2fe;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.user-profile-section {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-user-avatar {
+  width: 54px;
+  height: 54px;
+  border: 2px solid rgba(125, 211, 252, 0.8);
+  background: #ffffff;
+}
+
+.user-sidebar-name {
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.user-sidebar-role {
+  margin-top: 2px;
+  color: #c7d2fe;
+  font-size: 11.5px;
+  font-weight: 750;
+}
+
+.sidebar-nav {
+  flex: 1;
+  gap: 6px;
+}
+
+.nav-section-title {
+  color: #a5b4fc;
+  margin: 20px 0 7px 10px;
+}
+
+.nav-link-item {
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  color: #cbd5e1;
+  font-weight: 800;
+}
+
+.nav-link-item i {
+  width: 22px;
+  display: inline-flex;
+  justify-content: center;
+  color: #93c5fd;
+}
+
+.nav-link-item:hover,
+.nav-link-item.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.nav-link-item.active i {
+  color: #7dd3fc;
+}
+
+.logout-item {
+  margin-top: auto;
+  color: #fecaca !important;
+  cursor: pointer;
+}
+
+.logout-item i {
+  color: #fca5a5 !important;
+}
+
+.candidate-main {
+  min-width: 0;
+  background: transparent;
+}
+
+.candidate-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+  padding: 10px 34px;
+  background: rgba(255, 255, 255, 0.88);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  backdrop-filter: blur(14px);
+  min-height: 58px;
+}
+
+.header-welcome span {
+  color: var(--candidate-primary);
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.header-welcome h2 {
+  margin: 4px 0 3px;
+  color: var(--candidate-text);
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: -0.4px;
+}
+
+.header-welcome p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.candidate-content-body {
+  padding: 28px 34px 40px;
+}
+
+.modal-header h3 i,
+.info-value.text-slate {
+  color: var(--candidate-primary) !important;
+}
+
+.status-badge-fixed.bg-blue {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+@media (max-width: 980px) {
+  .candidate-app-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .candidate-sidebar {
+    width: 100%;
+    min-height: auto;
+    padding: 16px;
+  }
+
+  .sidebar-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nav-section-title {
+    grid-column: 1 / -1;
+  }
+
+  .logout-item {
+    margin-top: 0;
+  }
+
+  .candidate-main {
+    height: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .candidate-header,
+  .candidate-content-body {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .candidate-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sidebar-nav {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   CANDIDATE UI CLEAN THEME
+   ========================================================================== */
+:host {
+  --candidate-bg: #f6f8fb;
+  --candidate-surface: #ffffff;
+  --candidate-surface-soft: #f8fafc;
+  --candidate-border: #e2e8f0;
+  --candidate-text: #111827;
+  --candidate-muted: #64748b;
+  --candidate-accent: #2563eb;
+  --candidate-accent-soft: #eff6ff;
+  --candidate-sidebar: #0f172a;
+}
+
+.candidate-app-container {
+  background: var(--candidate-bg) !important;
+  color: var(--candidate-text);
+}
+
+.candidate-sidebar {
+  background: var(--candidate-sidebar) !important;
+  padding: 22px 14px !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-user-avatar {
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  background: #1f2937 !important;
+}
+
+.logo-text span,
+.nav-link-item.active i {
+  color: #60a5fa !important;
+}
+
+.nav-link-item {
+  border-radius: 10px !important;
+  color: #cbd5e1 !important;
+}
+
+.nav-link-item:hover,
+.nav-link-item.active {
+  background: rgba(37, 99, 235, 0.18) !important;
+  color: #ffffff !important;
+}
+
+.candidate-header {
+  min-height: 64px;
+  padding: 14px 26px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-bottom: 1px solid var(--candidate-border) !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.candidate-content-body {
+  padding: 22px 26px 34px !important;
+  background: var(--candidate-bg) !important;
+}
+
+.candidate-page-title {
+  min-width: 0;
+}
+
+.candidate-page-title span {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--candidate-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.candidate-page-title h1 {
+  margin: 0;
+  color: var(--candidate-text);
+  font-size: 19px;
+  line-height: 1.2;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.sidebar-user-avatar {
+  position: relative;
+}
+
+.sidebar-user-avatar.loading {
+  background: linear-gradient(90deg, #1f2937, #273244, #1f2937) !important;
+  background-size: 200% 100% !important;
+  animation: avatarPulse 1s ease-in-out infinite;
+}
+
+.avatar-initials {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #dbeafe;
+  background: #1f2937;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+@keyframes avatarPulse {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* ==========================================================================
+   STRICT PROFESSIONAL CANDIDATE SHELL
+   ========================================================================== */
+.candidate-app-container {
+  background: #f6f8fb !important;
+}
+
+.candidate-sidebar {
+  background: #0f172a !important;
+  box-shadow: none !important;
+}
+
+.logo-text span,
+.nav-link-item.active i,
+.nav-link-item i {
+  color: #bfdbfe !important;
+}
+
+.nav-link-item {
+  background: transparent !important;
+  color: #d1d5db !important;
+}
+
+.nav-link-item:hover,
+.nav-link-item.active {
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+.candidate-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+
+.candidate-page-title h1 {
+  color: #1e3a8a !important;
+  font-size: 18px !important;
+}
+
+.candidate-page-title span {
+  color: #6b7280 !important;
+}

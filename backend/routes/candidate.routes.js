@@ -13,6 +13,7 @@ const cvCtrl = require('../controllers/candidate/cv.controller');
 const appCtrl = require('../controllers/candidate/application.controller');
 const quizCtrl = require('../controllers/candidate/quiz.controller');
 const candidateJobCtrl = require('../controllers/candidate/job.controller');
+const engagementCtrl = require('../controllers/candidate/engagement.controller');
 const { validate } = require('../middleware/validate.middleware');
 const appSchemas = require('../validators/application.validator');
 
@@ -39,6 +40,14 @@ router.post('/cv/upload-pdf', verifyToken, upload.single('cv'), cvCtrl.uploadCvP
 router.get('/jobs/:jobId/quiz', verifyToken, quizCtrl.getJobQuizForCandidate);
 router.post('/apply', verifyToken, validate(appSchemas.apply), appCtrl.apply);
 router.get('/history', verifyToken, appCtrl.getHistory);
+router.post('/applications/:applicationId/interview/confirm', verifyToken, appCtrl.confirmInterview);
+
+router.get('/saved-jobs', verifyToken, engagementCtrl.getSavedJobs);
+router.post('/saved-jobs/toggle', verifyToken, engagementCtrl.toggleSavedJob);
+router.get('/job-alerts', verifyToken, engagementCtrl.getJobAlerts);
+router.post('/job-alerts', verifyToken, engagementCtrl.createJobAlert);
+router.patch('/job-alerts/:id', verifyToken, engagementCtrl.updateJobAlert);
+router.delete('/job-alerts/:id', verifyToken, engagementCtrl.deleteJobAlert);
 
 // La route publique pour récupérer les détails d'une entreprise est maintenant exposée dans app.js
 

@@ -12,6 +12,19 @@ import { environment } from '../../../../environments/environment';
 })
 export class CvBuilderComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
+  activeCvStep: 'identity' | 'experience' | 'education' | 'skills' = 'identity';
+  private savedCvSnapshot: {
+    cvData: {
+      title: string;
+      summary: string;
+      skills: string;
+      interests: string;
+      experiences: any[];
+      educations: any[];
+    };
+    candidateName: string;
+    candidateContact: { email: string; phone: string; address: string };
+  } | null = null;
 
   cvData = {
     title: '',
@@ -54,6 +67,37 @@ showSaveConfirmationModal: boolean = false;
     this.fetchCurrentCV();
   }
 
+  setCvStep(step: 'identity' | 'experience' | 'education' | 'skills') {
+    this.activeCvStep = step;
+    this.cdr.detectChanges();
+  }
+
+  private captureSavedCvSnapshot() {
+    this.savedCvSnapshot = {
+      cvData: {
+        ...this.cvData,
+        experiences: this.cvData.experiences.map(exp => ({ ...exp })),
+        educations: this.cvData.educations.map(edu => ({ ...edu }))
+      },
+      candidateName: this.candidateName,
+      candidateContact: { ...this.candidateContact }
+    };
+  }
+
+  private restoreSavedCvSnapshot() {
+    if (!this.savedCvSnapshot) {
+      return;
+    }
+
+    this.cvData = {
+      ...this.savedCvSnapshot.cvData,
+      experiences: this.savedCvSnapshot.cvData.experiences.map(exp => ({ ...exp })),
+      educations: this.savedCvSnapshot.cvData.educations.map(edu => ({ ...edu }))
+    };
+    this.candidateName = this.savedCvSnapshot.candidateName;
+    this.candidateContact = { ...this.savedCvSnapshot.candidateContact };
+  }
+
   fetchProfileDetails() {
     const token = localStorage.getItem('token');
     fetch(`${environment.apiUrl}/candidate/profile/details`, {
@@ -72,6 +116,7 @@ showSaveConfirmationModal: boolean = false;
         if (data.avatar_logo) {
           this.avatarUrl = `${environment.assetsUrl}/logos/${data.avatar_logo}`;
         }
+        this.captureSavedCvSnapshot();
         this.cdr.detectChanges();
       }
     }).catch(() => {});
@@ -97,6 +142,7 @@ showSaveConfirmationModal: boolean = false;
         if (this.cvData.title || this.cvData.summary) {
           this.isEditable = false;
         }
+        this.captureSavedCvSnapshot();
         this.cdr.detectChanges();
       }
     }).catch(() => {});
@@ -105,6 +151,15 @@ showSaveConfirmationModal: boolean = false;
   // 🔓 Active le mode modification
   enableEdit() {
     this.isEditable = true;
+    this.cdr.detectChanges();
+  }
+
+  cancelEdit() {
+    this.restoreSavedCvSnapshot();
+    this.showSaveConfirmationModal = false;
+    this.showExperienceModal = false;
+    this.showEducationModal = false;
+    this.isEditable = false;
     this.cdr.detectChanges();
   }
 
@@ -259,6 +314,7 @@ confirmAndSaveCV() {
     this.successMessage = "Toutes les modifications de votre profil ont été enregistrées !";
     this.isSaving = false;
     this.isEditable = false; 
+    this.captureSavedCvSnapshot();
     this.cdr.detectChanges();
     setTimeout(() => { this.successMessage = ''; this.cdr.detectChanges(); }, 3000);
   })

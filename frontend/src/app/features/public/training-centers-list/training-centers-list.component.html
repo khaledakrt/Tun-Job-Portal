@@ -1,36 +1,175 @@
-    <div class="centers-page-container">
-      <div class="page-header">
-        <h2><i class="bi bi-mortarboard-fill"></i> Centres de Formation Partenaires</h2>
-        <p>Boostez vos compétences avec nos centres de formation certifiés en Tunisie.</p>
+<main class="training-page">
+  <section class="training-hero">
+    <div class="hero-content">
+      <span class="hero-kicker"><i class="bi bi-mortarboard-fill"></i> Formations certifiées</span>
+      <h1>Trouvez le bon centre pour développer vos compétences</h1>
+      <p>
+        Explorez les centres de formation partenaires, comparez leurs profils et contactez directement les organismes vérifiés.
+      </p>
+      <div class="hero-actions">
+        <a href="/job-search" class="btn-primary-hero">Explorer les emplois</a>
+        <a href="/register" class="btn-secondary-hero">Créer un compte</a>
       </div>
-
-      @if (isLoading) {
-        <div class="loading-box"><i class="bi bi-arrow-clockwise spin"></i> Chargement des centres...</div>
-      } @else {
-        <div class="centers-grid">
-          @for (center of centers; track center.id) {
-            <div class="center-card">
-              <div class="center-logo">
-                <img [src]="center.company_logo ? assetsUrl + '/logos/' + center.company_logo : 'assets/images/default-avatar.png'" 
-                     (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
-              </div>
-              <div class="center-info">
-                <h4>{{ center.name }}</h4>
-                <span class="location-badge"><i class="bi bi-geo-alt-fill"></i> {{ center.address || 'Tunisie' }}</span>
-                <p class="center-bio">{{ center.company_bio | slice:0:120 }}{{ center.company_bio?.length > 120 ? '...' : '' }}</p>
-              </div>
-              <div class="card-footer">
-                <a [href]="'mailto:' + center.email" class="btn-contact-public"><i class="bi bi-envelope"></i> Contact</a>
-              </div>
-            </div>
-          }
-        </div>
-
-        @if (centers.length === 0) {
-          <div class="empty-state">
-            <i class="bi bi-mortarboard"></i>
-            <p>Aucun centre de formation n'est encore répertorié.</p>
-          </div>
-        }
-      }
     </div>
+
+    <div class="hero-stats-card">
+      <div class="stat-item">
+        <strong>{{ centersCount }}</strong>
+        <span>Centres vérifiés</span>
+      </div>
+      <div class="stat-item">
+        <strong>{{ citiesCount }}</strong>
+        <span>Villes couvertes</span>
+      </div>
+      <div class="stat-item">
+        <strong>{{ contactReadyCount }}</strong>
+        <span>Contacts directs</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="training-search-card">
+    <div class="search-card-heading">
+      <div>
+        <span>Recherche rapide</span>
+        <h2>Filtrer les centres de formation</h2>
+      </div>
+      <strong>{{ filteredCenters.length }} résultat(s)</strong>
+    </div>
+
+    <div class="advanced-search-grid">
+      <div class="search-filter-group">
+        <label><i class="bi bi-mortarboard"></i> Nom du centre</label>
+        <div class="input-with-icon">
+          <i class="bi bi-search"></i>
+          <input type="text" [(ngModel)]="searchTerm" placeholder="Ex: centre digital, academy...">
+        </div>
+      </div>
+      <div class="search-filter-group">
+        <label><i class="bi bi-geo-alt"></i> Localisation</label>
+        <div class="input-with-icon">
+          <i class="bi bi-map"></i>
+          <input type="text" [(ngModel)]="searchLocation" placeholder="Ex: Tunis, Sousse, Sfax...">
+        </div>
+      </div>
+      <button type="button" class="btn-reset-filters" [disabled]="!searchTerm && !searchLocation" (click)="onResetFilters()">
+        <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+      </button>
+    </div>
+  </section>
+
+  <section class="training-results-header">
+    <div>
+      <span>Annuaire formation</span>
+      <h2>Centres partenaires disponibles</h2>
+    </div>
+    <p>Des organismes vérifiés pour préparer vos prochaines compétences et accélérer votre évolution professionnelle.</p>
+  </section>
+
+  <section class="centers-grid">
+    @if (isLoading) {
+      <div class="loading-box">
+        <i class="bi bi-arrow-clockwise spin"></i>
+        <p>Chargement des centres...</p>
+      </div>
+    } @else {
+      @for (center of filteredCenters; track center.id) {
+        <article class="center-card" (click)="onViewCenterDetails(center)">
+          <div class="center-card-top">
+            <div class="center-logo">
+              <img [src]="getCenterLogo(center)" (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
+            </div>
+            <div class="center-title">
+              <h3>{{ center.name }}</h3>
+              <span><i class="bi bi-patch-check-fill"></i> Centre vérifié</span>
+            </div>
+          </div>
+
+          <p class="center-bio">
+            {{ center.company_bio || 'Ce centre partenaire n’a pas encore ajouté de présentation détaillée.' }}
+          </p>
+
+          <div class="center-meta-list">
+            <span><i class="bi bi-geo-alt-fill"></i> {{ getCenterCity(center.address) }}</span>
+            <span><i class="bi bi-envelope-fill"></i> {{ center.email || 'Contact non publié' }}</span>
+          </div>
+
+          <div class="card-footer">
+            <button type="button" class="btn-view-center">
+              <i class="bi bi-info-circle"></i> Voir le profil
+            </button>
+            <a *ngIf="center.email" [href]="'mailto:' + center.email" class="btn-contact-public" (click)="$event.stopPropagation()">
+              Contact
+            </a>
+          </div>
+        </article>
+      }
+
+      @if (filteredCenters.length === 0) {
+        <div class="empty-state">
+          <i class="bi bi-mortarboard"></i>
+          <h3>Aucun centre trouvé</h3>
+          <p>Essayez une autre ville ou un autre nom de centre.</p>
+          <button type="button" (click)="onResetFilters()">Réinitialiser la recherche</button>
+        </div>
+      }
+    }
+  </section>
+
+  @if (selectedCenter) {
+    <div class="modal-overlay" (click)="onCloseCenterModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <span>Fiche centre de formation</span>
+          <button type="button" (click)="onCloseCenterModal()" class="btn-close-modal"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body">
+          <section class="center-hero-section">
+            <div class="modal-center-logo">
+              <img [src]="getCenterLogo(selectedCenter)" (error)="$any($event.target).src='assets/images/default-avatar.png'" alt="Logo">
+            </div>
+            <div class="center-meta-content">
+              <span class="center-verified-badge"><i class="bi bi-patch-check-fill"></i> Centre partenaire officiel</span>
+              <h1>{{ selectedCenter.name }}</h1>
+              <p>{{ selectedCenter.address || 'Tunisie' }}</p>
+            </div>
+          </section>
+
+          <section class="center-modal-layout">
+            <aside class="center-modal-sidebar">
+              <div class="contact-item">
+                <i class="bi bi-envelope"></i>
+                <div>
+                  <span>Email</span>
+                  <strong>{{ selectedCenter.email || 'Non publié' }}</strong>
+                </div>
+              </div>
+              <div class="contact-item">
+                <i class="bi bi-telephone"></i>
+                <div>
+                  <span>Téléphone</span>
+                  <strong>{{ selectedCenter.phone || 'Non publié' }}</strong>
+                </div>
+              </div>
+              <div class="contact-item">
+                <i class="bi bi-geo-alt"></i>
+                <div>
+                  <span>Adresse</span>
+                  <strong>{{ selectedCenter.address || 'Tunisie' }}</strong>
+                </div>
+              </div>
+              <a *ngIf="selectedCenter.email" [href]="'mailto:' + selectedCenter.email" class="btn-modal-contact">
+                Contacter le centre
+              </a>
+            </aside>
+
+            <article class="center-modal-content">
+              <h2>Présentation</h2>
+              <p>{{ selectedCenter.company_bio || 'Aucune description détaillée n’est disponible pour ce centre de formation.' }}</p>
+            </article>
+          </section>
+        </div>
+      </div>
+    </div>
+  }
+</main>
